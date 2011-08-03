@@ -41,3 +41,30 @@
   </fieldset>
 </form>
 {%- endmacro %}
+
+{% macro wtform_grid(id, list, form, title=None) -%}
+<div class="table-container">
+  <p class="table-title"><span>{{ title }}</span></p>
+  <table class="simple-table">
+    <thead>
+      <tr>
+	{% for field in form %}
+	<td>{{ field.label.text|e }}</td>
+	{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for obj in list %}
+	{% for field in form %}
+        <td>
+          {{ obj|attr(field.short_name)|e }}
+        </td>
+	{% endfor %}
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{%- endmacro %}

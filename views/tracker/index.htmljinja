@@ -1,5 +1,5 @@
 {% extends "shared/page.htmljinja" %}
-{% from "macros/form.htmljinja" import wtform %}
+{% from "macros/form.htmljinja" import wtform, wtform_grid %}
 
 {% block title %}
 Manage trackers
@@ -35,43 +35,9 @@ attributes:</p>
             controller='tracker'), 
         submit_text='Create') }}
 
-<div class="table-container">
-  <p class="table-title"><span>Your current trackers</span></p>
-  <table class="simple-table">
-    <thead>
-      <tr>
-        <td>
-          Tracker name
-        </td>
-        <td>
-          Frequency
-        </td>
-        <td>
-          URL
-        </td>
-        <td>
-          Tracker group
-        </td>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        {% for tracker in trackers %}
-        <td>
-          {{ tracker.name|e }}
-        </td>
-        <td>
-          {{ tracker.frequency|e }}
-        </td>
-        <td>
-          <a href="{{ tracker.url|e }}">{{ tracker.url|e }}</a>
-        </td>
-        <td>
-          {{ tracker.tracker_group.name|e }}
-        </td>
-        {% endfor %}
-      </tr>
-    </tbody>
-  </table>
-</div>
+{{ wtform_grid(
+	id='tracker-list',
+	list=trackers,
+	form=form,
+	title='Your current trackers') }}
 {% endblock %}
