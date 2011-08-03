@@ -1,0 +1,48 @@
+{% extends 'shared/site.htmljinja' %}
+{% from "macros/form.htmljinja" import wtform, post_link %}
+
+{% block title %}
+Welcome to the Web Monitor
+{% endblock %}
+
+{% block body %}
+<div id="page">
+  <div id="menu">
+    <span style="font-size: 25px">Menu goes here</span>
+  </div>
+  <div id="main">
+    {% block main %}
+    {% endblock %}
+  </div>
+  <div id="help">
+    <div id="login-logout">
+      {% if not user and login_form %}
+      <a id="create-account-link" href="#">Create account</a>
+      <div id="credentials-form">
+      {{ wtform(
+	      id='login-form', 
+	      form=login_form, 
+	      action=u.action(
+		  name='login', 
+                  controller='credentials',
+                  rc=redirect_controller,
+	          ra=redirect_action),
+	      submit_text='Login') }}
+      </div>
+      {% else %}
+      {{ post_link(
+	      id='logout-form',
+	      action=u.action(
+		  name='logout', 
+                  controller='credentials',
+                  rc='home',
+		  ra='main'), 
+	      text='Logout') }}
+      {% endif %}
+      {% block help %}
+      <p>Use the form above to login!</p>
+      {% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}

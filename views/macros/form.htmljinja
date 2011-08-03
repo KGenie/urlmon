@@ -1,0 +1,43 @@
+
+{% macro dict_to_input(dict) -%}
+{% if dict %}
+{% for k,v in dict.items() %}
+<input type="hidden" name="{{ k }}" value="{{ v }}"/>
+{% endfor %}
+{% endif %}
+{%- endmacro %}
+
+{% macro post_link(id, action, text, method='POST') -%}
+<form id="{{ id }}" method="{{ method }}" action="{{ action }}"
+  class="post-link-form">
+    <a href="#" class="submit-link">{{ text }}</a>
+</form>
+{%- endmacro %}
+
+{% macro wtform(id, form, action, submit_text='Submit', method='POST') -%}
+
+<form id="{{ id }}" method="{{ method }}" action="{{ action }}">
+  <fieldset>
+    {% for field in form %}
+    <div class="form-cell{{ ' form-cell-error' if field.errors }}">
+      <label for="{{ field.label.field_id }}" class="form-label">
+        {{ field.label.text|e }} :
+      </label>
+      {{ field(class='form-input') }}
+      {% if field.errors %}
+      <div class="error-list">
+        <ul>
+          {% for error in field.errors %}
+          <li>{{ error|e }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <div class="form-cell">  
+      <button type="submit" class="form-submit">{{ submit_text }}</button>
+    </div>
+  </fieldset>
+</form>
+{%- endmacro %}

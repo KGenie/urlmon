@@ -1,0 +1,9 @@
+{% extends "shared/page.htmljinja" %}
+
+{% block main %}
+
+<h1>Main page</h1>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi purus libero, placerat sit amet aliquam in, rutrum sed ante. Etiam interdum blandit quam, nec malesuada risus sollicitudin ac. In a quam at elit ullamcorper pharetra. Quisque adipiscing convallis quam, at interdum odio ultrices id. Nullam convallis leo vel sem tincidunt porttitor. In et fringilla ipsum. Maecenas a lacus non leo pellentesque dapibus quis vitae mauris. Duis vestibulum, nisi quis posuere eleifend, ligula lectus vehicula purus, sed imperdiet lacus enim ac elit. Etiam id nulla ac nulla blandit volutpat. Donec sed nibh eu libero laoreet tristique sit amet a velit. Maecenas rutrum neque quis nunc accumsan tincidunt. Cras sit amet metus purus, sit amet fringilla nibh. Curabitur erat turpis, pellentesque ut viverra id, ultricies ut nisi. Curabitur hendrerit, elit ac fermentum mattis, lorem nulla suscipit nisl, quis hendrerit metus arcu eget orci. Proin est lacus, sagittis in bibendum eget, dictum vitae elit. Aliquam et sem felis. Etiam sit amet nisi sapien, id commodo massa. Fusce dignissim leo vitae justo venenatis fringilla.</p>
+
+<p>Pellentesque porttitor ornare justo id adipiscing. Donec dignissim tincidunt purus eget sollicitudin. Sed malesuada augue ac neque hendrerit nec facilisis magna condimentum. Mauris at iaculis elit. Nulla id urna sit amet velit rhoncus consectetur sit amet at nisi. Vivamus tristique nisl eget justo pharetra quis blandit nibh tristique. Nam sollicitudin ligula et sem aliquam at posuere arcu adipiscing. Praesent molestie rhoncus erat quis porta. Nullam quis sapien at nunc consectetur semper non eu felis. Quisque posuere suscipit felis, at pellentesque urna ullamcorper at. Duis et gravida ante. </p>
+{% endblock %}

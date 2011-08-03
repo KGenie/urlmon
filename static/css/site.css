@@ -1,0 +1,140 @@
+body {
+    background: #030303;
+}
+
+ul {
+    line-height: 2em;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    text-decoration: none;
+    text-indent: 5px;
+    list-style-type: none;
+    padding: 6px;
+    margin: 2px;
+}
+
+#page {
+    background: #dcdcdc;
+    float: left;
+    width: 80%;
+    margin-top: 5%;
+    margin-left: 10%;
+}
+
+#menu, #main {
+    padding-left: 2em;
+}
+
+#menu {
+    background-image: url('../images/menu.png');
+    background-repeat: repeat-x;
+    float: none;
+}
+
+#help {
+    width: 28%;
+    float: right;
+}
+
+#login-logout {
+}
+
+#login-logout a {
+    float: left;
+}
+
+#credentials-form {
+    clear: left;
+}
+
+
+#main {
+    width: 68%;
+}
+
+
+.form-cell {
+    float: none;
+    clear: left;
+}
+
+.form-cell-error {
+    border-width: 1px;
+    border-color: red;
+}
+
+.form-label {
+    width: 30%;
+    float: left;
+    text-align: right;
+    margin-top: 0.3em;
+    margin-right: 0.3em;
+    display: block
+}
+
+.form-input {
+    display: block;
+    float: left;
+    width: 65%;
+} 
+
+.error-list {
+    width: 65%;
+    margin-left: 30%;
+}
+
+.error-list ul li {
+    color: red;
+}
+
+.form-submit {
+    display:block;
+    margin-left: 32%
+}
+
+form.post-link-form {
+    display:inline;
+}
+
+.table-container {
+    width: 90%;
+    margin-left: 5%;
+}
+
+.table-container .table-title {
+    font-size: 2em;
+    text-align: center;
+}
+
+.table-container table {
+    width: 100%;
+}
+
+.simple-table {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-collapse: collapse;
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    font-size: 12px;
+    margin: 20px;
+    text-align: left;
+    width: 480px;
+}
+
+.simple-table th {
+    border-bottom: 2px solid #6678B1;
+    color: #003399;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px 8px;
+}
+
+.simple-table td {
+    border-bottom: 1px solid #CCCCCC;
+    color: #666699;
+    padding: 6px 8px;
+}
+
+.simple-table tbody tr:hover td {
+    color: #000099;
+}

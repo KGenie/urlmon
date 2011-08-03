@@ -1,0 +1,77 @@
+{% extends "shared/page.htmljinja" %}
+{% from "macros/form.htmljinja" import wtform %}
+
+{% block title %}
+Manage trackers
+{% endblock %}
+
+{% block help %}
+<p>This page will assist you in creating trackers. Trackers have the following
+attributes:</p>
+<ul>
+  <li>
+  Name: This will help you find it quickly if you have many trackers.
+  </li>
+  <li>
+  URL: This is the URL of the page you are going to track.
+  </li>
+  <li>
+  Frequency: This is how often the tracker will check for modifications.
+  </li>
+  <li>
+  Tracker group: This is a previously created Tracker group. It will help you
+  better organize your trackers.
+  </li>
+</ul>
+{% endblock %}
+
+{% block main %}
+<h3>Fill the form to create new trackers</h3>
+{{ wtform(
+        id='tracker-form', 
+        form=form, 
+        action=u.action(
+            name='create', 
+            controller='tracker'), 
+        submit_text='Create') }}
+
+<div class="table-container">
+  <p class="table-title"><span>Your current trackers</span></p>
+  <table class="simple-table">
+    <thead>
+      <tr>
+        <td>
+          Tracker name
+        </td>
+        <td>
+          Frequency
+        </td>
+        <td>
+          URL
+        </td>
+        <td>
+          Tracker group
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for tracker in trackers %}
+        <td>
+          {{ tracker.name|e }}
+        </td>
+        <td>
+          {{ tracker.frequency|e }}
+        </td>
+        <td>
+          <a href="{{ tracker.url|e }}">{{ tracker.url|e }}</a>
+        </td>
+        <td>
+          {{ tracker.tracker_group.name|e }}
+        </td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

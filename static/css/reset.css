@@ -1,0 +1,61 @@
+body {
+    padding: 0;
+    margin: 0;
+    font: 13px Arial, Helvetica, Garuda, sans-serif;
+          *font-size: small;
+          *font: x-small;
+}
+
+h1, h2, h3, h4, h5, h6, ul, li, em, strong, pre, code {
+    padding: 0;
+    margin: 0;
+    line-height: 1em;
+    font-size: 100%;
+    font-weight: normal;
+    font-style: normal;
+}
+
+table {
+    font-size: inherit;
+    font: 100%;
+}
+
+ul {
+    list-style: none;
+}
+
+img {
+    border: 0;
+}
+
+p {
+    margin: 1em 0;
+}
+
+h1 { font-size: 2em; margin: .67em 0 } 
+
+h2 { font-size: 1.5em; margin: .75em 0 }
+
+h3 { font-size: 1.17em; margin: .83em 0 }
+
+h4 { font-size: .95em; margin: 1.12em 0 }
+
+h5 { font-size: .83em; margin: 1.5em 0 }
+
+h6 { font-size: .75em; margin: 1.67em 0 }
+
+h1, h2, h3, h4, h5, h6, b, strong { 
+    font-weight: bolder 
+}
+
+p, blockquote, ul, fieldset, form, ol, dl, dir, menu {
+    margin: 1.12em 0 
+}
+
+input, select { 
+    display: inline-block 
+}
+
+div {
+    float: left;
+}

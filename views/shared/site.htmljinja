@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    {# third party stylesheets and scripts #}
+    <script type="text/javascript" 
+      src="{{ u.static('/js/jquery-1.5.1.min.js') }}"></script>
+    <script type="text/javascript" 
+      src="{{ u.static('/js/jquery-ui-1.8.14.custom.min.js') }}"></script>
+
+
+    {# site stylesheets and scripts #}
+    <link rel="stylesheet" href="{{ u.static('/css/reset.css') }}" type="text/css" /> 
+    <link rel="stylesheet" href="{{ u.static('/css/site.css') }}" type="text/css" />
+    <script type="text/javascript" 
+      src="{{ u.static('/js/site.js') }}"></script>
+
+    {% block headers %}
+    {% endblock %}
+  </head>
+  <body>
+    {% block body %}
+    {% endblock %}
+  </body>
+</html>
