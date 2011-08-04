@@ -14,23 +14,11 @@ class AuthMiddleware(object):
     either explicitly in each of the controllers/actions or implicitly by
     using the options defined in the middleware initializer.
     """
-    decorated_flag_key = '_auth_decorated'
 
-    def __init__(self, app, required=True, allow=('*',), deny=(),
-            login_controller='login',login_action='sign_in'):
-
+    def __init__(self, app, login_controller='login',login_action='sign_in'):
         self.app = app
-        self.default_auth_decorator = auth(required=required, allow=allow,\
-                deny=deny)
         self.login_controller = login_controller
         self.login_action = login_action
-
-
-    def ensure_is_decorated(self, controller_class):
-        # apply default access controll settings to 
-        if not hasattr(controller_class, self.decorated_flag_key):
-            self.default_auth_decorator(controller_class)
-            setattr(controller_class, self.decorated_flag_key, True)
 
 
     def authorized(self, user, action_callable):
@@ -47,7 +35,6 @@ class AuthMiddleware(object):
         session = environ['beaker.session']
 
         user = session.get('user', None)
-        self.ensure_is_decorated(controller_class)
 
         if action_callable._authentication_required:
             if not user:

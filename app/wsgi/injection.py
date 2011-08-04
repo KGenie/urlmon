@@ -13,7 +13,9 @@ class InjectionMiddleware(object):
     """
 
     def __init__(self, app):
+        from services.menu import MenuService
         self.app = app
+        self.MenuService = MenuService
 
     
     def __inject_services(self, controller_instance, request):
@@ -25,7 +27,7 @@ class InjectionMiddleware(object):
             setattr(controller_instance, service_name, service_class(None))
 
 
-    def __inject_template_helpers(self, environ):
+    def __inject_template_helpers(self, environ, request):
         controller = environ['route']['controller']
         action = environ['route']['action']
         ctx = {'u': UrlHelper(controller_name=controller,
@@ -34,6 +36,8 @@ class InjectionMiddleware(object):
         user = environ['beaker.session'].get('user', None)
         if user:
             ctx['user'] = user
+            menu_service = self.MenuService(request)
+            ctx['sitemap'] = menu_service.sitemap()
         environ['jinja_context'] = ctx
         environ['jinja_environment'] = app_globals.JINJA_ENV
 
@@ -54,6 +58,6 @@ class InjectionMiddleware(object):
         self.__inject_services(controller_instance, request)
         self.__inject_request(controller_instance, request)
         self.__inject_session(controller_instance, session)
-        self.__inject_template_helpers(environ)
+        self.__inject_template_helpers(environ, request)
         environ['route']['controller_instance'] = controller_instance
         return self.app(environ, start_response)

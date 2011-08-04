@@ -16,13 +16,13 @@ def is_authorized(user_roles, authorized_roles, denied_roles):
     authorized_roles = set(authorized_roles)
     denied_roles = set(denied_roles)
     return bool(user_roles.difference(denied_roles)) and\
-            bool(user_roles.intersection(authorized_roles))
-
+            not user_roles.isdisjoint(authorized_roles)
 
 
 def get_controller_actions(controller_dict):
     return dict((k,v) for k,v in controller_dict.items() \
                 if hasattr(v, '_methods_allowed'))
+
 
 def get_controller_services(controller_dict):
     return dict((k,v) for k,v in controller_dict.items() \

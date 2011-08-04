@@ -4,7 +4,6 @@ from forms.tracker import TrackerForm
 from services.tracker import TrackerService
 from wsgi.http_method import get, post
 
-
 class TrackerController(WebMonitorController):
 
     tracker_service = TrackerService

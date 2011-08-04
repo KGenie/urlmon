@@ -5,9 +5,7 @@ This implements the basic controller dispatching mechanism based on Pylons
 framework.
 """
 import sys
-from threading import Lock
 from app_components.response import NotFoundResponse
-from util import get_controller_class_name
 
 class ControllerMiddleware(object):
     """
@@ -17,7 +15,7 @@ class ControllerMiddleware(object):
     controller classes
     """
 
-    def __init__(self, app):
+    def __init__(self, app, controller_cache):
         """
         Middleware initializer.
 
@@ -26,33 +24,15 @@ class ControllerMiddleware(object):
         race condition.
         """
         self.app = app
-        self.class_cache_lock = Lock()
-        self.controller_classes = {}
+        self.controller_cache = controller_cache
+
 
     def get_controller_class(self, environ):
         """
         Gets controller class that will handle the request.
-
-        This will first try to get the controller class from the local cache,
-        if it is not found, it will try to resolve it.
         """
         controller_name = environ['route']['controller']
-        controller_class = self.controller_classes.get(controller_name, None)
-        
-        if not controller_class:
-            self.class_cache_lock.acquire()
-
-            # This double check should prevent race conditions
-            if not controller_class and controller_name:
-                module_name = 'controllers.' + controller_name
-                __import__(module_name, globals=globals(),fromlist=[controller_name])
-                module = sys.modules[module_name]
-                controller_class_name = get_controller_class_name(controller_name)
-                controller_class = getattr(module, controller_class_name, None)
-                self.controller_classes[controller_name] = controller_class
-
-            self.class_cache_lock.release()
-
+        controller_class = self.controller_cache.get(controller_name, None)
         return controller_class
 
 
