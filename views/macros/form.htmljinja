@@ -54,15 +54,15 @@
       </tr>
     </thead>
     <tbody>
+      {% for obj in list %}
       <tr>
-        {% for obj in list %}
-	{% for field in form %}
+        {% for field in form %}
         <td>
           {{ obj|attr(field.short_name)|e }}
         </td>
-	{% endfor %}
         {% endfor %}
       </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>

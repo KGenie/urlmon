@@ -2,9 +2,9 @@ from models.user import User
 from app_components.service import Service
 
 repo = [
-        User('tap', '123', 'Thiago de Arruda', roles=['admin']),
-        User('fred', '123', 'Frederic Bazin'),
-        User('saif', '123', 'Saif Bonar')
+        User(email='tap', password='123', roles=['admin']),
+        User(email='fred', password='123'),
+        User(email='saif', password='123')
         ]
 
 class UserService(Service):
@@ -12,7 +12,11 @@ class UserService(Service):
 
     def authenticate(self, user):
         for u in repo:
-            if u.username == user.username:
+            if u.email == user.email:
                 if u.password == user.password:
                     return u
                 return None
+
+
+    def get_all(self):
+        return repo

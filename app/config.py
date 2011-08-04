@@ -86,10 +86,11 @@ def make_controllers():
         __import__(module_name, globals=globals(),fromlist=[controller_name])
         module = sys.modules[module_name]
         controller_class_name = get_controller_class_name(controller_name)
-        controller_class = getattr(module, controller_class_name, None)
-        ensure_is_decorated(controller_class,
-                default_permissions_decorator)
-        ret[controller_name] = controller_class
+        if hasattr(module, controller_class_name):
+            controller_class = getattr(module, controller_class_name, None)
+            ensure_is_decorated(controller_class,
+                    default_permissions_decorator)
+            ret[controller_name] = controller_class
     return ret
 
 
@@ -131,4 +132,5 @@ class DispatcherMiddleware(object):
 
     def __call__(self, environ, start_response):
         response = self.app(environ, start_response)
+
         return response(environ, start_response)

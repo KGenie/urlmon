@@ -1,5 +1,6 @@
 from wtforms import Form, TextField, PasswordField
 
 class LoginForm(Form):
-    username = TextField('User')
+    # TODO place the email validator
+    email = TextField('Email')
     password = PasswordField('Password')

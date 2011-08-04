@@ -1,0 +1,18 @@
+{% extends "shared/page.htmljinja" %}
+{% from "macros/form.htmljinja" import wtform, wtform_grid %}
+
+{% block title %}
+Manage Registered Users
+{% endblock %}
+
+{% block help %}
+{% endblock %}
+
+{% block main %}
+
+{{ wtform_grid(
+	id='user-list',
+	list=users,
+	form=form,
+	title='Registered Users') }}
+{% endblock %}
