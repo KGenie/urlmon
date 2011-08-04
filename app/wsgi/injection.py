@@ -32,12 +32,14 @@ class InjectionMiddleware(object):
         action = environ['route']['action']
         ctx = {'u': UrlHelper(controller_name=controller,
                 action_name=action)}
+        menu_service = self.MenuService(request)
+        sitemap = menu_service.sitemap()
+        ctx['sitemap'] = sitemap
+
         session = environ['beaker.session']
         user = environ['beaker.session'].get('user', None)
         if user:
             ctx['user'] = user
-            menu_service = self.MenuService(request)
-            ctx['sitemap'] = menu_service.sitemap()
         environ['jinja_context'] = ctx
         environ['jinja_environment'] = app_globals.JINJA_ENV
 

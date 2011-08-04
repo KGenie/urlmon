@@ -17,23 +17,23 @@ ul {
 #page {
     background: #dcdcdc;
     float: left;
-    width: 80%;
+    width: 90%;
     margin-top: 5%;
-    margin-left: 10%;
+    margin-left: 5%;
 }
 
-#menu, #main {
+#main {
     padding-left: 2em;
 }
 
 #menu {
     background-image: url('../images/menu.png');
     background-repeat: repeat-x;
-    float: none;
+    width: 14%;
 }
 
 #help {
-    width: 28%;
+    width: 22%;
     float: right;
 }
 
@@ -50,7 +50,7 @@ ul {
 
 
 #main {
-    width: 68%;
+    width: 60%;
 }
 
 
@@ -138,3 +138,93 @@ form.post-link-form {
 .simple-table tbody tr:hover td {
     color: #000099;
 }
+
+.hovermenu {
+    width: 12em; /* set width of menu */
+    background: #eee;
+} 
+
+.hovermenu ul { /* remove bullets and list indents */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* style, color and size links and headings to suit */
+.hovermenu a, .hovermenu h2 {
+    font: bold 11px/16px arial, helvetica, sans-serif;
+    display: block;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ccc #888 #555 #bbb;
+    margin: 0;
+    padding: 2px 3px;
+}
+
+.hovermenu h2 {
+    color: #fff;
+    background: #000;
+    text-transform: uppercase;
+}
+
+.hovermenu a {
+    color: #000;
+    background: #efefef;
+    text-decoration: none;
+}
+
+.hovermenu a:hover {
+    color: #a00;
+    background: #fff;
+}
+
+.hovermenu li {
+    /* make the list elements a containing block for the nested lists */
+    position: relative;
+} 
+
+.hovermenu ul ul {
+    position: absolute;
+    top: 0;
+    left: 100%; /* to position them to the right of their containing block */
+    width: 100%; /* width is based on the containing block */
+}
+
+.hovermenu ul ul {
+    display: none;
+}
+
+.hovermenu ul li:hover ul {
+    display: block;
+}
+
+/*
+.hovermenu ul {
+font: bold 13px arial;
+padding-left: 0;
+margin-left: 0;
+height: 20px;
+}
+
+    .hovermenu ul li {
+    list-style: none;
+    display: inline;
+}
+
+    .hovermenu ul li a {
+    padding: 2px 0.5em;
+    text-decoration: none;
+    float: left;
+    color: black;
+    background-color: #e1e1e1; 
+    border: 2px solid #e1e1e1; 
+}
+
+    .hovermenu ul li a:hover {
+    background-color: #e5e5e5; 
+    border-style: outset;
+}
+
+    .hovermenu ul li a:active { 
+    border-style: inset;
+} */

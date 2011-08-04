@@ -4,6 +4,7 @@ from config import CONTROLLER_CACHE
 from threading import Lock
 from util import is_authorized, get_controller_actions
 from sets import ImmutableSet
+from helpers import menu
 
 _u = UrlHelper()
 _cache_lock = Lock()
@@ -12,7 +13,7 @@ _menu_cache = {}
 
 class MenuItem(object):
 
-    def __init__(self, label, controller, action):
+    def __init__(self, label=None, controller=None, action=None):
         self.label = label
         self.controller = controller
         self.action = action
@@ -24,33 +25,26 @@ class MenuItem(object):
     def __repr__(self):
         return self.label
 
-class Menu(object):
+class Menu(MenuItem):
 
     def __init__(self, label, children):
-        self.label = label
-        self.children = children
+        if len(children) == 1:
+            item = children[0]
+            self.label = item.label
+            self.controller = item.controller
+            self.action = item.action
+            self.children = None
+        else:
+            self.label = label
+            self.children = children
 
-    def __repr__(self):
-        return self.label
-
-
-def menu(label=None, exclude=False):
-    def dec(fn):
-        if not exclude:
-            lbl = label
-            if not lbl:
-                lbl = fn.__name__
-            setattr(fn, '_menu_label', lbl)
-        setattr(fn, '_menu_decorated', True)
-        return fn
-    return dec
 
 menu_decorator_instance = menu()
 
 class MenuService(Service):
 
     def sitemap(self):
-        user = self.context.environ.get('user', None)
+        user = self.context.environ['beaker.session'].get('user', None)
         roles = None
         if not user:
             roles = []
@@ -97,10 +91,12 @@ class MenuService(Service):
                         if not action._authentication_required or\
                             is_authorized(roles, action._roles_allowed,
                                 action._roles_denied):
-                            actions.append(MenuItem(action._menu_label, controller, action))
+                            actions.append(MenuItem(label=action._menu_label,
+                                controller=controller, action=action.__name__))
 
                     if actions:
-                        sitemap.append(Menu(controller_class._menu_label, actions))
+                        sitemap.append(Menu(label=controller_class._menu_label,
+                            children=actions))
                 _menu_cache[s] = sitemap
             _cache_lock.release()
         return _menu_cache[s]

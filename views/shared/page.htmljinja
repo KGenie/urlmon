@@ -7,8 +7,23 @@ Welcome to the Web Monitor
 
 {% block body %}
 <div id="page">
-  <div id="menu">
-    <span style="font-size: 25px">Menu goes here</span>
+  <div id="menu" class="hovermenu">
+    <ul>
+      {% for menu in sitemap %}
+      <li>
+      {% if menu.children %}
+      <a href="#">{{ menu.label }}</a></span>
+      <ul>
+        {% for menuitem in menu.children %}
+        <li><a href="{{ menuitem.url }}">{{ menuitem.label }}</a></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <span><a href="{{ menu.url }}">{{ menu.label }}</a></span>
+      {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
   </div>
   <div id="main">
     {% block main %}
@@ -40,7 +55,6 @@ Welcome to the Web Monitor
 	      text='Logout') }}
       {% endif %}
       {% block help %}
-      <p>Use the form above to login!</p>
       {% endblock %}
     </div>
   </div>

@@ -3,12 +3,15 @@ from models.tracker import Tracker
 from forms.tracker import TrackerForm
 from services.tracker import TrackerService
 from wsgi.http_method import get, post
+from helpers import menu
 
+@menu(label='Trackers')
 class TrackerController(WebMonitorController):
 
     tracker_service = TrackerService
 
     @get
+    @menu(label='Manage')
     def index(self, request):
         form = TrackerForm()
         trackers = self.tracker_service.get_all(self.session['user'])

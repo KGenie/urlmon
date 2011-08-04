@@ -6,6 +6,18 @@ _ACTION_MISSING_ERROR = \
         'action argument is necessary when initialized without a default'
 
 
+def menu(label=None, exclude=False):
+    def dec(fn):
+        if not exclude:
+            lbl = label
+            if not lbl:
+                lbl = fn.__name__
+            setattr(fn, '_menu_label', lbl)
+        setattr(fn, '_menu_decorated', True)
+        return fn
+    return dec
+
+
 
 class UrlHelper(object):
 
