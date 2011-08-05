@@ -1,4 +1,4 @@
-import os, sys, glob, app_globals
+import os, sys, glob, app_globals, logging
 from helpers import HtmlHelper
 from beaker.middleware import SessionMiddleware
 from routes import Mapper
@@ -94,8 +94,30 @@ def make_controllers():
     return ret
 
 
+def init_daemons():
+    """
+    Initalizes all daemons in the 'daemons' package.
+    """
+    daemon_names =  (f.replace('.py','').split('/')[1]\
+            for f in glob.glob('daemons/*.py') if\
+            '__init__.py' not in f)
+
+    for daemon_name in daemon_names:
+        module_name = 'daemons.%s' % daemon_name
+        __import__(module_name, globals=globals(),fromlist=[daemon_name])
+        module = sys.modules[module_name]
+        module.initialize()
+
+
+def setup_logging():
+    pass
+    #logging.root.addHandler(logging.StreamHandler())
+    #logging.root.setLevel(logging.DEBUG)
+
 
 def make_app():
+    setup_logging()
+    init_daemons()
     app_globals.JINJA_ENV = make_jinja_environment()
     global CONTROLLER_CACHE
     CONTROLLER_CACHE = make_controllers()
