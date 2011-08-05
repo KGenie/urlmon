@@ -1,5 +1,4 @@
-import smtplib
-import logging
+import smtplib, logging, signal
 from multiprocessing import Process, Queue
 from email.mime.text import MIMEText
 
@@ -15,6 +14,7 @@ _queue = None
 _child = None
 
 def run(queue):
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     while 1:
         log.debug('Waiting for mail to arrive...')
         msg = queue.get()
@@ -33,6 +33,10 @@ def initialize():
     _child = Process(target=run, args=(_queue,)) 
     _child.daemon = True
     _child.start()
+
+
+def cleanup():
+    _child.join(0)
     
 
 def enqueue_mail(to, subject, text, mime='plain'):
