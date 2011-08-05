@@ -1,0 +1,24 @@
+{% extends "shared/page.htmljinja" %}
+{% from "macros/form.htmljinja" import wtform %}
+
+{% block title %}
+Register yourself
+{% endblock %}
+
+{% block help %}
+<p>Register yourself!!</p>
+{% endblock %}
+
+{% block main %}
+<h3>Fill the form to create new trackers</h3>
+{{ wtform(
+        id='registration-form', 
+        form=form, 
+        action=u.action(
+            name='request_account', 
+            controller='registration'), 
+        submit_text='Create') }}
+{% endblock %}
+
+{% block login %}
+{% endblock %}

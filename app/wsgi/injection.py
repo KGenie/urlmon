@@ -24,7 +24,7 @@ class InjectionMiddleware(object):
         # injection of cross-service references.
         controller_class = controller_instance.__class__
         for service_name, service_class in controller_class._services.items():
-            setattr(controller_instance, service_name, service_class(None))
+            setattr(controller_instance, service_name, service_class(request))
 
 
     def __inject_template_helpers(self, environ, request):

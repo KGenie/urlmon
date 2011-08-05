@@ -39,7 +39,7 @@ def enqueue_mail(to, subject, text, mime='plain'):
     _queue.put((to, subject, text, mime))
 
 
-def send_mail(to, text, subject, mime):
+def send_mail(to, subject, text, mime):
     msg = MIMEText(text, mime)
     msg['Subject'] = subject
     msg['From'] = _from

@@ -2,9 +2,7 @@ from models.user import User
 from app_components.service import Service
 
 repo = [
-        User(email='tap', password='123', roles=['admin']),
-        User(email='fred', password='123'),
-        User(email='saif', password='123')
+        User(email='tap', password='123', roles=['admin'])
         ]
 
 class UserService(Service):
@@ -20,3 +18,6 @@ class UserService(Service):
 
     def get_all(self):
         return repo
+
+    def add_user(self, user):
+        repo.append(user)

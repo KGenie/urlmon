@@ -31,8 +31,12 @@ Welcome to the Web Monitor
   </div>
   <div id="help">
     <div id="login-logout">
+      {% block login %}
       {% if not user and login_form %}
-      <a id="create-account-link" href="#">Create account</a>
+      <a id="create-account-link" 
+        href="{{ u.action(name='new', controller='registration') }}">
+        Create account
+      </a>
       <div id="credentials-form">
       {{ wtform(
 	      id='login-form', 
@@ -54,6 +58,7 @@ Welcome to the Web Monitor
 		  ra='main'), 
 	      text='Logout') }}
       {% endif %}
+      {% endblock %}
       {% block help %}
       {% endblock %}
     </div>

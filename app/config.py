@@ -27,8 +27,8 @@ def make_routes():
 
     map = Mapper()
     map.directory = os.path.join(app_globals.APP_ROOT, 'controllers')
-    map.always_scan = True
-    map.minimization = False
+    map.always_scan = False
+    map.minimization = True
     map.explicit = False
 
     map.connect('/', controller='home', action='main')
@@ -110,7 +110,9 @@ def init_daemons():
 
 
 def setup_logging():
-    pass
+    logging.getLogger('daemons.mail').addHandler(logging.StreamHandler())
+    logging.getLogger('daemons.mail').setLevel(logging.DEBUG)
+
     #logging.root.addHandler(logging.StreamHandler())
     #logging.root.setLevel(logging.DEBUG)
 

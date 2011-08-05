@@ -1,0 +1,23 @@
+{% extends "shared/page.htmljinja" %}
+{% from "macros/form.htmljinja" import wtform, wtform_grid %}
+
+{% block title %}
+Confirm your activation
+{% endblock %}
+
+{% block help %}
+<p>Only after confirming is your account going to be activated</p>
+{% endblock %}
+
+{% block main %}
+<form id="confirm-activation-form" method="POST"
+  action="{{ u.action('activate', 'registration')}}">
+  <input type="hidden" name="reg_id" value="{{ reg_id }}" />
+  <div class="form-cell">
+    <h2>Do you confirm the activation?</h2>
+  </div>
+  <div class="form-cell">  
+    <button type="submit" class="form-submit">Activate</button>
+  </div> 
+</form>
+{% endblock %}
