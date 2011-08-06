@@ -1,6 +1,7 @@
 from app_components.controller import WebMonitorController
 from wsgi.auth import auth
 from wsgi.http_method import get, post
+from wtforms.validators import ValidationError
 from forms.registration import RegistrationForm
 from helpers import menu
 from models.user import User
@@ -13,15 +14,19 @@ class RegistrationController(WebMonitorController):
     registration_service = RegistrationService
     user_service = UserService
 
+
     @menu(exclude=True)
     @get
     def new(self, request):
         form = RegistrationForm()
         return self.view(dict(form=form))
 
+
     @post
     def request_account(self, request):
         form = RegistrationForm(request.POST)
+        setattr(form, '_user_service', self.user_service)
+
         if form.validate():
             user = User()
             form.populate_obj(user)
@@ -30,11 +35,13 @@ class RegistrationController(WebMonitorController):
         else:
             return self.view({'form': form}, 'new')
 
+
     @menu(exclude=True)
     @get
     def confirm_activation(self, request):
         reg_id = request.GET.get('reg_id', None)
         return self.view({'reg_id': reg_id})
+
 
     @post
     def activate(self, request):
@@ -46,4 +53,3 @@ class RegistrationController(WebMonitorController):
                 self.session['user'] = user
                 self.user_service.insert(user)
         return self.redirect('main', 'home')
-

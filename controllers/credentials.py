@@ -21,18 +21,11 @@ class CredentialsController(WebMonitorController):
         if id:
             qsargs['id'] = id
 
-
-        user = User()
-        form.populate_obj(user)
-        user = self.user_service.authenticate(user)
-
-        def fail_validator(x,y): 
-            raise ValidationError('Invalid email or password')
-
-        if not user:
-            form._fields['password'].validators.append(fail_validator)
+        setattr(form, '_user_service', self.user_service)
 
         if form.validate():
+            user = User()
+            form.populate_obj(user)
             self.session['user'] = user
             return self.redirect(redirect_action, redirect_controller, **qsargs)
         else:

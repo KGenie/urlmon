@@ -66,7 +66,7 @@ class TrackerController(WebMonitorController):
 
         return self.view({'form':form }, 'new')
 
-
+   
     @post
     def update(self, request):
         form = self.create_form(request.POST)

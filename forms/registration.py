@@ -1,6 +1,7 @@
 from wtforms.form import Form
 from wtforms.fields import TextField, PasswordField
-from wtforms.validators import Length, Email, Required, EqualTo
+from wtforms.validators import Length, Email, Required, EqualTo,\
+        ValidationError
 
 class RegistrationForm(Form):
 
@@ -10,3 +11,12 @@ class RegistrationForm(Form):
     password = PasswordField('Password', [Required()])
     confirm  = PasswordField('Repeat Password', [EqualTo('password', 
         message="Doesn't match")])
+
+
+    def validate_email(form, field):
+        if not hasattr(form, '_user_service'):
+            raise Exception(
+            'The controller must set the ''_user_service'' attribute with an user service instance bound to the current request')
+
+        if form._user_service.exists(field.data):
+            raise ValidationError('An user with that email is already registered')
