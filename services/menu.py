@@ -10,6 +10,19 @@ _u = UrlHelper()
 _cache_lock = Lock()
 _menu_cache = {}
 
+def menu_order(key):
+    key = key.controller.lower()
+    if 'home' == key:
+        return 0
+    elif 'tracker' == key:
+        return 1
+    elif 'tracker_group' == key:
+        return 2
+    elif 'user' == key:
+        return 3
+    else:
+        return 9999
+
 
 class MenuItem(object):
 
@@ -28,11 +41,11 @@ class MenuItem(object):
 class Menu(MenuItem):
 
     def __init__(self, label, children):
+        item = children[0]
+        self.controller = item.controller
+        self.action = item.action
         if len(children) == 1:
-            item = children[0]
             self.label = item.label
-            self.controller = item.controller
-            self.action = item.action
             self.children = None
         else:
             self.label = label
@@ -97,7 +110,7 @@ class MenuService(Service):
                     if actions:
                         sitemap.append(Menu(label=controller_class._menu_label,
                             children=actions))
-                _menu_cache[s] = sitemap
+                _menu_cache[s] = sorted(sitemap, key=menu_order)
             _cache_lock.release()
         return _menu_cache[s]
 

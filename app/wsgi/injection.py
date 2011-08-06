@@ -37,9 +37,25 @@ class InjectionMiddleware(object):
         ctx['sitemap'] = sitemap
 
         session = environ['beaker.session']
-        user = environ['beaker.session'].get('user', None)
+        user = session.get('user', None)
         if user:
             ctx['user'] = user
+
+        flash = None
+
+        flash_success = session.get('flash-success', None)
+        if flash_success:
+            del session['flash-success']
+            flash = {'message': flash_success, 'type': 'success'}
+        
+        flash_error = session.get('flash-error', None)
+        if flash_error:
+            del session['flash-error']
+            flash = {'message': flash_error, 'type': 'error'}
+            
+        if flash:
+            ctx['flash'] = flash
+
         environ['jinja_context'] = ctx
         environ['jinja_environment'] = app_globals.JINJA_ENV
 

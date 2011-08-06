@@ -6,5 +6,5 @@ class TrackerGroupService(StorageService):
 
     @classmethod
     def stub_data(cls):
-        cls.insert(TrackerGroup(name='Search engines', user='tap',
+        cls.insert(TrackerGroup(name='Search engines', user_id=1,
             comment='Trackers for search engines.'))

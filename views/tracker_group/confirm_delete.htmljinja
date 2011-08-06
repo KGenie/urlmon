@@ -1,0 +1,19 @@
+{% extends "shared/page.htmljinja" %}
+{% from "macros/form.htmljinja" import wtform_show %}
+
+{% block title %}
+Remove tracker group
+{% endblock %}
+
+{% block help %}
+{% endblock %}
+
+{% block main %}
+<h3>Are you sure you want to delete this tracker group?</h3>
+{{ wtform_show(
+        id='tracker-form', 
+        form=form, 
+        action=u.action(
+            name='delete', 
+            controller='tracker_group')) }}
+{% endblock %}

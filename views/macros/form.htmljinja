@@ -20,6 +20,7 @@ params=None) -%}
 <form id="{{ id }}" method="{{ method }}" action="{{ action }}">
   <fieldset>
     {% for field in form %}
+    {% if not field.type == 'HiddenField' %}
     <div class="form-cell{{ ' form-cell-error' if field.errors }}">
       <label for="{{ field.label.field_id }}" class="form-label">
         {{ field.label.text|e }} :
@@ -35,6 +36,9 @@ params=None) -%}
       </div>
       {% endif %}
     </div>
+    {% else %}
+    {{ field() }}
+    {% endif %}
     {% endfor %}
     {% if params %}
     {% for k, v in params.items() %}
@@ -48,30 +52,39 @@ params=None) -%}
 </form>
 {%- endmacro %}
 
-{% macro wtform_grid(id, u, list, form, title=None) -%}
+{% macro table(id, u, table_model, title=None, delete=true, edit=true) -%}
 <div class="table-container">
   <p class="table-title"><span>{{ title }}</span></p>
   <table class="simple-table">
     <thead>
       <tr>
-        <td colspan="2"></td>
-	{% for field in form %}
-	<td>{{ field.label.text|e }}</td>
+        {% if edit %}
+        <td></td>
+        {% endif %}
+        {% if delete %}
+        <td></td>
+        {% endif %}
+	{% for column in table_model %}
+	<td>{{ column.label|e }}</td>
 	{% endfor %}
       </tr>
     </thead>
     <tbody>
-      {% for obj in list %}
+      {% for obj in table_model.items %}
       <tr>
+        {% if edit %}
         <td>
           <a href="{{ u.action('edit', id=obj.id )}}">Edit</a>
         </td>
+        {% endif %}
+        {% if delete %}
         <td>
           <a href="{{ u.action('confirm_delete', id=obj.id )}}">Delete</a>
         </td>
-        {% for field in form %}
+        {% endif %}
+        {% for column in table_model %}
         <td>
-          {{ obj|attr(field.short_name)|e }}
+          {{ table_model.get(obj, column.name)|e }}
         </td>
         {% endfor %}
       </tr>
@@ -81,3 +94,38 @@ params=None) -%}
 </div>
 
 {%- endmacro %}
+
+{% macro wtform_show(id, form, action, delete=True, submit_text='Delete', method='POST',
+params=None) -%}
+
+<form id="{{ id }}" method="{{ method }}" action="{{ action }}">
+  <fieldset>
+    {% for field in form %}
+    <div class="form-cell{{ ' form-cell-error' if field.errors }}">
+      {% if field.type != 'HiddenField' %}
+      <label for="{{ field.label.field_id }}" class="form-label">
+        {{ field.label.text|e }} :
+      </label>
+      <div class="form-field-value">
+      {{ field.data|e }}
+      </div>
+      {% else %}
+      {{ field() }}
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% if params %}
+    {% for k, v in params.items() %}
+    <input type="hidden" name="{{ k }}" value="{{ v }}" />
+    {% endfor %}
+    {% endif %}
+    {% if delete %}
+    <div class="form-cell">  
+      <button type="submit" class="form-submit">{{ submit_text }}</button>
+    </div>
+    {% endif %}
+  </fieldset>
+</form>
+{%- endmacro %}
+
+

@@ -1,5 +1,5 @@
 {% extends "shared/page.htmljinja" %}
-{% from "macros/form.htmljinja" import wtform, wtform_grid %}
+{% from "macros/form.htmljinja" import table %}
 
 {% block title %}
 Manage Registered Users
@@ -10,9 +10,11 @@ Manage Registered Users
 
 {% block main %}
 
-{{ wtform_grid(
+{{ table(
 	id='user-list',
-	list=users,
-	form=form,
-	title='Registered Users') }}
+        u=u,
+	table_model=table_model,
+        title='Registered Users',
+        edit=false,
+        delete=false) }}
 {% endblock %}

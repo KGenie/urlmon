@@ -26,6 +26,11 @@ Welcome to the Web Monitor
     </ul>
   </div>
   <div id="main">
+    {% if flash %}
+    <div id="flash">
+      <span class="{{ flash.type }}">{{ flash.message }}</span> 
+    </div>
+    {% endif %}
     {% block main %}
     {% endblock %}
   </div>
@@ -45,8 +50,10 @@ Welcome to the Web Monitor
 		  name='login', 
                   controller='credentials',
                   rc=redirect_controller,
-	          ra=redirect_action),
-	      submit_text='Login') }}
+                  ra=redirect_action,
+                  id=id),
+              submit_text='Login')
+               }}
       </div>
       {% else %}
       {{ post_link(

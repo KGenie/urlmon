@@ -1,5 +1,5 @@
 {% extends "shared/page.htmljinja" %}
-{% from "macros/form.htmljinja" import wtform_grid %}
+{% from "macros/form.htmljinja" import table %}
 
 {% block title %}
 View tracker groups
@@ -10,10 +10,9 @@ View tracker groups
 {% endblock %}
 
 {% block main %}
-{{ wtform_grid(
+{{ table(
 	id='tracker-group-list',
         u=u,
-	list=tracker_groups,
-	form=form,
+	table_model=table_model,
 	title='Your current Tracker Groups') }}
 {% endblock %}

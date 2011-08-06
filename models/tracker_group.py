@@ -1,9 +1,14 @@
-from app_components.model import Model
+from app_components.model import Model, TableModel
+from forms.tracker_group import TrackerGroupForm
 
 class TrackerGroup(Model):
 
-    def __init__(self, id=None, name=None, comment=None, user=None):
+    def __init__(self, id=None, name=None, comment=None, user_id=None):
         self.id = id
         self.name = name
         self.comment = comment
-        self.user = user
+        self.user_id = user_id
+
+class TrackerGroupTable(TableModel):
+
+    form = TrackerGroupForm

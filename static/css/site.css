@@ -27,8 +27,6 @@ ul {
 }
 
 #menu {
-    background-image: url('../images/menu.png');
-    background-repeat: repeat-x;
     width: 14%;
 }
 
@@ -48,11 +46,24 @@ ul {
     clear: left;
 }
 
+#flash {
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 5%;
+    text-align: center;
+}
 
 #main {
     width: 60%;
 }
 
+#flash .error {
+    color: red;
+}
+
+#flash .success {
+    color: green;
+}
 
 .form-cell {
     float: none;
@@ -78,6 +89,12 @@ ul {
     float: left;
     width: 65%;
 } 
+
+.form-field-value {
+    width: 65%;
+    padding-top: 0.3em;
+    padding-left: 0.3em;
+}
 
 .error-list {
     width: 65%;

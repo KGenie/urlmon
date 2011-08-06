@@ -27,12 +27,13 @@ class StorageService(Service):
 
     @classmethod
     def get_all(cls):
-        return cls.items
+        return iter(cls.items)
        
 
     @classmethod
     def get_all_by_user(cls, user):
-        return (t for t in cls.items if t.user == user.email)
+        all = cls.get_all()
+        return (t for t in all if t.user_id == user.id)
 
 
     @classmethod
@@ -49,6 +50,7 @@ class StorageService(Service):
         id = cls.next_id()
         item.id = id
         cls.items.append(item)
+        return item
 
 
     @classmethod
@@ -62,6 +64,7 @@ class StorageService(Service):
         if i < len(cls.items):
             item.id = id
             cls.items[i] = item
+        return item
 
 
     @classmethod

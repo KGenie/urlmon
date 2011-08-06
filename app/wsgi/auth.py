@@ -3,6 +3,7 @@ from services.user import UserService
 from app_components.controller import WebMonitorController
 from app_components.response import RedirectToLoginResponse, NotAuthorizedResponse
 from util import get_controller_actions, is_authorized
+from services.user import UserService
 
 
 class AuthMiddleware(object):
@@ -35,13 +36,21 @@ class AuthMiddleware(object):
         session = environ['beaker.session']
 
         user = session.get('user', None)
+        #if not user:
+        #    # TODO Remove this when not developing
+        #    user = UserService(None).get_all().next()
+        #    session['user'] = user
 
         if action_callable._authentication_required:
             if not user:
                 controller = environ['route']['controller']
                 action = environ['route']['action']
+                qsargs={'rc':controller,'ra':action }
+                id = request.GET.get('id', None)
+                if id:
+                    qsargs['id'] = id
                 return RedirectToLoginResponse(controller=self.login_controller,\
-                        action=self.login_action,qsargs={'rc':controller,'ra':action })
+                        action=self.login_action,qsargs=qsargs)
             elif not self.authorized(user, action_callable):
                 return NotAuthorizedResponse()
 

@@ -14,9 +14,12 @@ class HomeController(WebMonitorController):
         model = {}
         redirect_controller = self.request.GET.get('rc', None)
         redirect_action = self.request.GET.get('ra', None)
+        id = self.request.GET.get('id', None)
         if redirect_controller:
             model['redirect_controller'] = redirect_controller
         if redirect_action:
             model['redirect_action'] = redirect_action
+        if id:
+            model['id'] = id
         model['login_form'] = LoginForm()
         return self.view(model)

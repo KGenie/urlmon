@@ -44,6 +44,6 @@ class RegistrationController(WebMonitorController):
             user = self.registration_service.activate_user(reg_id)
             if user:
                 self.session['user'] = user
-                self.user_service.add_user(user)
+                self.user_service.insert(user)
         return self.redirect('main', 'home')
 

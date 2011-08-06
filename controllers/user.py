@@ -1,5 +1,5 @@
 from app_components.controller import WebMonitorController
-from models.user import User
+from models.user import User, UserTable
 from forms.user import UserForm
 from services.user import UserService
 from wsgi.http_method import get, post
@@ -13,9 +13,9 @@ class UserController(WebMonitorController):
     user_service = UserService
 
     @get
-    @menu(label='View registered users')
+    @menu(label='Registered users')
     def index(self, request):
-        form = UserForm()
         users = self.user_service.get_all()
+        table_model = UserTable(users)
 
-        return self.view({'form': form, 'users': users})
+        return self.view({'table_model': table_model})

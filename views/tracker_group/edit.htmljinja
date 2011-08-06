@@ -16,6 +16,5 @@ Edit a Tracker Group
         action=u.action(
             name='update', 
             controller='tracker_group'), 
-        submit_text='Update',
-        params=dict(id=id)) }}
+        submit_text='Update') }}
 {% endblock %}
