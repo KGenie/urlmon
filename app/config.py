@@ -36,7 +36,6 @@ def make_routes():
     map.connect('/{controller}', action='index')
 
     map.connect('/{controller}/{action}')
-    map.connect('/{controller}/{action}/{id}')
 
     return map
 
@@ -53,6 +52,7 @@ def make_jinja_environment():
     ret = Environment(loader=FileSystemLoader('./views'))
     ret.globals['h'] = HtmlHelper()
     return ret
+
 
 def make_auth_options():
     return {'login_controller': 'home',
@@ -110,8 +110,9 @@ def init_daemons():
 
 
 def setup_logging():
-    logging.getLogger('daemons.mail').addHandler(logging.StreamHandler())
-    logging.getLogger('daemons.mail').setLevel(logging.DEBUG)
+    pass
+    #logging.getLogger('daemons.mail').addHandler(logging.StreamHandler())
+    #logging.getLogger('daemons.mail').setLevel(logging.DEBUG)
 
     #logging.root.addHandler(logging.StreamHandler())
     #logging.root.setLevel(logging.DEBUG)

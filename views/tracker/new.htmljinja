@@ -1,0 +1,37 @@
+{% extends "shared/page.htmljinja" %}
+{% from "macros/form.htmljinja" import wtform %}
+
+{% block title %}
+Create a new tracker
+{% endblock %}
+
+{% block help %}
+<p>This page will assist you in creating trackers. Trackers have the following
+attributes:</p>
+<ul>
+  <li>
+  Name: This will help you find it quickly if you have many trackers.
+  </li>
+  <li>
+  URL: This is the URL of the page you are going to track.
+  </li>
+  <li>
+  Frequency: This is how often the tracker will check for modifications.
+  </li>
+  <li>
+  Tracker group: This is a previously created Tracker group. It will help you
+  better organize your trackers.
+  </li>
+</ul>
+{% endblock %}
+
+{% block main %}
+<h3>Fill the form to create new trackers</h3>
+{{ wtform(
+        id='tracker-form', 
+        form=form, 
+        action=u.action(
+            name='create', 
+            controller='tracker'), 
+        submit_text='Create') }}
+{% endblock %}

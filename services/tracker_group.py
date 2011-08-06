@@ -1,12 +1,10 @@
 from app_components.service import Service
+from storage import StorageService
+from models.tracker_group import TrackerGroup
 
-tracker_groups = []
+class TrackerGroupService(StorageService):
 
-class TrackerGroupService(Service):
-
-    def insert(self, tracker_group):
-        tracker_groups.append(tracker_group)
-
-
-    def get_all(self, user):
-        return (t for t in tracker_groups if t.user == user)
+    @classmethod
+    def stub_data(cls):
+        cls.insert(TrackerGroup(name='Search engines', user='tap',
+            comment='Trackers for search engines.'))

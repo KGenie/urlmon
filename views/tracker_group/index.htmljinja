@@ -1,36 +1,18 @@
 {% extends "shared/page.htmljinja" %}
-{% from "macros/form.htmljinja" import wtform, wtform_grid %}
+{% from "macros/form.htmljinja" import wtform_grid %}
 
 {% block title %}
-Manage Tracker groups
+View tracker groups
 {% endblock %}
 
 {% block help %}
-<p>This page will assist you in creating Tracker Groups, which help you in
-organizing your trackers</p>
-<ul>
-  <li>
-  Name: This will help you find it quickly if you have many Tracker groups.
-  </li>
-  <li>
-  Comment: This is can be a simple comment to a large description of your
-  Tracker Group.
-  </li>
-</ul>
+<p>This is a list of your tracker groups</p>
 {% endblock %}
 
 {% block main %}
-<h3>Fill the form to create new Tracker Groups</h3>
-{{ wtform(
-        id='tracker-group-form', 
-        form=form, 
-        action=u.action(
-            name='create', 
-            controller='tracker_group'), 
-        submit_text='Create') }}
-
 {{ wtform_grid(
 	id='tracker-group-list',
+        u=u,
 	list=tracker_groups,
 	form=form,
 	title='Your current Tracker Groups') }}

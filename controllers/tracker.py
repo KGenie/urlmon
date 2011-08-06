@@ -15,29 +15,35 @@ class TrackerController(WebMonitorController):
     @get
     @menu(label='Manage Trackers')
     def index(self, request):
+        form = TrackerForm()
+        trackers = self.tracker_service.get_all_by_user(self.session['user'])
+        return self.view({'trackers': trackers, 'form': form})
+
+
+    @get
+    @menu(label='Create a Tracker')
+    def new(self, request):
         tracker_groups = ((tg.name,tg.name) for tg in
-                self.tracker_group_service.get_all(self.session['user']))
+                self.tracker_group_service.get_all_by_user(self.session['user']))
         form = TrackerForm()
         form.tracker_groups.choices = tracker_groups
-
-        trackers = self.tracker_service.get_all(self.session['user'])
-
-        return self.view({'form': form, 'trackers': trackers})
+        return self.view({'form':form })
 
 
     @post
     def create(self, request):
         form = TrackerForm(request.POST)
-        tracker_groups = ((tg.name,tg.name) for tg in
-        self.tracker_group_service.get_all(self.session['user']))
+        tracker_groups = list((tg.name,tg.name) for tg in
+                self.tracker_group_service.get_all_by_user(self.session['user']))
+
         form.tracker_groups.choices = tracker_groups
 
         if form.validate():
             tracker = Tracker()
             form.populate_obj(tracker)
-            tracker.user = self.session['user']
+            tracker.user = self.session['user'].email
             self.tracker_service.insert(tracker)
             return self.redirect('index')
 
-        return self.view({'form':form }, 'index')
+        return self.view({'form':form }, 'new')
 

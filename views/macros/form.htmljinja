@@ -14,7 +14,8 @@
 </form>
 {%- endmacro %}
 
-{% macro wtform(id, form, action, submit_text='Submit', method='POST') -%}
+{% macro wtform(id, form, action, submit_text='Submit', method='POST',
+params=None) -%}
 
 <form id="{{ id }}" method="{{ method }}" action="{{ action }}">
   <fieldset>
@@ -35,6 +36,11 @@
       {% endif %}
     </div>
     {% endfor %}
+    {% if params %}
+    {% for k, v in params.items() %}
+    <input type="hidden" name="{{ k }}" value="{{ v }}" />
+    {% endfor %}
+    {% endif %}
     <div class="form-cell">  
       <button type="submit" class="form-submit">{{ submit_text }}</button>
     </div>
@@ -42,12 +48,13 @@
 </form>
 {%- endmacro %}
 
-{% macro wtform_grid(id, list, form, title=None) -%}
+{% macro wtform_grid(id, u, list, form, title=None) -%}
 <div class="table-container">
   <p class="table-title"><span>{{ title }}</span></p>
   <table class="simple-table">
     <thead>
       <tr>
+        <td colspan="2"></td>
 	{% for field in form %}
 	<td>{{ field.label.text|e }}</td>
 	{% endfor %}
@@ -56,6 +63,12 @@
     <tbody>
       {% for obj in list %}
       <tr>
+        <td>
+          <a href="{{ u.action('edit', id=obj.id )}}">Edit</a>
+        </td>
+        <td>
+          <a href="{{ u.action('confirm_delete', id=obj.id )}}">Delete</a>
+        </td>
         {% for field in form %}
         <td>
           {{ obj|attr(field.short_name)|e }}

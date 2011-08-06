@@ -1,0 +1,20 @@
+{% extends "shared/page.htmljinja" %}
+{% from "macros/form.htmljinja" import wtform %}
+
+{% block title %}
+Edit a tracker
+{% endblock %}
+
+{% block help %}
+{% endblock %}
+
+{% block main %}
+<h3>Edit form fields to update the tracker</h3>
+{{ wtform(
+        id='tracker-form', 
+        form=form, 
+        action=u.action(
+            name='update', 
+            controller='tracker'), 
+        submit_text='Update') }}
+{% endblock %}
