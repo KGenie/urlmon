@@ -9,10 +9,13 @@ View trackers
 <p>This is a list of your trackers.</p>
 {% endblock %}
 
+{% block main_title %}
+Your current trackers
+{% endblock %}
+
 {% block main %}
 {{ table(
 	id='tracker-list',
         u=u,
-	table_model=table_model,
-	title='Your current trackers') }}
+	table_model=table_model) }}
 {% endblock %}

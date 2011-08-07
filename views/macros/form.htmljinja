@@ -52,9 +52,8 @@ params=None) -%}
 </form>
 {%- endmacro %}
 
-{% macro table(id, u, table_model, title=None, delete=true, edit=true) -%}
+{% macro table(id, u, table_model, delete=true, edit=true) -%}
 <div class="table-container">
-  <p class="table-title"><span>{{ title }}</span></p>
   <table class="simple-table">
     <thead>
       <tr>
@@ -125,6 +124,17 @@ params=None) -%}
     </div>
     {% endif %}
   </fieldset>
+</form>
+{%- endmacro %}
+
+
+{% macro hidden_form(id, form, action, submit_text='Submit', method='POST') -%}
+
+<form id="{{ id }}" method="{{ method }}" action="{{ action }}">
+    {% for field in form %}
+    <input type="hidden" name="{{ field.short_name }}" value="{{ field.data }}" />
+    {% endfor %}
+    <button type="submit">{{ submit_text }}</button>
 </form>
 {%- endmacro %}
 

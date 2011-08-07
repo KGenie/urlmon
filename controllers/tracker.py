@@ -3,6 +3,7 @@ from models.tracker import Tracker, TrackerTable
 from forms.tracker import TrackerForm
 from services.tracker import TrackerService
 from services.tracker_group import TrackerGroupService
+from services.url_cache import UrlCacheService
 from wsgi.http_method import get, post
 from helpers import menu
 
@@ -11,6 +12,8 @@ class TrackerController(WebMonitorController):
 
     tracker_service = TrackerService
     tracker_group_service = TrackerGroupService
+    url_cache_service = UrlCacheService
+
 
     @get
     @menu(label='Manage')
@@ -51,6 +54,27 @@ class TrackerController(WebMonitorController):
                 self.tracker_group_service.get(tracker.tracker_group_id)
         form.tracker_group_id.data = tracker_group.name
         return self.view({'form': form})
+
+
+    @post
+    def select_region(self, request):
+        form = self.create_form(request.POST)
+
+        if form.validate():
+            self.url_cache_service.cache_url(form.url.data)
+            return self.view({'form':form, 'select_region': True})
+        else:
+            return self.view({'form':form }, 'new')
+
+    @get
+    @menu(exclude=True)
+    def cached_url(self, request):
+        url = request.GET.get('url', None)
+        if not url:
+            return None
+            
+
+
 
 
     @post

@@ -1,6 +1,7 @@
 import os, sys, glob, app_globals, logging
 from helpers import HtmlHelper
 from beaker.middleware import SessionMiddleware
+from webob.exc import HTTPNotFound
 from routes import Mapper
 from routes.middleware import RoutesMiddleware
 from jinja2 import Environment, FileSystemLoader
@@ -106,7 +107,8 @@ def init_daemons():
         module_name = 'daemons.%s' % daemon_name
         __import__(module_name, globals=globals(),fromlist=[daemon_name])
         module = sys.modules[module_name]
-        module.initialize()
+        if hasattr(module, 'initialize'):
+            module.initialize()
 
 
 def setup_logging():
@@ -157,5 +159,7 @@ class DispatcherMiddleware(object):
 
     def __call__(self, environ, start_response):
         response = self.app(environ, start_response)
+        if not response:
+            return HTTPNotFound()(environ, start_response)
 
         return response(environ, start_response)

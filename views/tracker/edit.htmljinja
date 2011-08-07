@@ -8,8 +8,11 @@ Edit a tracker
 {% block help %}
 {% endblock %}
 
+{% block main_title %}
+Edit form fields to update the tracker
+{% endblock %}
+
 {% block main %}
-<h3>Edit form fields to update the tracker</h3>
 {{ wtform(
         id='tracker-form', 
         form=form, 

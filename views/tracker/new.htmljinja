@@ -25,13 +25,18 @@ attributes:</p>
 </ul>
 {% endblock %}
 
+{% block main_title %}
+Fill the form to create new trackers
+{% endblock %}
+
 {% block main %}
-<h3>Fill the form to create new trackers</h3>
+
 {{ wtform(
         id='tracker-form', 
         form=form, 
         action=u.action(
-            name='create', 
+            name='select_region', 
             controller='tracker'), 
-        submit_text='Create') }}
+        submit_text='Preview') }}
+
 {% endblock %}

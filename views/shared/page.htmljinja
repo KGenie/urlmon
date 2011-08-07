@@ -30,7 +30,14 @@ Welcome to the Web Monitor
     <div id="flash">
       <span class="{{ flash.type }}">{{ flash.message }}</span> 
     </div>
-    {% endif %}
+   {% endif %}
+   <div id="main-title">
+      <h3>
+        {% block main_title %}
+        {% endblock %}
+      </h3>
+    </div>
+
     {% block main %}
     {% endblock %}
   </div>

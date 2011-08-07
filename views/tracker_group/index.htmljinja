@@ -9,10 +9,13 @@ View tracker groups
 <p>This is a list of your tracker groups</p>
 {% endblock %}
 
+{% block main_title %}
+Your current Tracker Groups
+{% endblock %}
+
 {% block main %}
 {{ table(
 	id='tracker-group-list',
         u=u,
-	table_model=table_model,
-	title='Your current Tracker Groups') }}
+        table_model=table_model) }}
 {% endblock %}

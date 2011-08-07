@@ -6,13 +6,12 @@ from storage import StorageService
 class UserService(StorageService):
 
     @classmethod
-    def authenticate(cls, user):
+    def authenticate(cls, email, password):
         for u in cls.items:
-            if u.email == user.email:
-                if u.password == user.password:
+            if u.email == email:
+                if u.password == password:
                     return u
                 return None
-
 
     @classmethod
     def stub_data(cls):

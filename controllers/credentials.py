@@ -24,8 +24,7 @@ class CredentialsController(WebMonitorController):
         setattr(form, '_user_service', self.user_service)
 
         if form.validate():
-            user = User()
-            form.populate_obj(user)
+            user = form._user
             self.session['user'] = user
             return self.redirect(redirect_action, redirect_controller, **qsargs)
         else:

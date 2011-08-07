@@ -8,13 +8,15 @@ Manage Registered Users
 {% block help %}
 {% endblock %}
 
-{% block main %}
+{% block main_title %}
+Registered Users
+{% endblock %}
 
+{% block main %}
 {{ table(
 	id='user-list',
         u=u,
 	table_model=table_model,
-        title='Registered Users',
         edit=false,
         delete=false) }}
 {% endblock %}

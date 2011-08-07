@@ -8,8 +8,11 @@ Remove tracker
 {% block help %}
 {% endblock %}
 
+{% block main_title %}
+Are you sure you want to delete this tracker?
+{% endblock %}
+
 {% block main %}
-<h3>Are you sure you want to delete this tracker?</h3>
 {{ wtform_show(
         id='tracker-form', 
         form=form, 
