@@ -15,7 +15,8 @@ Select a region of the web page
 {% block main %}
 
 <div id="select-region">
-  <iframe src="{{ form.url.data }}">
+  <iframe src="{{ u.action('cached_url', 
+    controller='tracker', url=form.url.data) }}">
     <p>Your browser must support iframes to select a region!</p>
   </iframe>
 </div>

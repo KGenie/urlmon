@@ -41,6 +41,9 @@ class RedirectResponse(_HTTPMove):
         super(RedirectResponse, self).__init__(location=location, **kwargs)
 
 
+class StaticContentResponse(Response):
+    pass
+
 class RedirectToLoginResponse(RedirectResponse):
     code = 303
     title = 'Identify yourself'
@@ -48,6 +51,7 @@ class RedirectToLoginResponse(RedirectResponse):
     def __init__(self, controller='login', action='sign_in', **kwargs):
         super(RedirectToLoginResponse, self).\
                 __init__(controller, action, **kwargs)
+
 
 
 class NotFoundResponse(HTTPNotFound):

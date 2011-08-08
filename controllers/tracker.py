@@ -66,15 +66,15 @@ class TrackerController(WebMonitorController):
         else:
             return self.view({'form':form }, 'new')
 
+
     @get
     @menu(exclude=True)
     def cached_url(self, request):
         url = request.GET.get('url', None)
         if not url:
             return None
-            
-
-
+        return self.content('djfshlfjsfdl')
+        
 
 
     @post
