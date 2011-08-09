@@ -1,5 +1,13 @@
+"""
+Response objects used by the application
+
+The purpose of this module is to provide custom response classes(such as
+JinjaResponse) and to provide a layer of indirection into the webob
+framework(making easy to replace case it is necessary)
+"""
 from webob import Response
-from webob.exc import _HTTPMove, HTTPNotFound, HTTPForbidden, HTTPMethodNotAllowed
+from webob.exc import _HTTPMove, HTTPNotFound, HTTPForbidden,\
+        HTTPMethodNotAllowed, HTTPInternalServerError
 from helpers import UrlHelper
 from jinja2 import TemplateNotFound
 
@@ -52,7 +60,8 @@ class RedirectToLoginResponse(RedirectResponse):
         super(RedirectToLoginResponse, self).\
                 __init__(controller, action, **kwargs)
 
-
+class ServerErrorResponse(HTTPInternalServerError):
+    pass
 
 class NotFoundResponse(HTTPNotFound):
     pass

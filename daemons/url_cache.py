@@ -1,45 +1,44 @@
-import logging, signal, urllib2
-from BeautifulSoup import BeautifulSoup
-from multiprocessing import  Pipe, Process
-from multiprocessing.dummy import Pool as ThreadPool
-from Queue import Queue
-from threading import Thread, Condition, Lock
+import logging, urllib2
+from multiprocessing import Pool
+from threading import RLock
+from response_processor import process
 from time import sleep
 
 log = logging.getLogger(__name__)
 
-_pool = None
-_thread_pool = None
-_url_cache = None
+__pool = None
+__url_cache = None
+__cache_lock = None
 
 
 def initialize():
     process_count = 1
-    global _process_pool, _connection_pool, _url_cache, _thread_pool
-    _url_cache = {}
-    _thread_pool = ThreadPool(processes=process_count)
-    _process_pool = Queue(maxsize=process_count)
-    for i in range(process_count):
-        parent_conn, child_conn = Pipe(duplex=True)
-        worker = Process(target=get_urls, args=[child_conn])
-        worker.start()
-        _process_pool.put((parent_conn, worker))
+    global __pool, __url_cache, __cache_lock
+    __pool = Pool(process_count)
+    __url_cache = {}
+    __cache_lock = RLock()
 
 
-def get_urls(connection):
-    while 1:
-        url = connection.recv()
-        data = urllib2.urlopen(url).read()
-        connection.send((url,data))
+def retrieve_url(url):
+    request = urllib2.Request(url)
+    response = urllib2.urlopen(request)
+    body = process(response)
+    return body 
 
 
-def cache_url_async(url):
-    connection, worker = _process_pool.get()
-    connection.send(url)
-    _thread_pool.apply_async(receive_url, (connection, worker))
+def start_retrieving_url(url):
+    async_result = __pool.apply_async(retrieve_url, (url,))
+    __cache_lock.acquire()
+    __url_cache[url] = async_result.get
+    __cache_lock.release()
 
 
-def receive_url(connection, worker):
-    url, data = connection.recv()
-    _url_cache[url] = data
-    _process_pool.put((connection, worker))
+def finish_retrieving_url(url):
+    get_func = None
+    __cache_lock.acquire()
+    if url not in __url_cache:
+        assert False, 'URL retrieval was not requested by this thread'
+        start_retrieving_url(url)
+    get_func = __url_cache[url]
+    __cache_lock.release()
+    return get_func()

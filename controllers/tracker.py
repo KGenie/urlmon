@@ -61,7 +61,7 @@ class TrackerController(WebMonitorController):
         form = self.create_form(request.POST)
 
         if form.validate():
-            self.url_cache_service.cache_url(form.url.data)
+            self.url_cache_service.cache_url_contents(form.url.data)
             return self.view({'form':form, 'select_region': True})
         else:
             return self.view({'form':form }, 'new')
@@ -73,8 +73,8 @@ class TrackerController(WebMonitorController):
         url = request.GET.get('url', None)
         if not url:
             return None
-        return self.content('djfshlfjsfdl')
-        
+        contents = self.url_cache_service.get_url_contents(url)
+        return self.content(contents)
 
 
     @post

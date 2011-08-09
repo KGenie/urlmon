@@ -1,5 +1,5 @@
 from app_components.response import JinjaResponse, RedirectResponse,\
-        StaticContentResponse
+        StaticContentResponse, ServerErrorResponse
 from meta import WebMonitorControllerMetaclass
 
 class WebMonitorController(object):
@@ -34,7 +34,13 @@ class WebMonitorController(object):
         return RedirectResponse(controller=controller, action=action,
                 qsargs=qsargs)
 
+
     def content(self, body):
-        return StaticContentResponse(unicode_body=unicode(body))
-
-
+        ret = StaticContentResponse()
+        if isinstance(body, unicode):
+            ret.unicode_body = body
+        elif isinstance(body, str):
+            ret.body = body
+        else:
+            return ServerErrorResponse()
+        return ret
