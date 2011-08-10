@@ -36,10 +36,10 @@ class AuthMiddleware(object):
         session = environ['beaker.session']
 
         user = session.get('user', None)
-        if not user:
-            # TODO Remove this when not developing
-            #user = UserService(None).get_all().next()
-            #session['user'] = user
+        #if not user:
+        #    # TODO Remove this when not developing
+        #    user = UserService(None).get_all().next()
+        #    session['user'] = user
 
         if action_callable._authentication_required:
             if not user:
