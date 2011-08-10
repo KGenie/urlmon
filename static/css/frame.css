@@ -1,0 +1,7 @@
+.hovered-element {
+    border: 1px solid maroon;
+}
+
+.selected-element {
+    border: 3px solid green;
+}

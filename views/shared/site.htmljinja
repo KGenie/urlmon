@@ -14,8 +14,14 @@
     {# site stylesheets and scripts #}
     <link rel="stylesheet" href="{{ u.static('/css/reset.css') }}" type="text/css" /> 
     <link rel="stylesheet" href="{{ u.static('/css/site.css') }}" type="text/css" />
+
     <script type="text/javascript" 
-      src="{{ u.static('/js/site.js') }}"></script>
+      src="{{ u.static('/js/umon.js') }}"></script>
+
+
+    <script type="text/javascript" 
+      src="{{ u.static('/js/styles.js') }}"></script>
+
 
     {% block headers %}
     {% endblock %}

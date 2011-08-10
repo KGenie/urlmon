@@ -10,7 +10,7 @@
 {% macro post_link(id, action, text, method='POST') -%}
 <form id="{{ id }}" method="{{ method }}" action="{{ action }}"
   class="post-link-form">
-    <a href="#" class="submit-link">{{ text }}</a>
+  <button class="link" type="submit">{{ text }}</button>
 </form>
 {%- endmacro %}
 
@@ -20,25 +20,7 @@ params=None) -%}
 <form id="{{ id }}" method="{{ method }}" action="{{ action }}">
   <fieldset>
     {% for field in form %}
-    {% if not field.type == 'HiddenField' %}
-    <div class="form-cell{{ ' form-cell-error' if field.errors }}">
-      <label for="{{ field.label.field_id }}" class="form-label">
-        {{ field.label.text|e }} :
-      </label>
-      {{ field(class='form-input') }}
-      {% if field.errors %}
-      <div class="error-list">
-        <ul>
-          {% for error in field.errors %}
-          <li>{{ error|e }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-    </div>
-    {% else %}
-    {{ field() }}
-    {% endif %}
+    {{ render_field(field) }}
     {% endfor %}
     {% if params %}
     {% for k, v in params.items() %}
@@ -128,10 +110,11 @@ params=None) -%}
 {%- endmacro %}
 
 
-{% macro hidden_form(id, form, action, submit_text='Submit', method='POST') -%}
+{% macro hidden_form(id, form, action, submit_text='Submit', method='POST',
+show=[]) -%}
 
 <form id="{{ id }}" method="{{ method }}" action="{{ action }}">
-    {% for field in form %}
+    {% for field in form if field.short_name not in show %}
     <input type="hidden" name="{{ field.short_name }}" value="{{ field.data }}" />
     {% endfor %}
     <button type="submit">{{ submit_text }}</button>
@@ -139,3 +122,28 @@ params=None) -%}
 {%- endmacro %}
 
 
+{% macro render_field(field) -%}
+{% if not field.type == 'HiddenField' %}
+<div class="form-cell{{ ' form-cell-error' if field.errors }}">
+  <label for="{{ field.label.field_id }}" class="form-label">
+    {{ field.label.text|e }} :
+  </label>
+  {{ field(class='form-input') }}
+  {{ validation_summary(field) }}
+</div>
+{% else %}
+{{ field() }}
+{% endif %}
+{%- endmacro %}
+
+{% macro validation_summary(field) -%}
+{% if field.errors %}
+<div class="error-list">
+  <ul>
+    {% for error in field.errors %}
+    <li>{{ error|e }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{%- endmacro %}

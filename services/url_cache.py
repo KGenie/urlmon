@@ -6,5 +6,6 @@ class UrlCacheService(Service):
     def cache_url_contents(self, url):
         start_retrieving_url(url)
 
+
     def get_url_contents(self, url):
         return finish_retrieving_url(url)

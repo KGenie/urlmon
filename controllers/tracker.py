@@ -27,7 +27,7 @@ class TrackerController(WebMonitorController):
     @menu(label='Create')
     def new(self, request):
         form = self.create_form()
-        return self.view({'form':form })
+        return self.view({'form':form, 'preview': True })
 
 
     @get
@@ -56,17 +56,7 @@ class TrackerController(WebMonitorController):
         return self.view({'form': form})
 
 
-    @post
-    def select_region(self, request):
-        form = self.create_form(request.POST)
-
-        if form.validate():
-            self.url_cache_service.cache_url_contents(form.url.data)
-            return self.view({'form':form, 'select_region': True})
-        else:
-            return self.view({'form':form }, 'new')
-
-
+   
     @get
     @menu(exclude=True)
     def cached_url(self, request):
@@ -75,6 +65,18 @@ class TrackerController(WebMonitorController):
             return None
         contents = self.url_cache_service.get_url_contents(url)
         return self.content(contents)
+
+
+    @post
+    def preview(self, request):
+         form = self.create_form(request.POST)
+         form.css_selector.data = 'stub'
+         if form.validate():
+             form.css_selector.data = ''
+             self.url_cache_service.cache_url_contents(form.url.data)
+             return self.view({'form':form}, 'new')
+         else:
+             return self.view({'form':form, 'preview':True}, 'new')
 
 
     @post
