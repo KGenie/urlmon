@@ -3,7 +3,7 @@ var uMon = {};
 (function (uMon, $) {
     uMon.iFrameLoaded = function() {
         var iFrame = $('#select-frame');
-        var iFrameChildren = iFrame.contents().find('*');
+        var iFrameChildren = iFrame.contents().find('.selectable-element');
         var iFrameHead = iFrame.contents().find('head');
         var input = $('input#css_selector');
         iFrameHead.append('<link rel="stylesheet" href="../css/frame.css" type="text/css" />');

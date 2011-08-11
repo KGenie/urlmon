@@ -14,8 +14,17 @@ def process(response):
 
     _process_links(url, dom)
     _process_scripts(dom)
+    _process_selectable_elements(dom)
     _process_ids(dom)
     return etree.tostring(dom, method="html")
+
+
+def _process_selectable_elements(dom):
+    all_tags = dom.cssselect('body *')
+    for tag in all_tags:
+        classes = tag.attrib.get('class', '')
+        classes += ' selectable-element'
+        tag.attrib['class'] = classes
 
 
 def _process_scripts(dom):
@@ -47,7 +56,7 @@ def _process_links(request_url, dom):
 
 def _process_ids(dom):
     existing_ids = set()
-    all_tags = dom.cssselect('*')
+    all_tags = dom.cssselect('.selectable-element')
     for tag in all_tags:
         _process_id(tag, existing_ids)
 
@@ -78,6 +87,7 @@ def _generate_id(tag, existing_ids):
     while id in existing_ids:
         id = _increase_id(id)
     tag.attrib['id'] = id
+    tag.attrib['title'] = 'CSS Selector: #%s' % id
     existing_ids.add(id)
 
 
