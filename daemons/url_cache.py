@@ -1,5 +1,5 @@
 import logging, urllib2
-from multiprocessing.dummy import Pool
+from multiprocessing import Pool
 from threading import RLock
 from response_processor import process
 from time import sleep
@@ -13,7 +13,7 @@ __cache_lock = None
 
 
 def initialize():
-    thread_count = 5
+    thread_count = 1
     global __pool, __url_cache, __cache_lock
     __pool = Pool(thread_count)
     __url_cache = {}

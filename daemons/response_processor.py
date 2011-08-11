@@ -30,6 +30,7 @@ def _is_int(s):
     except ValueError:
         return False
 
+
 def _process_id(tag, existing_ids):
     if tag.name not in __filtered_tags:
         _generate_id(tag, existing_ids)
@@ -57,7 +58,7 @@ def _increase_id(id):
     except ValueError:
         return id + '_1'
 
-    num = id[idx+1]
+    num = id[idx+1:]
     if not _is_int(num):
         return id + '_1'
     else:
@@ -80,19 +81,24 @@ def _process_scripts(dom):
 
 def _process_links(request_url, dom):
     for link in dom('link'):
-        if link.get('type', 'text/css') == 'text/css':
-            if 'href' in link:
-                link['href'] = _process_link(link['href'], request_url)
+        type = link.get('type', 'text/css')
+        if type == 'text/css':
+            href = link.get('href', None) 
+            if href:
+                link['href'] = _process_link(href, request_url)
         else:
             link.extract()
 
     for a in dom('a'):
-        if 'href' in a:
-            a['href'] = _process_link(a['href'], request_url)
+        href = a.get('href', None)
+        if href:
+            a['href'] = _process_link(href, request_url)
+
 
     for img in dom('img'):
-        if 'src' in img:
-            img['src'] = _process_link(img['src'], request_url)
+        src = img.get('src', None)
+        if src:
+            img['src'] = _process_link(src, request_url)
 
 
 def _process_link(link_src, request_url):
