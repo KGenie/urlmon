@@ -1,4 +1,4 @@
-import os, sys, glob, app_globals, logging
+import os, sys, glob, app_globals, logging, fork_vars
 from helpers import HtmlHelper
 from beaker.middleware import SessionMiddleware
 from webob.exc import HTTPNotFound
@@ -121,8 +121,8 @@ def setup_logging():
 
 
 def make_app():
-    setup_logging()
-    init_daemons()
+    setup_logging() # logging before daemons so we will share logger setup
+    init_daemons() # this is where we fork
     app_globals.JINJA_ENV = make_jinja_environment()
     global CONTROLLER_CACHE
     CONTROLLER_CACHE = make_controllers()

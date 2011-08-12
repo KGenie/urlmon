@@ -1,4 +1,3 @@
-from app_components.service import Service
 from storage import StorageService
 from tracker_group import TrackerGroupService
 from models.tracker import Tracker

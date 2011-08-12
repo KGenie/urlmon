@@ -7,7 +7,7 @@ class UserService(StorageService):
 
     @classmethod
     def authenticate(cls, email, password):
-        for u in cls.items:
+        for u in cls.get_all():
             if u.email == email:
                 if u.password == password:
                     return u
@@ -21,5 +21,5 @@ class UserService(StorageService):
 
     @classmethod
     def exists(cls, email):
-        l = list(u for u in cls.items if u.email == email)
+        l = list(u for u in cls.get_all() if u.email == email)
         return len(l)

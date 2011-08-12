@@ -1,7 +1,7 @@
 import logging, urllib2
 from multiprocessing import Pool
 from threading import RLock
-from response_processor import process
+from tasks.response_processor import process
 from time import sleep
 from datetime import datetime
 

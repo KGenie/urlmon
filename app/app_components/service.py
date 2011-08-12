@@ -3,7 +3,7 @@ class ServiceMetaclass(type):
 
     def __new__(cls, name, bases, attrs):
 
-        return super(ServiceMetaclass).__new__(cls, name, bases, attrs)
+        return super(ServiceMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
 

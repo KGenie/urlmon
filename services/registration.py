@@ -1,7 +1,7 @@
 import smtplib, datetime
 from string import Template
 from app_components.service import Service
-from daemons import mail
+from daemons import mailer
 from hashlib import md5
 from helpers import UrlHelper
 from urllib import quote
@@ -25,7 +25,7 @@ class RegistrationService(Service):
         msg = _msg_template.substitute(
                 activation_link=self.reconstruct_url(reg_id))
         subject = 'Activate your account on the Web Monitor'
-        mail.enqueue_mail(user.email, subject, msg)
+        mailer.enqueue_mail(user.email, subject, msg)
 
 
     def activate_user(self, reg_id):
