@@ -1,57 +1,52 @@
-import smtplib, logging, signal
-from multiprocessing import Process, Queue
+import smtplib, logging
+from controllable import ControllableDaemon
 from email.mime.text import MIMEText
 
-log = logging.getLogger(__name__)
+__logger = logging.getLogger('daemons.controllable.mailer')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
 
 
-_from = 'thiago.arruda@live.com'
-_smtp_server = 'smtp.live.com'
-_port = 587
-_username = 'thiago.arruda@live.com'
-_password = 'ark123ark'
-_queue = None
-_child = None
+class Mailer(ControllableDaemon):
 
-def run(queue):
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-    while 1:
-        log.debug('Waiting for mail to arrive...')
-        msg = queue.get()
-        log.debug('Mail arrived, sending it...')
+    def __init__(self, 
+            sender='thiago.arruda@live.com',
+            smtp_server='smtp.live.com',
+            port=587,
+            username='thiago.arruda@live.com',
+            password='ark123ark'):
+        ControllableDaemon.__init__(self)
+        self.sender = sender
+        self.smtp_server = smtp_server
+        self.port = port
+        self.username = username
+        self.password = password
+
+
+    def process_message(self, message):
+        debug('Mail arrived, trying to send it...')
         try:
-            send_mail(*msg)
+            self.sendmail(*message)
         except Exception as e:
-            log.error('Error ocurred while sending mail: %s', e)
+            error('Error ocurred while sending mail: %s', e)
         except:
-            log.debug('Mail successfully sent!')
+            debug('Mail successfully sent!')
 
 
-def initialize():
-    global _queue, _child
-    _queue = Queue()
-    _child = Process(target=run, args=(_queue,)) 
-    _child.daemon = True
-    _child.start()
+    def sendmail(self, to, subject, text, mime='plain', charset='utf-8'):
+        msg = MIMEText(text, mime, charset)
+        msg['Subject'] = subject
+        msg['From'] = self.sender
+        msg['to'] = to
 
+        conn = smtplib.SMTP(self.smtp_server, self.port)
+        conn.starttls()
+        conn.ehlo()
+        conn.login(self.username, self.password)
+        conn.sendmail(self.sender, [to], msg.as_string())
+        conn.quit()
+            
 
-def cleanup():
-    _child.join(0)
-    
-
-def enqueue_mail(to, subject, text, mime='plain'):
-    _queue.put((to, subject, text, mime))
-
-
-def send_mail(to, subject, text, mime):
-    msg = MIMEText(text, mime)
-    msg['Subject'] = subject
-    msg['From'] = _from
-    msg['to'] = to
-
-    conn = smtplib.SMTP(_smtp_server, _port)
-    conn.starttls()
-    conn.ehlo()
-    conn.login(_username, _password)
-    conn.sendmail(_from, [to], msg.as_string())
-    conn.quit()
+DAEMON = Mailer()

@@ -4,6 +4,12 @@ from tasks.task_runner import TaskRunner
 from services.scheduled_task import TaskService
 from Queue import Queue
 
+
+def daemonize():
+    scheduler = TaskScheduler()
+
+
+
 class TaskScheduler(object):
 
     def __init__(self, runners=1, threads_per_runner=5):

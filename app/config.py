@@ -1,5 +1,6 @@
-import os, sys, glob, app_globals, logging, fork_vars
+import os, sys, glob, app_globals, logging, fork_vars, atexit
 from helpers import HtmlHelper
+from pipestream import PipeStream
 from beaker.middleware import SessionMiddleware
 from webob.exc import HTTPNotFound
 from routes import Mapper
@@ -7,13 +8,8 @@ from routes.middleware import RoutesMiddleware
 from jinja2 import Environment, FileSystemLoader
 from paste.cascade import Cascade
 from paste.urlparser import StaticURLParser
-from wsgi.app import WebMonitorApp
-from wsgi.auth import AuthMiddleware, auth
-from wsgi.controller import ControllerMiddleware
-from wsgi.request import RequestMiddleware
-from wsgi.injection import InjectionMiddleware
-from wsgi.http_method import HTTPMethodMiddleware
 from util import get_controller_class_name
+from daemons import logger, mailer, url_cache, storage
 
 
 CONTROLLER_CACHE = None
@@ -31,14 +27,11 @@ def make_routes():
     map.always_scan = False
     map.minimization = True
     map.explicit = False
-
     map.connect('/', controller='home', action='main')
-
     map.connect('/{controller}', action='index')
-
     map.connect('/{controller}/{action}')
-
     return map
+
 
 def make_beaker_options():
     return {
@@ -69,6 +62,7 @@ def ensure_is_decorated(controller_class, default_permissions_decorator):
 
 
 def make_controllers():
+    from wsgi.auth import auth
     """
     Imports all controllers.
 
@@ -95,34 +89,70 @@ def make_controllers():
     return ret
 
 
-def init_daemons():
-    """
-    Initalizes all daemons in the 'daemons' package.
-    """
-    daemon_names =  (f.replace('.py','').split('/')[1]\
-            for f in glob.glob('daemons/*.py') if\
-            '__init__.py' not in f)
+def start_daemon(daemon, parent_pid):
+    daemon.start()
+    if os.getpid() != parent_pid:
+        sys.exit(0)
 
-    for daemon_name in daemon_names:
-        module_name = 'daemons.%s' % daemon_name
-        __import__(module_name, globals=globals(),fromlist=[daemon_name])
-        module = sys.modules[module_name]
-        if hasattr(module, 'initialize'):
-            module.initialize()
+
+def stop_daemons():
+    daemons = list(get_daemons())
+    daemons.reverse()
+    for daemon in daemons:
+        daemon.stop()
+
+
+
+def get_daemons():
+    return [logger.DAEMON, mailer.DAEMON, storage.DAEMON]
+
+
+def start_daemons():
+    parent_pid = os.getpid()
+
+    for daemon in get_daemons():
+        start_daemon(daemon, parent_pid)
+
+    #url_cache.initialize()
+
 
 
 def setup_logging():
-    pass
-    #logging.getLogger('daemons.mail').addHandler(logging.StreamHandler())
-    #logging.getLogger('daemons.mail').setLevel(logging.DEBUG)
+    #print 'log directory is %s' % fork_vars.LOG_DIR
+    logging_file = os.path.join(fork_vars.LOG_DIR, 'logpipe.log')
+    #if os.path.exists(logging_file):
+    #    os.unlink(logging_file)
+    #os.mkfifo(logging_file)
+    #stream = PipeStream(logging_file,read=False, write=True)
 
-    #logging.root.addHandler(logging.StreamHandler())
-    #logging.root.setLevel(logging.DEBUG)
+    #logging.getLogger('daemons.controllable').addHandler(logging.StreamHandler(stream))
+    #logging.getLogger('daemons.controllable').setLevel(logging.DEBUG)
+    #logging.getLogger('services').addHandler(logging.StreamHandler(stream))
+    #logging.getLogger('services').setLevel(logging.DEBUG)
+
+
+    #logging_file = os.path.join(fork_vars.IPC_SOCKET_DIR,'log.txt')
+    #logging.getLogger(mailer.__name__).setLevel(logging.DEBUG)
+
+    ##logging.root.addHandler(logging.StreamHandler(logging_file))
+    ##logging.root.setLevel(logging.DEBUG)
+    #print 'log file location: %s' % logging_file
 
 
 def make_app():
     setup_logging() # logging before daemons so we will share logger setup
-    init_daemons() # this is where we fork
+    start_daemons() # this is where we fork
+
+    # Do these imports here to avoid having modules loaded before forking
+    from wsgi.app import WebMonitorApp
+    from wsgi.auth import AuthMiddleware
+    from wsgi.controller import ControllerMiddleware
+    from wsgi.request import RequestMiddleware
+    from wsgi.injection import InjectionMiddleware
+    from wsgi.http_method import HTTPMethodMiddleware
+
+    
+    atexit.register(stop_daemons)
     app_globals.JINJA_ENV = make_jinja_environment()
     global CONTROLLER_CACHE
     CONTROLLER_CACHE = make_controllers()
@@ -142,6 +172,8 @@ def make_app():
     app = SessionMiddleware(app, make_beaker_options())
     path = os.path.join(app_globals.APP_ROOT, 'static')
     app = Cascade([StaticURLParser(path), app])
+
+    
 
     return app
 

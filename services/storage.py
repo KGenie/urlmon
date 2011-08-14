@@ -1,86 +1,74 @@
-import os, fork_vars, types
+import os, fork_vars, logging
 from app_components.service import Service, ServiceMetaclass
-from multiprocessing.connection import Listener, Client
-from threading import Thread, RLock
+from multiprocessing.connection import Client
+from daemons.storage import DAEMON as storage_daemon
+
+__logger = logging.getLogger('services.storage')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
 
 
 def generate_client_classmethod_proxy(method_name, socket_path):
     def proxy(cls, *args, **kwargs):
-        conn = Client(socket_path, 'AF_UNIX')
-        conn.send((method_name, args, kwargs))
-        result = conn.recv()
-        conn.close()
+        module_name = cls.__module__
+        class_name = cls.__name__
+        result = storage_daemon.send((module_name, class_name, 
+            method_name, args, kwargs), get_response=True)
+        debug('RESULT was %s' % result)
         return result
     return classmethod(proxy)
 
 
-def generate_threadsafe_classmethod(method_name, wrapped_func, lock):
-    method = wrapped_func.__func__
-    def proxy(cls, *args, **kwargs):
-        lock.acquire()
-        result = method(cls, *args, **kwargs)
-        lock.release()
-        return result
-    return classmethod(proxy)
+def proxy_class_methods(attrs):
+    socket_dir = fork_vars.IPC_SOCKET_DIR
+    socket_path = os.path.join(socket_dir, 'storage.socket')
+
+    method_list = list((k, v) for k, v in attrs.items() if \
+            isinstance(v, classmethod))
+
+    for k,v in method_list:
+        attrs[k] = generate_client_classmethod_proxy(k, socket_path)
 
 
-def serve(cls, listener):
-    while 1:
-        conn = listener.accept()
-        method_name, args, kwargs = conn.recv()
-        method = getattr(cls, method_name, None)
-        if not method:
-            print "unknown method '%s'" % method_name
-            continue
-        try:
-            result = method(*args, **kwargs)
-        except Exception, e:
-            result = e
-        if hasattr(result, '__iter__'):
-            result = list(result)
-        conn.send(result)
-        conn.close()
-        
+class ServerStorageServiceMetaclass(ServiceMetaclass):
 
-class StorageServiceMetaclass(ServiceMetaclass):
     def __new__(cls, name, bases, attrs):
-        socket_dir = fork_vars.STORAGE_SOCKET_DIR
-        socket_path = os.path.join(socket_dir, '%sSocket' % name)
+        debug('Creating server DAO %s' % os.getpid())
+        attrs['_id'] = 0
+        attrs['items'] = []
         
-        is_child = os.path.exists(socket_path)
-
-        method_list = list((k, v) for k, v in attrs.items() if isinstance(v,
-            classmethod))
-
-        if is_child:
-            for k,v in method_list:
-                attrs[k] = generate_client_classmethod_proxy(k, socket_path)
-        else:
-            lock = RLock()
-            for k,v in method_list:
-                attrs[k] = generate_threadsafe_classmethod(k, v, lock)
-
-            attrs['_thread_lock'] = lock
-            attrs['_id'] = 0
-            attrs['items'] = []
-
-        klass = super(StorageServiceMetaclass, cls).__new__(cls, name, bases,
-                    attrs)
-
-        if not is_child:
-            listener = Listener(socket_path, 'AF_UNIX')
-            server_thread = Thread(target=serve, args=(klass, listener))
-            server_thread.daemon = True
-            server_thread.start()
-            setattr(klass, 'server_thread', server_thread)
-            klass.stub_data()
-
+        klass = super(ServerStorageServiceMetaclass, cls).__new__(cls, 
+                    name, bases, attrs)
+        klass.stub_data()
+        debug('Server DAO %s successfully created' % name)
+           
         return klass
+
+
+
+class ClientStorageServiceMetaclass(ServiceMetaclass):
+
+    def __new__(cls, name, bases, attrs):
+        debug('Creating client DAO %s' % name)
+        proxy_class_methods(attrs)
+        klass = super(ClientStorageServiceMetaclass, cls).__new__(cls, 
+                    name, bases, attrs)
+        debug('Client DAO %s successfully created' % name)
+        return klass
+
 
   
 class StorageService(Service):
 
-    __metaclass__ = StorageServiceMetaclass
+    if fork_vars.SERVER_STORAGE == True:
+        debug('Setting to server metaclass')
+        __metaclass__  = ServerStorageServiceMetaclass
+    else:
+        debug('Setting to client metaclass')
+        __metaclass__ = ClientStorageServiceMetaclass
+
 
 
     @classmethod
