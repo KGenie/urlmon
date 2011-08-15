@@ -1,5 +1,10 @@
 from storage import StorageService
+from models.task import Task
 
 
 class TaskService(StorageService):
-    pass
+
+    @classmethod
+    def stub_data(cls):
+        cls.insert(Task(type=1))
+

@@ -95,11 +95,10 @@ def start_daemon(daemon, parent_pid):
 
 
 def stop_daemons():
-    from daemons import logger, mailer, webpage, storage
+    from daemons import logger, mailer, webpage, storage, task
 
-    daemons = [mailer.DAEMON, webpage.DAEMON,
+    daemons = [task.DAEMON, mailer.DAEMON, webpage.DAEMON,
             storage.DAEMON, logger.DAEMON]
-    daemons.reverse()
     for daemon in daemons:
         daemon.stop()
 
@@ -120,19 +119,23 @@ def start_daemons():
     from daemons import webpage
     start_daemon(webpage.DAEMON, parent_pid)
 
+    from daemons import task
+    start_daemon(task.DAEMON, parent_pid)
+
     
 
 def setup_logging():
     #print 'log directory is %s' % fork_vars.LOG_DIR
     logging_file = os.path.join(fork_vars.LOG_DIR, 'logpipe.log')
+    print 'Temp directory is %s' % fork_vars.LOG_DIR
     if os.path.exists(logging_file):
         os.unlink(logging_file)
     os.mkfifo(logging_file)
 
     stream = PipeStream(logging_file,read=False, write=True)
 
-    logging.getLogger('daemons.controllable').addHandler(logging.StreamHandler(stream))
-    logging.getLogger('daemons.controllable').setLevel(logging.DEBUG)
+    logging.getLogger('daemons.task').addHandler(logging.StreamHandler(stream))
+    logging.getLogger('daemons.task').setLevel(logging.DEBUG)
     #logging.getLogger('services').addHandler(logging.StreamHandler(stream))
     #logging.getLogger('services').setLevel(logging.DEBUG)
 
