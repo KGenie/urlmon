@@ -9,7 +9,6 @@ from jinja2 import Environment, FileSystemLoader
 from paste.cascade import Cascade
 from paste.urlparser import StaticURLParser
 from util import get_controller_class_name
-from daemons import logger, mailer, url_cache, storage
 
 
 CONTROLLER_CACHE = None
@@ -96,37 +95,44 @@ def start_daemon(daemon, parent_pid):
 
 
 def stop_daemons():
-    daemons = list(get_daemons())
+    from daemons import logger, mailer, webpage, storage
+
+    daemons = [mailer.DAEMON, webpage.DAEMON,
+            storage.DAEMON, logger.DAEMON]
     daemons.reverse()
     for daemon in daemons:
         daemon.stop()
 
 
 
-def get_daemons():
-    return [logger.DAEMON, mailer.DAEMON, storage.DAEMON]
-
-
 def start_daemons():
     parent_pid = os.getpid()
 
-    for daemon in get_daemons():
-        start_daemon(daemon, parent_pid)
+    from daemons import logger
+    start_daemon(logger.DAEMON, parent_pid)
 
-    #url_cache.initialize()
+    from daemons import storage
+    start_daemon(storage.DAEMON, parent_pid)
 
+    from daemons import mailer
+    start_daemon(mailer.DAEMON, parent_pid)
 
+    from daemons import webpage
+    start_daemon(webpage.DAEMON, parent_pid)
+
+    
 
 def setup_logging():
     #print 'log directory is %s' % fork_vars.LOG_DIR
     logging_file = os.path.join(fork_vars.LOG_DIR, 'logpipe.log')
-    #if os.path.exists(logging_file):
-    #    os.unlink(logging_file)
-    #os.mkfifo(logging_file)
-    #stream = PipeStream(logging_file,read=False, write=True)
+    if os.path.exists(logging_file):
+        os.unlink(logging_file)
+    os.mkfifo(logging_file)
 
-    #logging.getLogger('daemons.controllable').addHandler(logging.StreamHandler(stream))
-    #logging.getLogger('daemons.controllable').setLevel(logging.DEBUG)
+    stream = PipeStream(logging_file,read=False, write=True)
+
+    logging.getLogger('daemons.controllable').addHandler(logging.StreamHandler(stream))
+    logging.getLogger('daemons.controllable').setLevel(logging.DEBUG)
     #logging.getLogger('services').addHandler(logging.StreamHandler(stream))
     #logging.getLogger('services').setLevel(logging.DEBUG)
 

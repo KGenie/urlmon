@@ -3,7 +3,7 @@ from models.tracker import Tracker, TrackerTable
 from forms.tracker import TrackerForm
 from services.tracker import TrackerService
 from services.tracker_group import TrackerGroupService
-from services.url_cache import UrlCacheService
+from services.fetcher import FetcherService
 from wsgi.http_method import get, post
 from helpers import menu
 
@@ -12,7 +12,7 @@ class TrackerController(WebMonitorController):
 
     tracker_service = TrackerService
     tracker_group_service = TrackerGroupService
-    url_cache_service = UrlCacheService
+    fetcher_service = FetcherService
 
 
     @get
@@ -55,7 +55,6 @@ class TrackerController(WebMonitorController):
         form.tracker_group_id.data = tracker_group.name
         return self.view({'form': form})
 
-
    
     @get
     @menu(exclude=True)
@@ -63,17 +62,14 @@ class TrackerController(WebMonitorController):
         url = request.GET.get('url', None)
         if not url:
             return None
-        contents = self.url_cache_service.get_url_contents(url)
-        return self.content(contents)
+        page = self.fetcher_service.fetch(url)
+        return self.content(page.contents)
 
 
     @post
     def preview(self, request):
          form = self.create_form(request.POST)
-         form.css_selector.data = 'stub'
          if form.validate():
-             form.css_selector.data = ''
-             self.url_cache_service.cache_url_contents(form.url.data)
              return self.view({'form':form}, 'new')
          else:
              return self.view({'form':form, 'preview':True}, 'new')

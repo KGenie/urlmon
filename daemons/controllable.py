@@ -84,7 +84,8 @@ class ControllableDaemon(Daemon):
         try:
             self.init_daemon()
         except Exception, e:
-            error('Error ocurred while initializing the daemon: %s' % e)
+            error('Error ocurred while initializing the daemon %s: %s' %
+                    (self.name, e))
         if self.use_pool:
             self.pool = ThreadPool()
         self.listener = Listener(self.sockfilename, 'AF_UNIX')

@@ -14,16 +14,17 @@ class Storage(ControllableDaemon):
     def __init__(self):
         ControllableDaemon.__init__(self)
         self.module_cache = None
+        self.use_pool = False
 
 
     def process_message(self, message):
         debug('Method call arrived, dispatching it')
         ret = None
         try:
-            ret = self.dispatch(*message)
+            ret = self.__dispatch(*message)
         except Exception as e:
             error('Error ocurred while dispatching method call: %s', e)
-        except:
+        else:
             debug('Method successfully executed, sending back the result')
         return ret
 
@@ -43,22 +44,30 @@ class Storage(ControllableDaemon):
             __import__(module_name, globals=globals(), 
                     fromlist=[service_name])
             self.module_cache[module_name] = sys.modules[module_name]
+            reload(self.module_cache[module_name])
         debug('Imported all modules successfully')
         os.chdir('/')
             
 
-    def dispatch(self, module_name, class_name, method_name,
+    def __dispatch(self, module_name, class_name, method_name,
             args, kwargs):
         module = self.module_cache[module_name]
         klass = getattr(module, class_name)
         method = getattr(klass, method_name)
-        debug('Invoking %s with args %s and kwargs %s' % (method_name, 
-            args, kwargs))
+        debug('Invoking %s.%s with args %s and kwargs %s' % (class_name, 
+            method_name, args, kwargs))
+        debug('Actual method to be invoked: %s' % method.__name__)
         ret = method(*args, **kwargs)
         debug('Method successfully invoked, return value was %s' % ret)
         if hasattr(ret, '__iter__'):
             ret = list(ret)
         return ret
+
+
+    def dispatch(self, module_name, class_name, method_name, args,
+            kwargs):
+        return self.send((module_name, class_name, method_name, 
+            args, kwargs), get_response=True)
        
 
 DAEMON = Storage()

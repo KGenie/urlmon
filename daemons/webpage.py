@@ -1,7 +1,60 @@
+import urllib2, datetime, logging
+from controllable import ControllableDaemon
+from models.webpage import Webpage
+from services.webpage import WebpageService
 from urlparse import urlparse, urlunparse
 from lxml import etree, html
 from lxml.html import builder as E
 from udammit import UnicodeDammit
+
+
+__logger = logging.getLogger('daemons.controllable.webpage')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
+
+class WebpageDaemon(ControllableDaemon):
+
+    def __init__(self):
+        ControllableDaemon.__init__(self)
+       
+
+    def process_message(self, message):
+        debug('Preparing to make a web request')
+        ret = None
+        try:
+            ret = self.__fetch(*message)
+        except Exception as e:
+            error('Error ocurred while fetching web page: %s', e)
+        else:
+            debug('Webpage successfully fetched and stored')
+        return ret
+
+
+    def __fetch(self, url):
+        request = urllib2.Request(url)
+        request.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0')
+        debug('Making request to %s...' % url)
+        response = urllib2.urlopen(request)
+        debug('Response obtained, processing the page for storage')
+        body = process(response)
+
+        page = Webpage(url, body, datetime.datetime.now())
+        return page
+
+
+    def fetch(self, url):
+        return self.send((url,), get_response=True)
+
+           
+
+DAEMON = WebpageDaemon()
+
+
+
+
+# Page processing code
 
 
 __filtered_tags = set(['html', 'head', 'body'])

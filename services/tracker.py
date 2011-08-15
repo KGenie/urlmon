@@ -25,6 +25,7 @@ class TrackerService(StorageService):
             setattr(item, 'tracker_group', tracker_group)
         return super(TrackerService, cls).get_all()
 
+
     @classmethod
     def any_with_group(cls, group_id):
         group_id = int(group_id)

@@ -28,14 +28,14 @@ class Mailer(ControllableDaemon):
     def process_message(self, message):
         debug('Mail arrived, trying to send it...')
         try:
-            self.sendmail(*message)
+            self.__sendmail(*message)
         except Exception as e:
             error('Error ocurred while sending mail: %s', e)
-        except:
+        else:
             debug('Mail successfully sent!')
 
 
-    def sendmail(self, to, subject, text, mime='plain', charset='utf-8'):
+    def __sendmail(self, to, subject, text, mime='plain', charset='utf-8'):
         msg = MIMEText(text, mime, charset)
         msg['Subject'] = subject
         msg['From'] = self.sender
@@ -47,6 +47,9 @@ class Mailer(ControllableDaemon):
         conn.login(self.username, self.password)
         conn.sendmail(self.sender, [to], msg.as_string())
         conn.quit()
-            
+
+
+    def sendmail(self, email, subject, msg):
+        self.send((email, subject, msg))
 
 DAEMON = Mailer()

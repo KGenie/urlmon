@@ -25,7 +25,7 @@ class RegistrationService(Service):
         msg = _msg_template.substitute(
                 activation_link=self.reconstruct_url(reg_id))
         subject = 'Activate your account on the Web Monitor'
-        mailer_daemon.send((user.email, subject, msg))
+        mailer_daemon.sendmail(user.email, subject, msg)
 
 
     def activate_user(self, reg_id):

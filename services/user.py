@@ -16,8 +16,8 @@ class UserService(StorageService):
     @classmethod
     def authenticate(cls, email, password):
         for u in cls.get_all():
-            if unicode(u.email) == unicode(email):
-                if unicode(u.password) == unicode(password):
+            if u.email == email:
+                if u.password == password:
                     return u
                 return None
 
@@ -30,6 +30,7 @@ class UserService(StorageService):
 
     @classmethod
     def exists(cls, email):
+        debug('Checking if email %s exists' % email)
         l = list(u for u in cls.get_all() if\
-                unicode(u.email) == unicode(email))
+                u.email == email)
         return len(l)

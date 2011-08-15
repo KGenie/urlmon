@@ -14,8 +14,8 @@ def generate_client_classmethod_proxy(method_name, socket_path):
     def proxy(cls, *args, **kwargs):
         module_name = cls.__module__
         class_name = cls.__name__
-        result = storage_daemon.send((module_name, class_name, 
-            method_name, args, kwargs), get_response=True)
+        result = storage_daemon.dispatch(module_name, class_name, 
+            method_name, args, kwargs)
         debug('RESULT was %s' % result)
         return result
     return classmethod(proxy)
