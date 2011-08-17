@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta
 from app_components.controller import WebMonitorController
 from models.tracker import Tracker, TrackerTable
+from models.task import UpdateResource, TrackResource
 from forms.tracker import TrackerForm
 from services.tracker import TrackerService
 from services.tracker_group import TrackerGroupService
+from services.task import TaskService
 from services.fetcher import FetcherService
 from wsgi.http_method import get, post
 from helpers import menu
@@ -13,6 +16,7 @@ class TrackerController(WebMonitorController):
     tracker_service = TrackerService
     tracker_group_service = TrackerGroupService
     fetcher_service = FetcherService
+    task_service = TaskService
 
 
     @get
@@ -83,7 +87,15 @@ class TrackerController(WebMonitorController):
             tracker = Tracker()
             form.populate_obj(tracker)
             tracker.user_id = self.session['user'].id
-            self.tracker_service.insert(tracker)
+            tracker = self.tracker_service.insert(tracker)
+            
+            self.task_service.insert(UpdateResource(url=tracker.url,
+                next_run=datetime.now() + timedelta(seconds=20)))
+
+            self.task_service.insert(TrackResource(tracker_id=tracker.id,\
+                    next_run=datetime.now() + timedelta(seconds=5)))
+
+
             return self.redirect('index')
 
         return self.view({'form':form }, 'new')

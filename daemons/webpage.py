@@ -1,11 +1,12 @@
 import urllib2, datetime, logging
+from traceback import format_exc
 from controllable import ControllableDaemon
 from models.webpage import Webpage
-from services.webpage import WebpageService
 from urlparse import urlparse, urlunparse
 from lxml import etree, html
 from lxml.html import builder as E
 from udammit import UnicodeDammit
+from util import normalize_url
 
 
 __logger = logging.getLogger('daemons.controllable.webpage')
@@ -26,14 +27,15 @@ class WebpageDaemon(ControllableDaemon):
         try:
             ret = self.__fetch(*message)
         except Exception as e:
-            error('Error ocurred while fetching web page: %s', e)
+            error('Error ocurred while fetching web page: %s', format_exc(e))
         else:
             debug('Webpage successfully fetched and stored')
         return ret
 
 
+
     def __fetch(self, url):
-        request = urllib2.Request(url)
+        request = urllib2.Request(normalize_url(url))
         request.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0')
         debug('Making request to %s...' % url)
         response = urllib2.urlopen(request)

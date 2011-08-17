@@ -1,4 +1,5 @@
 import logging, os, fork_vars, glob, sys
+from traceback import format_exc
 from controllable import ControllableDaemon
 from app_globals import APP_ROOT
 
@@ -23,7 +24,8 @@ class Storage(ControllableDaemon):
         try:
             ret = self.__dispatch(*message)
         except Exception as e:
-            error('Error ocurred while dispatching method call: %s', e)
+            error('Error ocurred while dispatching method call: %s',
+                    format_exc(e))
         else:
             debug('Method successfully executed, sending back the result')
         return ret

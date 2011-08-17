@@ -1,5 +1,6 @@
 import inspect
 from app_components.service import Service
+from urlparse import urlparse, urlunparse
 
 def is_authorized(user_roles, authorized_roles, denied_roles):
     """
@@ -17,6 +18,16 @@ def is_authorized(user_roles, authorized_roles, denied_roles):
     denied_roles = set(denied_roles)
     return bool(user_roles.difference(denied_roles)) and\
             not user_roles.isdisjoint(authorized_roles)
+
+
+def normalize_url(url):
+    if '//' not in url:
+        url = '//' + url
+    u = list(urlparse(url))
+    if u[0] == '':
+        u[0] = 'http'
+    u = urlunparse(u)
+    return u
 
 
 def get_controller_actions(controller_dict):

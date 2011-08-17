@@ -22,15 +22,20 @@ class TaskDaemon(Daemon):
         
 
     def run(self):
-        debug('Starting task scheduler')
-        sleep(1)
-        pool = ThreadPool(self.threads)
-        while 1:
+        try:
+            debug('Starting task scheduler')
             time = datetime.now()
+            sleep(2)
+            pool = ThreadPool(self.threads)
+        except Exception, ex:
+            error('An error ocurred while beginning task scheduler: %s' %
+                        format_exc(ex))
+
+        while 1:
             debug('Began to run tasks at %s' % time)
             try:
                 service = TaskService(None)
-                tasks = service.get_all()
+                tasks = service.get_tasks_to_run()
             except Exception, e:
                 error('An error ocurred while retrieving all tasks: %s' %
                         format_exc(e))
@@ -38,25 +43,20 @@ class TaskDaemon(Daemon):
                 debug('Tasks retrieved: %s. preparing to run all' % tasks)
                 try:
                     for task in tasks:
-                        if task.match(time):
-                            pool.apply_async(self.run_task, args=(task,))
+                        pool.apply_async(self.run_task, args=(task, service))
                 except Exception, e:
-                    error('An error ocurred while executing one or more tasks: %s '
+                    error('An error ocurred while dispatching one or more tasks: %s '
                             % format_exc(e))
-
-            # check for scheduled tasks again in at most one minute
-            time += timedelta(seconds=5)
-            current = datetime.now()
-            while current < time:
-                current = datetime.now()
-                if current > time:
-                    current = time
-                sleeptime = max((time - current).seconds, 0)
-                sleep(sleeptime)
+            sleep(5)
 
 
-    def run_task(self, task):
-        debug('Running task %s' % task.id)
+    def run_task(self, task, task_service):
+        try:
+            task.run()
+            task_service.update(task.id, task)
+        except Exception, e:
+            error('An error occurred while executing a task: %s' %
+                    format_exc(e))
 
 
     def enqueue_task(self, task):

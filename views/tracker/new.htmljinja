@@ -44,19 +44,13 @@ Fill the form to create new trackers
     {{ render_field(form.id) }}
     {{ render_field(form.name) }}
 
-    <div class="form-cell">
-      <label for="{{ form.url.label.field_id }}" class="form-label">
-        {{ form.url.label.text|e }} :
-      </label>   
-      {{ form.url() }} 
-      {{ validation_summary(form.url) }}
-      {% if preview %}
-      <button type="submit">Preview</button>
-      {% endif %}
-    </div>
+    {{ render_field(form.url) }}
 
     {{ render_field(form.css_selector) }}
-    
+
+    {{ render_field(form.frequency) }}
+    {{ render_field(form.tracker_group_id) }}
+
     {% if not preview %}
     <span class="tip">Click on a region to automatically fill the 'CSS Selector'</span>
     <div id="select-region">
@@ -67,14 +61,14 @@ Fill the form to create new trackers
     </div>
     {% endif %}
 
-    {{ render_field(form.frequency) }}
-    {{ render_field(form.tracker_group_id) }}
 
-    {% if not preview %}
     <div class="form-cell">  
+      {% if not preview %}
       <button type="submit" class="form-submit">Create tracker!</button>
+      {% else %}
+      <button type="submit" class="form-submit">Preview</button>
+      {% endif %}
     </div>
-    {% endif %}
   </fieldset>
 </form>
 

@@ -8,11 +8,13 @@ class TrackerService(StorageService):
 
     @classmethod
     def stub_data(cls):
+#        cls.insert(Tracker(name='Dusty Feet', url='http://dustyfeet.com',
+#            tracker_group_id=1, frequency=30, css_selector='#center-font', user_id=1))
         cls.insert(Tracker(name='Google tracker', url='http://www.google.com',
-            tracker_group_id=1, frequency='20',
+            tracker_group_id=1, frequency=20,
             user_id=1))
         cls.insert(Tracker(name='Yahoo tracker', url='http://www.yahoo.com',
-            tracker_group_id=1, frequency='5',
+            tracker_group_id=1, frequency=5,
             user_id=1))
 
 

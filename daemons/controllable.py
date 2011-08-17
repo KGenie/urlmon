@@ -1,4 +1,5 @@
 import os, logging, fork_vars
+from traceback import format_exc
 from multiprocessing.connection import Listener, Client
 from multiprocessing.dummy import Pool as ThreadPool
 from daemon import Daemon
@@ -71,7 +72,7 @@ class ControllableDaemon(Daemon):
                 connection.send(response)
                 debug('Response successfully sent')
         except Exception, e:
-            error('Error ocurred while receiving message: %s' % e) 
+            error('Error ocurred while receiving message: %s' % format_exc(e)) 
         finally:
             connection.close()
 
@@ -85,7 +86,7 @@ class ControllableDaemon(Daemon):
             self.init_daemon()
         except Exception, e:
             error('Error ocurred while initializing the daemon %s: %s' %
-                    (self.name, e))
+                    (self.name, format_exc(e)))
         if self.use_pool:
             self.pool = ThreadPool()
         self.listener = Listener(self.sockfilename, 'AF_UNIX')
@@ -102,7 +103,8 @@ class ControllableDaemon(Daemon):
                 else:
                     self.serve_connection(conn)
             except Exception, e:
-                error('There was an error in accepting the connection: %s' % e)
+                error('There was an error in accepting the connection: %s' %
+                        format_exc(e))
         if self.use_pool:
             self.pool.close()
             self.pool.join()

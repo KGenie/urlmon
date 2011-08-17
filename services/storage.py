@@ -90,7 +90,11 @@ class StorageService(Service):
     @classmethod
     def get_all_by_user(cls, user):
         all = cls.get_all()
-        return (t for t in all if t.user_id == user.id)
+        if isinstance(user, (int, long)):
+            user_id = user
+        else:
+            user_id = user.id
+        return (t for t in all if t.user_id == user_id)
 
 
     @classmethod
