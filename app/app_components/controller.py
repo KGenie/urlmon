@@ -27,6 +27,17 @@ class WebMonitorController(object):
         return JinjaResponse(self.request, name, controller,
                 model)
 
+    def js(self, model=None, name=None, controller=None):
+        view_name_format = '%s.jsjinja'
+        if not name:
+            name = self.request.environ['route']['action']
+        if not controller:
+            controller = self.request.environ['route']['controller']
+        name = view_name_format % name
+        return JinjaResponse(self.request, name, controller,
+                model, content_type='text/javascript')
+
+
     def redirect(self, action, controller=None, **qsargs):
         if not controller:
             controller = self.request.environ['route']['controller']

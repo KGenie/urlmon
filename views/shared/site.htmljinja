@@ -15,9 +15,15 @@
     <link rel="stylesheet" href="{{ u.static('/css/reset.css') }}" type="text/css" /> 
     <link rel="stylesheet" href="{{ u.static('/css/site.css') }}" type="text/css" />
 
+    <script type="text/javascript"
+      src="{{ u.action('helpers', controller='js') }}"></script>
+
+
     <script type="text/javascript" 
       src="{{ u.static('/js/umon.js') }}"></script>
 
+    <script type="text/javascript" 
+      src="{{ u.static('/js/umon_helpers.js') }}"></script>
 
     <script type="text/javascript" 
       src="{{ u.static('/js/styles.js') }}"></script>

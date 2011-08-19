@@ -1,9 +1,12 @@
+from datetime import datetime, timedelta
 from storage import StorageService
 from tracker_group import TrackerGroupService
 from models.tracker import Tracker
 
 
 class TrackerService(StorageService):
+
+    task_service = 'task_service'
 
 
     @classmethod

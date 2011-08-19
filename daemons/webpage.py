@@ -34,20 +34,23 @@ class WebpageDaemon(ControllableDaemon):
 
 
 
-    def __fetch(self, url):
+    def __fetch(self, url, current_selector):
         request = urllib2.Request(normalize_url(url))
         request.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0')
         debug('Making request to %s...' % url)
         response = urllib2.urlopen(request)
         debug('Response obtained, processing the page for storage')
-        body = process(response)
+        body_dom = get_processed_dom(response)
+        if current_selector:
+            body_dom = select_content(body_dom, current_selector)
+        body = etree.tostring(body_dom, method='html')
 
         page = Webpage(url, body, datetime.datetime.now())
         return page
 
 
-    def fetch(self, url):
-        return self.send((url,), get_response=True)
+    def fetch(self, url, current_selector=None):
+        return self.send((url, current_selector), get_response=True)
 
            
 
@@ -58,11 +61,18 @@ DAEMON = WebpageDaemon()
 
 # Page processing code
 
+def select_content(body_dom, current_selector):
+    for tag in body_dom.cssselect(current_selector):
+        classes = tag.attrib.get('class', '')
+        classes += ' selected-element'
+        tag.attrib['class'] = classes
+    return body_dom
+
 
 __filtered_tags = set(['html', 'head', 'body'])
 __parser = etree.HTMLParser(recover=True)
 
-def process(response):
+def get_processed_dom(response):
     url = urlparse(response.geturl())
     dammit = UnicodeDammit(response.read(), isHTML=True)
     dom = html.fromstring(dammit.unicode, base_url=url.geturl())
@@ -71,7 +81,7 @@ def process(response):
     _process_scripts(dom)
     _process_selectable_elements(dom)
     _process_ids(dom)
-    return etree.tostring(dom, method="html")
+    return dom
 
 
 def _process_selectable_elements(dom):

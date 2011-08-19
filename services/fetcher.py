@@ -4,5 +4,5 @@ from daemons.webpage import DAEMON as fetcher_daemon
 
 class FetcherService(Service):
 
-    def fetch(self, url):
-        return fetcher_daemon.fetch(url)
+    def fetch(self, url, selector=None):
+        return fetcher_daemon.fetch(url, selector)

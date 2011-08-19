@@ -120,7 +120,6 @@ button.link {
 
 .tip {
     display: block;
-    padding-top:3em;
 }
 
 .form-cell, .form-cell-with-button {
@@ -135,7 +134,7 @@ button.link {
 }
 
 .form-label {
-    width: 30%;
+    width: 20%;
     float: left;
     text-align: right;
     margin-top: 0.3em;
@@ -146,13 +145,28 @@ button.link {
 .form-input {
     display: block;
     float: left;
-    width: 65%;
+    width: 75%;
 } 
+
+.form-input-smaller {
+    display: block;
+    float: left;
+    width: 70%;
+}
 
 .form-field-value {
     width: 65%;
     padding-top: 0.3em;
     padding-left: 0.3em;
+}
+
+.form-input-button {
+    width: 5%;
+    padding: 0;
+}
+
+.img-input-button {
+    width: 85%;
 }
 
 .error-list {
@@ -172,6 +186,7 @@ button.link {
 form.post-link-form {
     display:inline;
 }
+
 
 .table-container {
     width: 90%;

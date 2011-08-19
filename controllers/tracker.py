@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from app_components.controller import WebMonitorController
 from models.tracker import Tracker, TrackerTable
-from models.task import UpdateResource, TrackResource
+from models.update_resource import UpdateResource
+from models.track_resource import TrackResource
 from forms.tracker import TrackerForm
 from services.tracker import TrackerService
 from services.tracker_group import TrackerGroupService
@@ -31,7 +32,7 @@ class TrackerController(WebMonitorController):
     @menu(label='Create')
     def new(self, request):
         form = self.create_form()
-        return self.view({'form':form, 'preview': True })
+        return self.view({'form':form })
 
 
     @get
@@ -64,19 +65,13 @@ class TrackerController(WebMonitorController):
     @menu(exclude=True)
     def cached_url(self, request):
         url = request.GET.get('url', None)
+        selector = request.GET.get('selector', None)
         if not url:
             return None
-        page = self.fetcher_service.fetch(url)
+        page = self.fetcher_service.fetch(url, selector)
+        if not page:
+            return self.content('Server error ocurred!')
         return self.content(page.contents)
-
-
-    @post
-    def preview(self, request):
-         form = self.create_form(request.POST)
-         if form.validate():
-             return self.view({'form':form}, 'new')
-         else:
-             return self.view({'form':form, 'preview':True}, 'new')
 
 
     @post
@@ -88,12 +83,12 @@ class TrackerController(WebMonitorController):
             form.populate_obj(tracker)
             tracker.user_id = self.session['user'].id
             tracker = self.tracker_service.insert(tracker)
-            
+
             self.task_service.insert(UpdateResource(url=tracker.url,
                 next_run=datetime.now() + timedelta(seconds=20)))
 
             self.task_service.insert(TrackResource(tracker_id=tracker.id,\
-                    next_run=datetime.now() + timedelta(seconds=5)))
+                next_run=datetime.now() + timedelta(seconds=5)))
 
 
             return self.redirect('index')
@@ -115,6 +110,15 @@ class TrackerController(WebMonitorController):
             else:
                 self.session['flash-success'] = \
                 'Tracker sucessfully updated'
+                self.task_service.get_by_tracker_id
+
+                self.task_service.insert(UpdateResource(url=tracker.url,
+                next_run=datetime.now() + timedelta(seconds=20)))
+
+                self.task_service.insert(TrackResource(tracker_id=tracker.id,\
+                    next_run=datetime.now() + timedelta(seconds=5)))
+
+
 
             return self.redirect('index')
 

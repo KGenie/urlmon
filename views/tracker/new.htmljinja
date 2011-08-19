@@ -1,5 +1,5 @@
 {% extends "shared/page.htmljinja" %}
-{% from "macros/form.htmljinja" import wtform, render_field, validation_summary %}
+{% from "tracker/macros.htmljinja" import trackerform %}
 
 {% block title %}
 Create a new tracker
@@ -31,46 +31,11 @@ Fill the form to create new trackers
 
 {% block main %}
 
-{% if preview %}
-{% set action='preview' %}
-{% else %}
-{% set action='create' %}
-{% endif %}
-
-<form id="tracker-form" method="POST"
-  action="{{ u.action(name=action, controller='tracker') }}">
-  <fieldset>
-
-    {{ render_field(form.id) }}
-    {{ render_field(form.name) }}
-
-    {{ render_field(form.url) }}
-
-    {{ render_field(form.css_selector) }}
-
-    {{ render_field(form.frequency) }}
-    {{ render_field(form.tracker_group_id) }}
-
-    {% if not preview %}
-    <span class="tip">Click on a region to automatically fill the 'CSS Selector'</span>
-    <div id="select-region">
-      <iframe id="select-frame" src="{{ u.action('cached_url', 
-        controller='tracker', url=form.url.data) }}">
-        <p>Your browser must support iframes to select a region visually!</p>
-      </iframe>
-    </div>
-    {% endif %}
-
-
-    <div class="form-cell">  
-      {% if not preview %}
-      <button type="submit" class="form-submit">Create tracker!</button>
-      {% else %}
-      <button type="submit" class="form-submit">Preview</button>
-      {% endif %}
-    </div>
-  </fieldset>
-</form>
-
+{{ trackerform(
+      id='tracker-form',
+      action=u.action('create'), 
+      refresh_img=u.static('/images/refresh.png'),
+      form=form, 
+      submit_text='Create tracker!') }}
 
 {% endblock %}

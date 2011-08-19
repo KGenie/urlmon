@@ -1,0 +1,45 @@
+{% from "macros/form.htmljinja" import render_field, validation_summary %}
+
+{% macro trackerform(id, form, action, refresh_img, submit_text='Submit', method='POST') -%}
+<form id="{{ id }}" method="{{ method }}"
+  action="{{ action }}">
+  <fieldset>
+
+    {{ render_field(form.id) }}
+    {{ render_field(form.name) }}
+
+
+    {{ render_field(form.frequency) }}
+    {{ render_field(form.tracker_group_id) }}
+
+
+    <div class="form-cell{{ ' form-cell-error' if form.url.errors }}">
+      <label for="{{ form.url.label.field_id }}" class="form-label">
+        {{ form.url.label.text|e }} :
+      </label>
+      {{ form.url(class='form-input-smaller') }}
+      <button id="refresh-iframe-button" title="Click to refresh the window below" 
+        class="form-input-button">
+        <img class="img-input-button" src="{{ refresh_img }}" />
+      </button>
+      {{ validation_summary(form.url) }}
+    </div>
+
+
+    {{ render_field(form.css_selector) }}
+    <div class="form-cell">
+      <span class="tip">Click on a region to automatically fill the 'CSS Selector'</span>
+      <div id="select-region">
+        <iframe id="select-frame" src="" disabled="disabled">
+          <p>Your browser must support iframes to select a region visually!</p>
+        </iframe>
+      </div>
+    </div>
+
+    <div class="form-cell">  
+      <button type="submit" class="form-submit">{{ submit_text }}</button>
+    </div>
+  </fieldset>
+</form>
+
+{%- endmacro %}

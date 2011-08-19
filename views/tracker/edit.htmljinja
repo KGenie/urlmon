@@ -1,5 +1,5 @@
 {% extends "shared/page.htmljinja" %}
-{% from "macros/form.htmljinja" import wtform %}
+{% from "tracker/macros.htmljinja" import trackerform %}
 
 {% block title %}
 Edit a tracker
@@ -13,11 +13,10 @@ Edit form fields to update the tracker
 {% endblock %}
 
 {% block main %}
-{{ wtform(
-        id='tracker-form', 
-        form=form, 
-        action=u.action(
-            name='update', 
-            controller='tracker'), 
-        submit_text='Update') }}
+{{ trackerform(
+      id='tracker-form',
+      action=u.action('update'), 
+      refresh_img=u.static('/images/refresh.png'),
+      form=form, 
+      submit_text='Update tracker!') }}
 {% endblock %}

@@ -1,0 +1,5 @@
+var uMon = uMon || {};
+
+uMon.globals = {
+
+};

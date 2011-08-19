@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from storage import StorageService
-from models.task import TrackResource, UpdateResource
+from models.track_resource import TrackResource
+from models.update_resource import UpdateResource
 
 text=""" elcome to my Small-But-Intense Home Page! There's not
 much here yet, but at least I'm avoiding those obnoxious under construction tags, so if
@@ -24,3 +25,4 @@ class TaskService(StorageService):
         tasks = cls.get_all()
         now = datetime.now()
         return (t for t in tasks if t.next_run <= now)
+

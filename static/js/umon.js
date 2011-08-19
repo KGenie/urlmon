@@ -1,6 +1,35 @@
-var uMon = {};
+var uMon = uMon || {};
 
 (function (uMon, $) {
+
+    $(document).ready(function() {
+        var iFrameButton = $('#refresh-iframe-button'); 
+        iFrameButton.click(uMon.iFrameRefresh); 
+        iFrameButton.trigger('click');
+    });
+
+    uMon.iFrameRefresh = function (event) {
+        var sender = $(this);
+        var newUrl = sender.closest('form').find('#url').val();
+        var cssSelector = sender.closest('form').find('#css_selector').val();
+        var iFrame = sender.closest('form').find('iframe');
+        if (iFrame.length == 0 || !newUrl) {
+            return false;
+        }
+
+        var param = {
+            url: newUrl
+        };
+
+        if (cssSelector) {
+            param.selector = cssSelector;
+        }
+   
+        var cachedUrl = uMon.action('cached_url', 'tracker', param);
+        iFrame.attr('src', cachedUrl);
+        return false;
+    };
+
     uMon.iFrameLoaded = function() {
         var iFrame = $('#select-frame');
         var iFrameChildren = iFrame.contents().find('.selectable-element');

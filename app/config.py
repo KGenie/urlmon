@@ -1,5 +1,5 @@
 import os, sys, glob, app_globals, logging, fork_vars, atexit
-from helpers import HtmlHelper
+from helpers import HtmlHelper, UrlHelper
 from pipestream import PipeStream
 from beaker.middleware import SessionMiddleware
 from webob.exc import HTTPNotFound
@@ -41,7 +41,7 @@ def make_beaker_options():
             }
 
 
-def make_jinja_environment():
+def make_jinja_web_environment():
     ret = Environment(loader=FileSystemLoader('./views'))
     ret.globals['h'] = HtmlHelper()
     return ret
@@ -162,7 +162,7 @@ def make_app():
 
     
     atexit.register(stop_daemons)
-    app_globals.JINJA_ENV = make_jinja_environment()
+    app_globals.JINJA_ENV = make_jinja_web_environment()
     global CONTROLLER_CACHE
     CONTROLLER_CACHE = make_controllers()
   
