@@ -6,6 +6,5 @@ class WebpageService(StorageService):
 
     entity = Webpage
 
-    @classmethod
     def get_by_url(self, url):
         return self.get(url)

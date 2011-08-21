@@ -20,5 +20,5 @@ class TrackResource(Task):
         if isinstance(value, unicode):
             value = value.encode('utf-8')
         h.update(value)
-        self.last_digest = h.hexdigest()        
+        self.last_digest = h.digest()        
         self._last_content = value

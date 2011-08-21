@@ -134,11 +134,9 @@ def setup_logging():
     stream = PipeStream(logging_file,read=False, write=True)
 
     logging.getLogger('services').addHandler(logging.StreamHandler(stream))
-    logging.getLogger('services').setLevel(logging.ERROR)
-    logging.getLogger('daemons').addHandler(logging.StreamHandler(stream))
-    logging.getLogger('daemons').setLevel(logging.ERROR)
-    logging.getLogger('models.task').addHandler(logging.StreamHandler(stream))
-    logging.getLogger('models.task').setLevel(logging.DEBUG)
+    logging.getLogger('services').setLevel(logging.DEBUG)
+    logging.getLogger('daemons.task').addHandler(logging.StreamHandler(stream))
+    logging.getLogger('daemons.task').setLevel(logging.DEBUG)
 
 
     #logging_file = os.path.join(fork_vars.IPC_SOCKET_DIR,'log.txt')
@@ -202,6 +200,10 @@ class DispatcherMiddleware(object):
     def __call__(self, environ, start_response):
         response = self.app(environ, start_response)
         if not response:
+            sqlalch.Session().rollback()
+            sqlalch.Session().close()
             return HTTPNotFound()(environ, start_response)
 
+        sqlalch.Session().commit()
+        sqlalch.Session().close()
         return response(environ, start_response)

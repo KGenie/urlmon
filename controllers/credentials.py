@@ -5,6 +5,7 @@ from wsgi.http_method import get, post
 from forms.login import LoginForm
 from models.user import User
 from services.user import UserService
+from database.sqlalch import Session
 
 @auth(required=False)
 class CredentialsController(WebMonitorController):

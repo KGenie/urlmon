@@ -65,7 +65,7 @@ class TrackerGroupController(WebMonitorController):
         if form.validate():
             tracker_group = TrackerGroup()
             form.populate_obj(tracker_group)
-            tracker_group.user_id = self.session['user'].id
+            tracker_group.user_email = self.session['user'].email
             tracker_group = self.tracker_group_service.insert(tracker_group)
             if not tracker_group:
                 self.session['flash-error'] = \
@@ -85,7 +85,7 @@ class TrackerGroupController(WebMonitorController):
         if form.validate():
             tracker_group = TrackerGroup()
             form.populate_obj(tracker_group)
-            tracker_group.user_id = self.session['user'].id
+            tracker_group.user_email = self.session['user'].email
             tracker_group = self.tracker_group_service.update(tracker_group.id, tracker_group)
             if not tracker_group:
                 self.session['flash-error'] = \

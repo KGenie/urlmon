@@ -9,7 +9,8 @@ webpage = Table('webpage', metadata,
         # 2083 is the maximum url length supported by IE
         Column('url', String(2083), primary_key=True),
         Column('contents', LargeBinary),
-        Column('last_modified', DateTime)
+        Column('last_updated', DateTime),
+        Column('digest', LargeBinary(20))
         )
 
 
@@ -40,13 +41,13 @@ tracker = Table('tracker', metadata,
         Column('css_selector', String(300)),
         Column('url', ForeignKey('webpage.url')),
         Column('tracker_group_id', ForeignKey('tracker_group.id')),
-        Column('user_email', ForeignKey('user.email'))
         )
 
 
 task = Table('task', metadata,
         Column('id', Integer, primary_key=True),
         Column('next_run', DateTime),
+        Column('is_running', Boolean),
         Column('type', Integer)
         )
 
@@ -54,11 +55,12 @@ task = Table('task', metadata,
 track_resource = Table('track_resource', metadata,
         Column('id', ForeignKey('task.id'), primary_key=True),
         Column('tracker_id', ForeignKey('tracker.id')),
-        Column('last_content', LargeBinary)
+        Column('last_content', LargeBinary),
+        Column('last_digest', LargeBinary(20))
         )
 
 
 update_resource = Table('update_resource', metadata,
         Column('id', ForeignKey('task.id'), primary_key=True),
-        Column('url', ForeignKey('webpage.url'))
+        Column('url', ForeignKey('webpage.url'), unique=True)
         )

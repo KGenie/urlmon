@@ -4,10 +4,11 @@ from util import normalize_url
 
 class Webpage(Model):
     
-    def __init__(self, url, contents, last_modified):
+    def __init__(self, url, contents, last_updated):
         self.url = url
+        self.digest = None
         self.contents = contents
-        self.last_modified = last_modified
+        self.last_updated = last_updated
 
 
     @property
@@ -31,5 +32,5 @@ class Webpage(Model):
         if isinstance(value, unicode):
             value = value.encode('utf-8')
         h.update(value)
-        self.digest = h.hexdigest()        
+        self.digest = h.digest()        
         self._contents = value

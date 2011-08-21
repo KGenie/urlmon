@@ -16,42 +16,49 @@ def populate():
     # Users
     u1 = User(email='tpadilha84@gmail.com', first_name='Thiago',
         last_name='Padilha', password='123', roles=['admin', 'normal'])
-    session.add(u1)
+    u2 = User(email='tap@cin.ufpe.br', first_name='Thiago',
+            last_name='Arruda', password='123')
+    session.add_all([u1,u2])
     session.commit()
 
+    # Webpage
+   # wp1 = Webpage('http://dustyfeet.com', contents, datetime.now())
+   # session.add(wp1)
+   # session.commit()
 
     # Tracker groups
     tg1 = TrackerGroup(name='Search engines', user_email=u1.email, 
             comment='Trackers for search engines.')
-    session.add(tg1)
+    tg2 = TrackerGroup(name='Tests', user_email=u2.email,
+            comment='Testing trackers 2')
+    session.add_all([tg1,tg2])
     session.commit()
 
 
     # Trackers
-    tr1 = Tracker(name='Google tracker', url='http://www.google.com',
-            tracker_group_id=tg1.id, frequency=20, user_email=u1.email)
-    tr2 = Tracker(name='Yahoo tracker', url='http://www.yahoo.com',
-            tracker_group_id=tg1.id, frequency=5, user_email=u1.email)
-    #tr3 = Tracker(name='Dusty Feet', url='http://dustyfeet.com',
-    #        tracker_group_id=tg1.id, frequency=30, 
-    #        css_selector='#center-font', user_email=u1.email))
-    session.add_all([tr1,tr2])
-    session.commit()
-
-
-    # Webpage
-    wp1 = Webpage('http://dustyfeet.com', contents, datetime.now())
-    session.add(wp1)
-    session.commit()
+   # tr1 = Tracker(name='Google tracker', url='http://www.google.com',
+   #         tracker_group_id=tg1.id, frequency=20)
+   # tr2 = Tracker(name='Yahoo tracker', url='http://www.yahoo.com',
+   #         tracker_group_id=tg1.id, frequency=5)
+   # tr3 = Tracker(name='Dusty Feet', url='http://dustyfeet.com',
+   #         tracker_group_id=tg1.id, frequency=30, 
+   #         css_selector='#center-font')
+   # tr4 = Tracker(name='Dusty Feet2', url='http://dustyfeet.com',
+   #         tracker_group_id=tg2.id, frequency=30, 
+   #         css_selector='#non-existent')
+   # session.add_all([tr1,tr2,tr3,tr4])
+   # session.commit()
 
 
     #Tasks
-    t1 = UpdateResource(url='http://dustyfeet.com',
-            next_run=datetime.now() + timedelta(seconds=20))
-    t2 = TrackResource(tracker_id=tr1.id, last_content=text,
-            next_run=datetime.now() + timedelta(seconds=5))
-    session.add_all([t1,t2])
-    session.commit()
+   # t1 = UpdateResource(url='http://dustyfeet.com',
+   #         next_run=datetime.now() + timedelta(seconds=20))
+   # t2 = TrackResource(tracker_id=tr3.id, last_content=text,
+   #         next_run=datetime.now() + timedelta(seconds=5))
+   # t3 = TrackResource(tracker_id=tr4.id, last_content='non-existent',
+   #         next_run=datetime.now() + timedelta(seconds=5))
+   # session.add_all([t1,t2,t3])
+   # session.commit()
 
 
 text=u""" elcome to my Small-But-Intense Home Page! There's not

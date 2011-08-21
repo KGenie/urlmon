@@ -15,13 +15,18 @@ class UserService(StorageService):
 
     entity = User
 
+   
+
     def authenticate(self, email, password):
-        return self.session.query(User).\
+        ret = self.session.query(User).\
                 filter(User.email == email).\
                 filter(User.password == password).first()
+        self.session.refresh(ret)
+        self.session.expunge(ret)
+        return ret
 
 
 
     def exists(self, email):
         debug('Checking if email %s exists' % email)
-        return self.session.query(User).get(email)
+        return bool(list(self.session.query(User).get(email)))

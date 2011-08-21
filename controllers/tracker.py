@@ -81,7 +81,6 @@ class TrackerController(WebMonitorController):
         if form.validate():
             tracker = Tracker()
             form.populate_obj(tracker)
-            tracker.user_id = self.session['user'].id
             tracker = self.tracker_service.insert(tracker)
 
 
@@ -96,7 +95,6 @@ class TrackerController(WebMonitorController):
         if form.validate():
             tracker = Tracker()
             form.populate_obj(tracker)
-            tracker.user_id = self.session['user'].id
             tracker = self.tracker_service.update(tracker.id, tracker)
             if not tracker:
                 self.session['flash-error'] = \
@@ -104,15 +102,6 @@ class TrackerController(WebMonitorController):
             else:
                 self.session['flash-success'] = \
                 'Tracker sucessfully updated'
-                self.task_service.get_by_tracker_id
-
-                self.task_service.insert(UpdateResource(url=tracker.url,
-                next_run=datetime.now() + timedelta(seconds=20)))
-
-                self.task_service.insert(TrackResource(tracker_id=tracker.id,\
-                    next_run=datetime.now() + timedelta(seconds=5)))
-
-
 
             return self.redirect('index')
 

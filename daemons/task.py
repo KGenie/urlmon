@@ -1,16 +1,20 @@
 import logging
 from traceback import format_exc
 from datetime import datetime, timedelta
-from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing.dummy import Pool
 from time import sleep
-from services.task import TaskService
+from models.task import Task
+from models.update_resource import UpdateResource
+from models.user import User
+from models.webpage import Webpage
 from daemons.daemon import Daemon
 from daemons.mailer import DAEMON as mailer_daemon
 from daemons.webpage import DAEMON as webpage_daemon
-from services.tracker import TrackerService
-from services.user import UserService
-from services.webpage import WebpageService
+from app_config import NUMBER_OF_TASK_RUNNERS, \
+        INTERVAL_BETWEEN_TASK_CHECKS
 from lxml import etree, html
+from database.sqlalch import Session
+from hashlib import sha1
 
 
 __logger = logging.getLogger('daemons.task')
@@ -22,50 +26,60 @@ info = __logger.info
 
 class TaskDaemon(Daemon):
 
-    def __init__(self, threads=5, stdin='/dev/null', stdout='/dev/null', 
+    def __init__(self, stdin='/dev/null', stdout='/dev/null', 
             stderr='/dev/null'):
         Daemon.__init__(self, stdin, stdout, stderr)
-        self.threads = threads
+        self.threads = NUMBER_OF_TASK_RUNNERS
         
 
     def run(self):
         try:
             debug('Starting task scheduler')
-            time = datetime.now()
             sleep(2)
-            pool = ThreadPool(self.threads)
+            pool = Pool(self.threads)
         except Exception, ex:
             error('An error ocurred while beginning task scheduler: %s' %
                         format_exc(ex))
 
         while 1:
-            debug('Began to run tasks at %s' % time)
+            debug('Looking for tasks to run')
             try:
-                service = TaskService(None)
-                tasks = service.get_tasks_to_run()
+                now = datetime.now()
+                task_ids = Session().query(Task.id).\
+                        filter(Task.next_run <= now).\
+                        filter(Task.is_running == False)
             except Exception, e:
                 error('An error ocurred while retrieving all tasks: %s' %
                         format_exc(e))
             else:
-                debug('Tasks retrieved: %s. preparing to run all' % tasks)
                 try:
-                    for task in tasks:
-                        pool.apply_async(self.run_task, args=(task, service))
+                    for task_id in task_ids:
+                        pool.apply_async(self.run_task, args=(task_id))
                 except Exception, e:
                     error('An error ocurred while dispatching one or more tasks: %s '
                             % format_exc(e))
-            sleep(5)
+            sleep(INTERVAL_BETWEEN_TASK_CHECKS)
 
 
-    def run_task(self, task, task_service):
+    def run_task(self, task_id):
         try:
-            name = task.__class__.__name__
-            if name == 'TrackResource':
+            debug('Running task with id %s' % task_id)
+            session = Session()
+            task = session.query(Task).get(task_id)
+            task.is_running = True
+            session.commit()
+            
+            task_type = task.type
+            if task_type == 1:
                 run_track_resource(task)
-            elif name == 'UpdateResource':
+            elif task_type == 2:
                 run_update_resource(task)
-            task_service.update(task.id, task)
+            task.is_running = False
+            session.commit()
         except Exception, e:
+            session.rollback()
+            task.is_running = False
+            session.commit()
             error('An error occurred while executing a task: %s' %
                     format_exc(e))
 
@@ -80,88 +94,126 @@ DAEMON = TaskDaemon()
 
 
 def run_track_resource(task):
-    webpage_service = WebpageService(None)
-    tracker_service = TrackerService(None)
-
+    session = Session()
     debug('Preparing check url for changes')
-    tracker = tracker_service.get(task.tracker_id)
-    if tracker != None:
-        debug('Tracker successfully retrieved')
+    tracker = task.tracker
+    stored_page = tracker.webpage
+
+    now = datetime.now()
+
+    ur_task = session.query(UpdateResource).filter(\
+            UpdateResource.url == tracker.url).first()
+
+    update = False
+    if stored_page:
+        time_since_last_updated = now - stored_page.last_updated
+        if time_since_last_updated.seconds >= tracker.frequency +\
+                INTERVAL_BETWEEN_TASK_CHECKS:
+            update = True
     else:
-        error('Tracker not found, skipping task with id: %s' % task.id)
+        update = True
+
+    if update:
+        if not ur_task:
+            ur_task = UpdateResource(url=tracker.url)
+            session.add(ur_task)
+
+        warn('Page at %s must be updated' % tracker.url)
+        warn('Scheduling an update for the next run cycle')
+        ur_task.next_run = now
+        warn('Will try to run this task again soon')
         return
-    stored_page = webpage_service.get_by_url(tracker.url)
-    if stored_page == None:
-        error('Page was not previously stored, skipping task with id: %s'\
-                % task.id)
-        return
+
+
     selector = tracker.css_selector
     dom = html.fromstring(stored_page.contents, base_url=tracker.url)
     debug('Stored page successfully retrieved and parsed')
     h = sha1()
-    new_elements = []
-    for watched in dom.cssselect(selector):
-        watched_contents = etree.tostring(watched,\
+    selected = list(dom.cssselect(selector))
+    if not selected:
+        warn('We didn''t find anything using the previous selector!')
+        warn('Changing the selector to ''body'' and sending notification to warn the user!')
+        tracker.css_selector = 'body'
+        send_warning_mail(task)
+        return
+    else:
+        updated_content = etree.tostring(selected[0],\
                 encoding=unicode, method='text')
-        new_elements.append(watched_contents)
-        h.update(watched_contents.encode('utf-8'))
-    digest = h.hexdigest()
+        h.update(updated_content.encode('utf-8'))
+    digest = h.digest()
     if digest != task.last_digest:
         debug('Page at %s was updated' % tracker.url)
-        task.last_digest = digest
-        task.send_mail(tracker, new_elements)
+        old_content = task.last_content
+        task.last_content = updated_content
+        send_mail(task, updated_content, old_content)
     else:
         debug('There wasnt any relevant modification to %s' % tracker.url)
 
-    task.next_run = datetime.now() + tracker.frequency
+    task.next_run = datetime.now() + timedelta(seconds=tracker.frequency)
     debug('Next run is scheduled for %s' % task.next_run)
 
 
 
 def run_update_resource(task):
+    session = Session()
+    now = datetime.now()
     debug('Downloading web page at %s...', task.url)
     new_page = webpage_daemon.fetch(task.url)
     debug('Web page downloaded. Retrieving the stored version...')
-    stored_page = webpage_service.get_by_url(task.url)
+    stored_page = task.webpage
 
-    if stored_page != None and stored_page.digest != new_page.digest:
-        debug('Old digest %s, new digest %s' % (stored_page.digest,\
-            new_page.digest))
+    if stored_page != None and new_page != None and\
+            stored_page.digest != new_page.digest:
         debug('Stored version is outdated, updating it now')
         now = datetime.now()
-        new_page.last_modified = now
-        webpage_service.update(stored_page.id, new_page)
+        stored_page.contents = new_page.contents
+        stored_page.last_updated = now
         debug('Web page at %s was updated' % task.url)
     elif stored_page == None:
         debug('This is the first time we are downloading this page')
         now = datetime.now()
         new_page.last_modified = now
-        webpage_service.insert(new_page)
+        session.add(new_page)
         debug('Web page successfully stored')
+    elif new_page == None:
+        error('There was an error when retrieving %s. Exiting.' % task.url)
     else:
         debug('Stored version is up to date')
-    task.next_run = datetime.now() + timedelta(seconds=60) 
+    session.delete(task)
 
 
+def send_warning_mail(task):
+    tracker = task.tracker
+    tracker_group = tracker.tracker_group
+    user = tracker_group.user
+    debug('Sending warning to %s' % user.email)
 
-def send_mail(task, tracker, changes):
-    user_service = UserService(None)
-    debug('Sending notification to user')
-    user = user_service.get(tracker.user_id)
-    debug('CHANGES %s' % changes[0].__class__)
+    subject = 'Warning: The page at %s has changed, but its tracker must be updated.' % tracker.url
+    template_name = 'tracker_not_found'
+    template_context = { 'url': tracker.url }
 
-    if task.last_content:
+    mailer_daemon.send_template_mail(user.email, subject, template_name,
+            template_context)
+    debug('Warning successfully sent')
+
+
+def send_mail(task, updated_content, old_content):
+    tracker = task.tracker
+    tracker_group = tracker.tracker_group
+    user = tracker_group.user
+    debug('Sending notification to %s' % user.email)
+
+    if old_content:
         subject = 'The page at %s has changed' % tracker.url
         template_name = 'tracker_updated'
-        template_context = { 'url': tracker.url, 'new_content': changes[0],
-                'old_content': task.last_content }
+        template_context = { 'url': tracker.url, 'new_content': updated_content,
+                'old_content': old_content }
     else:
         subject = 'Tracking %s' % tracker.url
         template_name = 'tracker_started'
-        template_context = { 'url': tracker.url, 'new_content': changes[0] }
+        template_context = { 'url': tracker.url, 'new_content': updated_content }
 
 
-    task.last_content = changes[0]
     mailer_daemon.send_template_mail(user.email, subject, template_name,
             template_context)
     debug('Notification successfully sent')
