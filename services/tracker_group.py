@@ -3,8 +3,8 @@ from storage import StorageService
 from models.tracker_group import TrackerGroup
 
 class TrackerGroupService(StorageService):
+    entity = TrackerGroup
 
-    @classmethod
-    def stub_data(cls):
-        cls.insert(TrackerGroup(name='Search engines', user_id=1,
-            comment='Trackers for search engines.'))
+    def get_all_by_user(self, user):
+        return self.session.query(TrackerGroup).\
+                filter(TrackerGroup.user_email == user.email).all()

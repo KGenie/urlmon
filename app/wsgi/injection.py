@@ -18,18 +18,7 @@ class InjectionMiddleware(object):
         self.MenuService = MenuService
 
 
-    def __inject_to_service(self, service_instance, request, serv_cache):
-        service_class = service_instance.__class__
-        for service_name, service_class in service_class._services.items():
-            if service_name not in serv_cache:
-                break
-            if not getattr(service_instance, service_name, None):
-                setattr(service_instance, service_name,
-                        serv_cache[service_name])
-                self.__inject_to_service(serv_cache[service_name], request,
-                        serv_cache)
-
-    
+        
     def __inject_services(self, controller_instance, request):
         # TODO later this will provide the service with a context object,
         # that will by shared by all services. This should also handle
@@ -40,9 +29,6 @@ class InjectionMiddleware(object):
             if service_name not in serv_cache:
                 serv_cache[service_name] = service_class(request)
             setattr(controller_instance, service_name, serv_cache[service_name])
-        for k,v in serv_cache.items():
-            self.__inject_to_service(serv_cache[service_name], request,
-                    serv_cache)
 
 
     def __inject_template_helpers(self, environ, request):

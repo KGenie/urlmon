@@ -13,24 +13,15 @@ info = __logger.info
 
 class UserService(StorageService):
 
-    @classmethod
-    def authenticate(cls, email, password):
-        for u in cls.get_all():
-            if u.email == email:
-                if u.password == password:
-                    return u
-                return None
+    entity = User
+
+    def authenticate(self, email, password):
+        return self.session.query(User).\
+                filter(User.email == email).\
+                filter(User.password == password).first()
 
 
-    @classmethod
-    def stub_data(cls):
-        cls.insert(User(email='tpadilha84@gmail.com', first_name='Thiago',
-            last_name='Padilha', password='123', roles=['admin']))
 
-
-    @classmethod
-    def exists(cls, email):
+    def exists(self, email):
         debug('Checking if email %s exists' % email)
-        l = list(u for u in cls.get_all() if\
-                u.email == email)
-        return len(l)
+        return self.session.query(User).get(email)

@@ -102,8 +102,9 @@ class TrackerGroupController(WebMonitorController):
     @post
     def delete(self, request):
         id = request.POST.get('id', None)
-        tracker_group = self.tracker_group_service.delete(id)
-        if not tracker_group:
+        tracker_group = self.tracker_group_service.get(id)
+        rows = self.tracker_group_service.delete(tracker_group)
+        if not rows:
             self.session['flash-error'] = \
             'There was an error while trying to delete the tracker group'
         else:

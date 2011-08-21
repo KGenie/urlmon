@@ -84,12 +84,6 @@ class TrackerController(WebMonitorController):
             tracker.user_id = self.session['user'].id
             tracker = self.tracker_service.insert(tracker)
 
-            self.task_service.insert(UpdateResource(url=tracker.url,
-                next_run=datetime.now() + timedelta(seconds=20)))
-
-            self.task_service.insert(TrackResource(tracker_id=tracker.id,\
-                next_run=datetime.now() + timedelta(seconds=5)))
-
 
             return self.redirect('index')
 
@@ -128,8 +122,9 @@ class TrackerController(WebMonitorController):
     @post
     def delete(self, request):
         id = request.POST.get('id', None)
-        tracker = self.tracker_service.delete(id)
-        if not tracker:
+        tracker = self.tracker_service.get(id)
+        rows = self.tracker_service.delete(tracker)
+        if not rows:
             self.session['flash-error'] = \
             'There was an error while trying to delete the tracker'
         else:

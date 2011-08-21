@@ -1,38 +1,29 @@
 from datetime import datetime, timedelta
 from storage import StorageService
-from tracker_group import TrackerGroupService
 from models.tracker import Tracker
 
 
 class TrackerService(StorageService):
 
-    task_service = 'task_service'
+    entity = Tracker
+
+  
+    def insert(self, tracker):
+        tracker = super(TrackerService, self).insert(tracker)
+        self.session.refresh(tracker)
+        self.session.add(UpdateResource(url=tracker.url,
+            next_run=datetime.now() + timedelta(seconds=20)))
+        self.session.add(TrackResource(tracker_id=tracker.id,\
+            next_run=datetime.now() + timedelta(seconds=5)))
+        return tracker
 
 
-    @classmethod
-    def stub_data(cls):
-#        cls.insert(Tracker(name='Dusty Feet', url='http://dustyfeet.com',
-#            tracker_group_id=1, frequency=30, css_selector='#center-font', user_id=1))
-        cls.insert(Tracker(name='Google tracker', url='http://www.google.com',
-            tracker_group_id=1, frequency=20,
-            user_id=1))
-        cls.insert(Tracker(name='Yahoo tracker', url='http://www.yahoo.com',
-            tracker_group_id=1, frequency=5,
-            user_id=1))
+    def any_with_group(self, group_id):
+        return self.session.query(self.__class__).\
+                filter(Tracker.tracker_group_id == group_id).first()
+      
 
+    def get_all_by_user(self, user):
+        return self.session.query(Tracker).\
+                filter(Tracker.user_email == user.email).all()
 
-    @classmethod
-    def get_all(cls):
-        all = super(TrackerService, cls).get_all()
-        for item in all:
-            id = item.tracker_group_id
-            tracker_group = TrackerGroupService(None).get(id)
-            setattr(item, 'tracker_group', tracker_group)
-        return super(TrackerService, cls).get_all()
-
-
-    @classmethod
-    def any_with_group(cls, group_id):
-        group_id = int(group_id)
-        l = list(t for t in cls.get_all() if t.tracker_group_id == group_id)
-        return len(l)

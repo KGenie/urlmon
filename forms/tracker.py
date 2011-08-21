@@ -1,7 +1,6 @@
 from wtforms.form import Form
 from wtforms.fields import TextField, SelectField, HiddenField, TextAreaField
 from wtforms.validators import Length, URL, Required
-from services.tracker_group import TrackerGroupService
 from app_components.fields import HiddenIntegerField
 
 class TrackerForm(Form):

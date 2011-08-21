@@ -1,4 +1,5 @@
-import os, sys, glob, app_globals, logging, fork_vars, atexit
+import os, sys, glob, app_globals, logging, fork_vars, atexit,\
+        app_config
 from helpers import HtmlHelper, UrlHelper
 from pipestream import PipeStream
 from beaker.middleware import SessionMiddleware
@@ -9,6 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 from paste.cascade import Cascade
 from paste.urlparser import StaticURLParser
 from util import get_controller_class_name
+from database import sqlalch
 
 
 CONTROLLER_CACHE = None
@@ -95,10 +97,10 @@ def start_daemon(daemon, parent_pid):
 
 
 def stop_daemons():
-    from daemons import logger, mailer, webpage, storage, task
+    from daemons import logger, mailer, webpage, task
 
     daemons = [task.DAEMON, mailer.DAEMON, webpage.DAEMON,
-            storage.DAEMON, logger.DAEMON]
+            logger.DAEMON]
     for daemon in daemons:
         daemon.stop()
 
@@ -109,9 +111,6 @@ def start_daemons():
 
     from daemons import logger
     start_daemon(logger.DAEMON, parent_pid)
-
-    from daemons import storage
-    start_daemon(storage.DAEMON, parent_pid)
 
     from daemons import mailer
     start_daemon(mailer.DAEMON, parent_pid)
@@ -134,6 +133,8 @@ def setup_logging():
 
     stream = PipeStream(logging_file,read=False, write=True)
 
+    logging.getLogger('services').addHandler(logging.StreamHandler(stream))
+    logging.getLogger('services').setLevel(logging.ERROR)
     logging.getLogger('daemons').addHandler(logging.StreamHandler(stream))
     logging.getLogger('daemons').setLevel(logging.ERROR)
     logging.getLogger('models.task').addHandler(logging.StreamHandler(stream))

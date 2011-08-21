@@ -1,0 +1,2 @@
+OUTPUT_SQL = True
+DATABASE_CONNECTION_STRING = 'sqlite:///umon.db3'
