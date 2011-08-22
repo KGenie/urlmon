@@ -10,7 +10,7 @@ class TrackerForm(Form):
     comment = TextAreaField('Comments', [Length(max=550)])
     url = TextField('URL to track', [URL()])
     css_selector = TextField('CSS Selector', [Required()])
-    frequency = SelectField('Frequency to check', choices=[(5, '5 seconds'),
-        (60, '1 minute'), (300, '5 minutes'), (600, '10 minutes'), ],
+    frequency = SelectField('Frequency to check', choices=[(60, '1 minute'), 
+        (300, '5 minutes'), (600, '10 minutes'), (1800, '30 minutes')],
         coerce=int)
     tracker_group_id = SelectField('Tracker group', choices=[], coerce=int)
