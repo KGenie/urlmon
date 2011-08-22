@@ -21,12 +21,13 @@ class UserService(StorageService):
         ret = self.session.query(User).\
                 filter(User.email == email).\
                 filter(User.password == password).first()
-        self.session.refresh(ret)
-        self.session.expunge(ret)
+        if ret:
+            self.session.refresh(ret)
+            self.session.expunge(ret)
         return ret
 
 
 
     def exists(self, email):
         debug('Checking if email %s exists' % email)
-        return bool(list(self.session.query(User).get(email)))
+        return bool(self.session.query(User).get(email))

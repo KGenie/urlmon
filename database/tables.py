@@ -1,5 +1,5 @@
 from sqlalchemy import Table, MetaData, Column, ForeignKey, Boolean,\
-        Integer, String, DateTime, LargeBinary
+        Integer, String, DateTime, LargeBinary, PickleType
 from custom_types import StringList
 
 metadata = MetaData()
@@ -20,16 +20,22 @@ user = Table('user', metadata,
         Column('first_name', String(50)),
         Column('last_name', String(50)),
         Column('password', String(50)),
-        Column('active', Boolean),
         Column('roles', StringList(200)),
         Column('last_login', DateTime)
+        )
+
+
+registration = Table('registration', metadata,
+        Column('reg_id', String(40), primary_key=True),
+        Column('email', String(320), unique=True, index=True),
+        Column('user', PickleType)
         )
 
 
 tracker_group = Table('tracker_group', metadata,
         Column('id', Integer, primary_key=True),
         Column('name', String(75)),
-        Column('comment', String(225)),
+        Column('comment', String(550)),
         Column('user_email', ForeignKey('user.email'))
         )
 
@@ -37,6 +43,7 @@ tracker_group = Table('tracker_group', metadata,
 tracker = Table('tracker', metadata,
         Column('id', Integer, primary_key=True),
         Column('name', String(75)),
+        Column('comment', String(550)),
         Column('frequency', Integer),
         Column('css_selector', String(300)),
         Column('url', ForeignKey('webpage.url')),

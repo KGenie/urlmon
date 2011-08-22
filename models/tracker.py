@@ -6,12 +6,13 @@ from forms.tracker import TrackerForm
 class Tracker(Model):
 
     def __init__(self, name=None, url=None, frequency=None,
-            tracker_group_id=None, css_selector=None):
+            tracker_group_id=None, css_selector=None, comments=None):
         self.name = name
         self.url = url
         self.frequency = frequency
         self.tracker_group_id = tracker_group_id
         self.css_selector = css_selector
+        self.comments = comments
 
 
 class TrackerTable(TableModel):

@@ -5,12 +5,14 @@ from wsgi.http_method import get, post
 from forms.login import LoginForm
 from models.user import User
 from services.user import UserService
+from services.registration import RegistrationService
 from database.sqlalch import Session
 
 @auth(required=False)
 class CredentialsController(WebMonitorController):
 
     user_service = UserService
+    registration_service = RegistrationService
 
     @post
     def login(self, request):
@@ -23,6 +25,7 @@ class CredentialsController(WebMonitorController):
             qsargs['id'] = id
 
         setattr(form, '_user_service', self.user_service)
+        setattr(form, '_registration_service', self.registration_service)
 
         if form.validate():
             user = form._user

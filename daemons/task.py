@@ -119,8 +119,11 @@ def run_track_resource(task):
             session.add(ur_task)
 
         warn('Page at %s must be updated' % tracker.url)
-        warn('Scheduling an update for the next run cycle')
-        ur_task.next_run = now
+        if not ur_task.is_running:
+            warn('Scheduling an update for the next run cycle')
+            ur_task.next_run = now
+        else:
+            warn('URL is currently being downloaded.')
         warn('Will try to run this task again soon')
         return
 

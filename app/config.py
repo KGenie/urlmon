@@ -39,7 +39,7 @@ def make_beaker_options():
             'beaker.session.type': 'memory',
             'beaker.session.auto': True,
             'beaker.session.key': 'webmon',
-            'beaker.session.secret': 'webmonsecret'
+            'beaker.session.secret': 'webmonsecret',
             }
 
 
@@ -97,9 +97,9 @@ def start_daemon(daemon, parent_pid):
 
 
 def stop_daemons():
-    from daemons import logger, mailer, webpage, task
+    from daemons import logger, mailer, webpage, task, cleanup
 
-    daemons = [task.DAEMON, mailer.DAEMON, webpage.DAEMON,
+    daemons = [cleanup.DAEMON, task.DAEMON, mailer.DAEMON, webpage.DAEMON,
             logger.DAEMON]
     for daemon in daemons:
         daemon.stop()
@@ -121,6 +121,9 @@ def start_daemons():
     from daemons import task
     start_daemon(task.DAEMON, parent_pid)
 
+    from daemons import cleanup
+    start_daemon(cleanup.DAEMON, parent_pid)
+
     
 
 def setup_logging():
@@ -132,19 +135,16 @@ def setup_logging():
     os.mkfifo(logging_file)
 
     stream = PipeStream(logging_file,read=False, write=True)
+    formatter =\
+            logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-    logging.getLogger('services').addHandler(logging.StreamHandler(stream))
-    logging.getLogger('services').setLevel(logging.DEBUG)
-    logging.getLogger('daemons.task').addHandler(logging.StreamHandler(stream))
-    logging.getLogger('daemons.task').setLevel(logging.DEBUG)
+    for k,v in app_config.LEVELS.items():
+        handler = logging.StreamHandler(stream)
+        handler.setFormatter(formatter)
+        logging.getLogger(k).addHandler(handler)
+        logging.getLogger(k).setLevel(v)
+        logging.getLogger(k).propagate = 0
 
-
-    #logging_file = os.path.join(fork_vars.IPC_SOCKET_DIR,'log.txt')
-    #logging.getLogger(mailer.__name__).setLevel(logging.DEBUG)
-
-    ##logging.root.addHandler(logging.StreamHandler(logging_file))
-    ##logging.root.setLevel(logging.DEBUG)
-    #print 'log file location: %s' % logging_file
 
 
 def make_app():

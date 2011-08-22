@@ -7,4 +7,4 @@ class TrackerGroupForm(Form):
 
     id = HiddenIntegerField()
     name = TextField('Name', [Length(min=4, max=25)])
-    comment = TextAreaField('Comments')
+    comment = TextAreaField('Comments', [Length(max=550)])

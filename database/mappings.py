@@ -2,6 +2,7 @@ import tables
 from sqlalchemy.orm import mapper, relationship, backref
 from models.webpage import Webpage
 from models.user import User
+from models.registration import Registration
 from models.tracker_group import TrackerGroup
 from models.tracker import Tracker
 from models.task import Task
@@ -15,6 +16,11 @@ mapper(Webpage, tables.webpage,
             })
 
 mapper(User, tables.user)
+
+mapper(Registration, tables.registration,
+        properties={
+            '_user': tables.registration.c.user
+            })
 
 mapper(TrackerGroup, tables.tracker_group,
         properties={

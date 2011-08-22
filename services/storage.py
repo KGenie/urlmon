@@ -11,8 +11,9 @@ info = __logger.info
   
 class StorageService(Service):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, context, *args, **kwargs):
         self.session = Session()
+        self.context = context
 
 
     def get_all(self):
@@ -29,6 +30,7 @@ class StorageService(Service):
 
 
     def update(self, id, item):
+        self.session.merge(item)
         return item
        
 

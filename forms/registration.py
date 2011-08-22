@@ -14,9 +14,12 @@ class RegistrationForm(Form):
 
 
     def validate_email(form, field):
-        if not hasattr(form, '_user_service'):
+        if not hasattr(form, '_user_service') or\
+                not hasattr(form, '_registration_service'):
             raise Exception(
-            'The controller must set the ''_user_service'' attribute with an user service instance bound to the current request')
+            'The controller must set the \'_user_service\' attribute with an user service instance bound to the current request')
 
         if form._user_service.exists(field.data):
             raise ValidationError('An user with that email is already registered')
+        if form._registration_service.pending(field.data):
+            raise ValidationError('An user with that email is pending activation') 

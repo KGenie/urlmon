@@ -26,6 +26,7 @@ class RegistrationController(WebMonitorController):
     def request_account(self, request):
         form = RegistrationForm(request.POST)
         setattr(form, '_user_service', self.user_service)
+        setattr(form, '_registration_service', self.registration_service)
 
         if form.validate():
             user = User()
@@ -51,5 +52,5 @@ class RegistrationController(WebMonitorController):
             user = self.registration_service.activate_user(reg_id)
             if user:
                 self.session['user'] = user
-                self.user_service.insert(user)
-        return self.redirect('main', 'home')
+                return self.redirect('main', 'home')
+        raise Exception('User couldn\'t be activated!')

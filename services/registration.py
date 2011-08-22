@@ -1,44 +1,45 @@
-import smtplib, datetime
+import smtplib, logging
 from string import Template
-from app_components.service import Service
+from storage import StorageService
 from daemons.mailer import DAEMON as mailer_daemon
-from hashlib import md5
+from models.registration import Registration
 from helpers import UrlHelper
 from urllib import quote
 
-_msg_template = Template("""Welcome to the Web Monitor! To activate your account please link on the
-following link:
-    $activation_link
-""")
+__logger = logging.getLogger('services.registration')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
 
-registration_requests = {}
+
 u = UrlHelper()
 
-class RegistrationService(Service):
+class RegistrationService(StorageService):
 
     def request_registration(self, user):
-        hash = md5()
-        hash.update(user.email)
-        hash.update(str(datetime.datetime.now()))
-        reg_id = hash.hexdigest()
-        registration_requests[reg_id] = user
-        msg = _msg_template.substitute(
-                activation_link=self.reconstruct_url(reg_id))
+        reg = Registration(user)
+        reg.email = user.email
+        self.session.add(reg)
+        activation_link = self.reconstruct_url(reg.reg_id)
         subject = 'Activate your account on the Web Monitor'
-        mailer_daemon.send_mail(user.email, subject, msg)
+        mailer_daemon.send_template_mail(user.email, subject, 'activate',
+                {'activation_link': activation_link})
 
 
     def activate_user(self, reg_id):
-        key = None
-        user = None
-        for k, v in registration_requests.items():
-            if k == reg_id:
-                key = k
-                user = v
-                break
-        del registration_requests[key]
-        return user
-            
+        ret = None
+        reg = self.session.query(Registration).get(reg_id)
+        if reg:
+            user = reg.user
+            self.session.add(user)
+            self.session.commit()
+            self.session.refresh(user)
+            self.session.expunge(user)
+            self.session.delete(reg)
+            ret = user 
+        return ret
+                   
 
     def reconstruct_url(self, reg_id):
         environ = self.context.environ
@@ -56,3 +57,8 @@ class RegistrationService(Service):
         url += u.action(controller='registration', name='confirm_activation',
                 reg_id=reg_id)
         return url
+
+
+    def pending(self, email):
+        return self.session.query(Registration).\
+                filter(Registration.email == email).count() > 0
