@@ -7,7 +7,7 @@
 
     {{ render_field(form.id) }}
     {{ render_field(form.name) }}
-
+    {{ render_field(form.comment) }}
 
     {{ render_field(form.frequency) }}
     {{ render_field(form.tracker_group_id) }}

@@ -25,6 +25,7 @@ class StorageService(Service):
        
 
     def insert(self, item):
+        item.id = None
         self.session.add(item)
         return item
 

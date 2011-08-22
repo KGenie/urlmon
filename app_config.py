@@ -14,7 +14,5 @@ NUMBER_OF_TASK_RUNNERS = 5
 # Logging
 LEVELS = {
         'daemons': WARNING,
-        'services': WARNING,
-        'daemons.cleanup': WARNING,
-        'daemons.task': DEBUG
+        'services': WARNING
         }
