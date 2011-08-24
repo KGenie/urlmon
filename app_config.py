@@ -4,7 +4,7 @@ from logging import NOTSET, DEBUG, ERROR, WARNING
 
 # Database
 OUTPUT_SQL = False
-DATABASE_CONNECTION_STRING = 'sqlite:///%s/umon.db3' % APP_ROOT
+DATABASE_CONNECTION_STRING = 'sqlite:///%s/umon.db' % APP_ROOT
 
 
 # Task daemon
@@ -14,5 +14,6 @@ NUMBER_OF_TASK_RUNNERS = 5
 # Logging
 LEVELS = {
         'daemons': WARNING,
+        'daemons.task': DEBUG,
         'services': WARNING
         }

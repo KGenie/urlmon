@@ -37,3 +37,4 @@ class StorageService(Service):
 
     def delete(self, item):
         self.session.delete(item)
+        return 1

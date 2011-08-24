@@ -1,4 +1,4 @@
-from sqlalchemy import Table, MetaData, Column, ForeignKey, Boolean,\
+from sqlalchemy import Table, MetaData, Column, Index, ForeignKey, Boolean,\
         Integer, String, DateTime, LargeBinary, PickleType
 from custom_types import StringList
 
@@ -38,6 +38,8 @@ tracker_group = Table('tracker_group', metadata,
         Column('comment', String(550)),
         Column('user_email', ForeignKey('user.email'))
         )
+Index('idx_name_user', tracker_group.c.name, tracker_group.c.user_email,
+        unique=True)
 
 
 tracker = Table('tracker', metadata,

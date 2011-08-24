@@ -1,16 +1,24 @@
+import logging
 from datetime import datetime, timedelta
 from storage import StorageService
 from models.tracker import Tracker
 from models.tracker_group import TrackerGroup
 from models.update_resource import UpdateResource
 from models.track_resource import TrackResource
+from models.webpage import Webpage
+
+__logger = logging.getLogger('services.tracker')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
 
 
 class TrackerService(StorageService):
 
     entity = Tracker
 
-    def on_update(self, tracker):
+    def after_insert(self, tracker):
         s = self.session
         t1 = UpdateResource(url=tracker.url,
             next_run=datetime.now() + timedelta(seconds=5))
@@ -20,15 +28,40 @@ class TrackerService(StorageService):
         s.add_all([t1,t2])
 
 
-  
+    def before_insert(self, tracker):
+        s = self.session
+        u = tracker.url
+        if s.query(Webpage).filter(Webpage._url == u).count() == 0:
+            wp = Webpage(url=tracker.url)
+            # The merge is used in case of a race condition
+            # (It will insert or update)
+            tracker.webpage = wp
+
+
     def insert(self, tracker):
+        self.before_insert(tracker)
         tracker = super(TrackerService, self).insert(tracker)
-        self.on_update(tracker)
+        self.after_insert(tracker)
         return tracker
 
 
+    def before_delete(self, tracker):
+        s = self.session
+        tasks = s.query(TrackResource).filter(TrackResource.tracker_id ==
+                tracker.id).all()
+        if tasks:
+            for task in tasks:
+                s.delete(task)
+
+
+    def delete(self, tracker):
+        self.before_delete(tracker)
+        ret = super(TrackerService, self).delete(tracker)
+        return ret
+
+
     def any_with_group(self, group_id):
-        return self.session.query(self.__class__).\
+        return self.session.query(self.entity).\
                 filter(Tracker.tracker_group_id == group_id).first()
       
 

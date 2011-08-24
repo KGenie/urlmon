@@ -97,6 +97,10 @@ def run_track_resource(task):
     session = Session()
     debug('Preparing check url for changes')
     tracker = task.tracker
+    if not tracker:
+        warn('Tracker not found, skipping task')
+        return
+
     stored_page = tracker.webpage
 
     now = datetime.now()
@@ -107,7 +111,7 @@ def run_track_resource(task):
     update = False
     if stored_page:
         time_since_last_updated = now - stored_page.last_updated
-        if time_since_last_updated.seconds >= tracker.frequency +\
+        if time_since_last_updated.total_seconds() >= tracker.frequency +\
                 INTERVAL_BETWEEN_TASK_CHECKS:
             update = True
     else:
@@ -164,6 +168,7 @@ def run_update_resource(task):
     new_page = webpage_daemon.fetch(task.url)
     debug('Web page downloaded. Retrieving the stored version...')
     stored_page = task.webpage
+    debug('NEWPAGE digest %s' % new_page.digest)
 
     if stored_page != None and new_page != None and\
             stored_page.digest != new_page.digest:

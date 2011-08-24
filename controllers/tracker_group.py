@@ -62,6 +62,7 @@ class TrackerGroupController(WebMonitorController):
     @post
     def create(self, request):
         form = TrackerGroupForm(request.POST)
+        setattr(form, '_tracker_group_service', self.tracker_group_service)
         if form.validate():
             tracker_group = TrackerGroup()
             form.populate_obj(tracker_group)
@@ -82,6 +83,7 @@ class TrackerGroupController(WebMonitorController):
     @post
     def update(self, request):
         form = TrackerGroupForm(request.POST)
+        setattr(form, '_tracker_group_service', self.tracker_group_service)
         if form.validate():
             tracker_group = TrackerGroup()
             form.populate_obj(tracker_group)
