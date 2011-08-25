@@ -13,6 +13,7 @@ NUMBER_OF_TASK_RUNNERS = 5
 
 # Logging
 LEVELS = {
+        'dispatcher': ERROR,
         'daemons': WARNING,
         'daemons.task': DEBUG,
         'services': WARNING

@@ -101,21 +101,21 @@ class TrackerGroupController(WebMonitorController):
     @post
     def update(self, request):
         form = TrackerGroupForm(request.POST)
+        id = form.id.data
+        tracker_group = self.tracker_group_service.get(id)
+        if not tracker_group:
+            return self.notfound()
+        if form.name.data != tracker_group.name:
+            setattr(form, '_check_name', True)
+
         setattr(form, '_tracker_group_service', self.tracker_group_service)
         if form.validate():
-            tracker_group = TrackerGroup()
+         
             form.populate_obj(tracker_group)
-
-            tg = self.tracker_group_service.get(tracker_group.id)
-            if not tg:
-                return self.notfound()
-
-            tracker_group = Session().merge(tracker_group)
-
             current_user_email = self.session['user'].email
+
             if tracker_group.user.email != current_user_email:
                 return self.forbidden()
-
 
             tracker_group = self.tracker_group_service.update(tracker_group.id, tracker_group)
             if not tracker_group:

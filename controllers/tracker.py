@@ -110,19 +110,16 @@ class TrackerController(WebMonitorController):
     def update(self, request):
         form = self.create_form(request.POST)
         if form.validate():
-            tracker = Tracker()
-            form.populate_obj(tracker)
-
-            t = self.tracker_service.get(tracker.id)
-            if not t:
+            id = form.id.data
+            tracker = self.tracker_service.get(id)
+            if not tracker:
                 return self.notfound()
 
-            tracker = Session().merge(tracker)
-
+            form.populate_obj(tracker)
             current_user_email = self.session['user'].email
+
             if tracker.tracker_group.user.email != current_user_email:
                 return self.forbidden()
-
 
             tracker = self.tracker_service.update(tracker.id, tracker)
             if not tracker:

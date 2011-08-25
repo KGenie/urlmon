@@ -11,6 +11,9 @@ class TrackerGroupForm(Form):
 
 
     def validate_name(form, field):
+        if not hasattr(form, '_check_name'):
+            return
+
         if not hasattr(form, '_tracker_group_service'):
             raise Exception('Inject dependencies for this form')
 

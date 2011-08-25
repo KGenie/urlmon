@@ -1,5 +1,6 @@
 import os, sys, glob, app_globals, logging, fork_vars, atexit,\
         app_config
+from traceback import format_exc
 from helpers import HtmlHelper, UrlHelper
 from pipestream import PipeStream
 from beaker.middleware import SessionMiddleware
@@ -185,6 +186,9 @@ def make_app():
 
     return app
 
+
+
+
 class DispatcherMiddleware(object):
     """
     Response Dispatcher Middleware.
@@ -196,14 +200,31 @@ class DispatcherMiddleware(object):
 
     def __init__(self, app):
         self.app = app
+        logger = logging.getLogger('dispatcher')
+        self.debug = logger.debug
+        self.warn = logger.warn
+        self.error = logger.error
+        self.info = logger.info
+
 
     def __call__(self, environ, start_response):
-        response = self.app(environ, start_response)
+        s = sqlalch.Session()
+        response = None
+        try:
+            response = self.app(environ, start_response)
+        except Exception, e:
+            s.rollback()
+            self.error('Exception happened while dispatching the request %s'\
+                    % format_exc(e))
+        else:
+            if response:
+                s.commit()
+            else:
+                s.rollback()
+        finally:
+            s.close()
+
         if not response:
-            sqlalch.Session().rollback()
-            sqlalch.Session().close()
             return HTTPNotFound()(environ, start_response)
 
-        sqlalch.Session().commit()
-        sqlalch.Session().close()
         return response(environ, start_response)

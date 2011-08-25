@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from storage import StorageService
 from models.tracker import Tracker
 from models.tracker_group import TrackerGroup
-from models.update_resource import UpdateResource
 from models.track_resource import TrackResource
 from models.webpage import Webpage
 
@@ -20,12 +19,10 @@ class TrackerService(StorageService):
 
     def after_insert(self, tracker):
         s = self.session
-        t1 = UpdateResource(url=tracker.url,
-            next_run=datetime.now() + timedelta(seconds=5))
-        t2 = TrackResource(tracker_id=tracker.id,\
+        t = TrackResource(tracker_id=tracker.id,\
             next_run=datetime.now() + timedelta(seconds=15))
-        t2.tracker = tracker
-        s.add_all([t1,t2])
+        t.tracker = tracker
+        s.add(t)
 
 
     def before_insert(self, tracker):

@@ -103,9 +103,8 @@ def _process_scripts(dom):
             if ev in el.attrib:
                 del el.attrib[ev]
 
-    script = E.SCRIPT('parent.uMon.iFrameLoaded();',type='text/javascript')
-    body = dom.cssselect('body')[0]
-    body.append(script)
+    body = dom.cssselect('body')[0].attrib['onload'] =\
+            'parent.uMon.iFrameLoaded();' 
 
 
 def _process_links(request_url, dom):
