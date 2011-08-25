@@ -29,6 +29,8 @@ class TrackerService(StorageService):
 
 
     def before_insert(self, tracker):
+        if not tracker.css_selector:
+            tracker.css_selector = 'body'
         s = self.session
         u = tracker.url
         if s.query(Webpage).filter(Webpage._url == u).count() == 0:
@@ -68,4 +70,5 @@ class TrackerService(StorageService):
     def get_all_by_user(self, user):
         return self.session.query(Tracker).join(TrackerGroup).\
                 filter(TrackerGroup.user_email == user.email).all()
+
 

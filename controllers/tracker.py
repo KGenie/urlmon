@@ -10,6 +10,7 @@ from services.task import TaskService
 from services.fetcher import FetcherService
 from wsgi.http_method import get, post
 from helpers import menu
+from database.sqlalch import Session
 
 @menu(label='Trackers')
 class TrackerController(WebMonitorController):
@@ -42,6 +43,13 @@ class TrackerController(WebMonitorController):
         if not id:
             return self.redirect('index')
         tracker = self.tracker_service.get(id)
+        if not tracker:
+            return self.notfound()
+        current_user_email = self.session['user'].email
+        if tracker.tracker_group.user.email != current_user_email:
+            return self.forbidden()
+
+
         form = self.create_form(obj=tracker)
 
         return self.view({'form': form})
@@ -54,6 +62,15 @@ class TrackerController(WebMonitorController):
         if not id:
             return self.redirect('index')
         tracker = self.tracker_service.get(id)
+
+        if not tracker:
+            return self.notfound()
+
+        current_user_email = self.session['user'].email
+        if tracker.tracker_group.user.email != current_user_email:
+            return self.forbidden()
+
+
         form = self.create_form(obj=tracker)
         tracker_group =\
                 self.tracker_group_service.get(tracker.tracker_group_id)
@@ -95,6 +112,18 @@ class TrackerController(WebMonitorController):
         if form.validate():
             tracker = Tracker()
             form.populate_obj(tracker)
+
+            t = self.tracker_service.get(tracker.id)
+            if not t:
+                return self.notfound()
+
+            tracker = Session().merge(tracker)
+
+            current_user_email = self.session['user'].email
+            if tracker.tracker_group.user.email != current_user_email:
+                return self.forbidden()
+
+
             tracker = self.tracker_service.update(tracker.id, tracker)
             if not tracker:
                 self.session['flash-error'] = \
@@ -112,6 +141,16 @@ class TrackerController(WebMonitorController):
     def delete(self, request):
         id = request.POST.get('id', None)
         tracker = self.tracker_service.get(id)
+
+        if not tracker:
+            return self.notfound()
+
+
+        current_user_email = self.session['user'].email
+        if tracker.tracker_group.user.email != current_user_email:
+            return self.forbidden()
+
+
         rows = self.tracker_service.delete(tracker)
         if not rows:
             self.session['flash-error'] = \

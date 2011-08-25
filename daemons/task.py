@@ -168,19 +168,20 @@ def run_update_resource(task):
     new_page = webpage_daemon.fetch(task.url)
     debug('Web page downloaded. Retrieving the stored version...')
     stored_page = task.webpage
-    debug('NEWPAGE digest %s' % new_page.digest)
+
+    if stored_page:
+        stored_page.last_updated = now
 
     if stored_page != None and new_page != None and\
             stored_page.digest != new_page.digest:
         debug('Stored version is outdated, updating it now')
         now = datetime.now()
         stored_page.contents = new_page.contents
-        stored_page.last_updated = now
         debug('Web page at %s was updated' % task.url)
     elif stored_page == None:
         debug('This is the first time we are downloading this page')
         now = datetime.now()
-        new_page.last_modified = now
+        new_page.last_updated = now
         session.add(new_page)
         debug('Web page successfully stored')
     elif new_page == None:

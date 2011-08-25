@@ -25,10 +25,10 @@ def make_jinja_email_environment():
 class Mailer(ControllableDaemon):
 
     def __init__(self, 
-            sender='thiago.arruda@live.com',
+            sender='kgenie@live.com',
             smtp_server='smtp.live.com',
             port=587,
-            username='thiago.arruda@live.com',
+            username='kgenie@live.com',
             password='ark123ark'):
         ControllableDaemon.__init__(self)
         self.sender = sender

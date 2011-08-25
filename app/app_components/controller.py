@@ -1,5 +1,6 @@
 from app_components.response import JinjaResponse, RedirectResponse,\
-        StaticContentResponse, ServerErrorResponse
+        StaticContentResponse, ServerErrorResponse,NotAuthorizedResponse,\
+        NotFoundResponse
 from meta import WebMonitorControllerMetaclass
 
 class WebMonitorController(object):
@@ -45,6 +46,13 @@ class WebMonitorController(object):
         return RedirectResponse(controller=controller, action=action,
                 qsargs=qsargs)
 
+
+    def forbidden(self):
+        return NotAuthorizedResponse()
+
+
+    def notfound(self):
+        return NotFoundResponse()
 
     def content(self, body):
         ret = StaticContentResponse()

@@ -5,6 +5,7 @@ from services.tracker_group import TrackerGroupService
 from services.tracker import TrackerService
 from wsgi.http_method import get, post
 from helpers import menu
+from database.sqlalch import Session
 
 @menu(label='Tracker Groups')
 class TrackerGroupController(WebMonitorController):
@@ -36,6 +37,14 @@ class TrackerGroupController(WebMonitorController):
             self.session['flash-error'] = 'An id must be specified'
             return self.redirect('index')
         tracker_group = self.tracker_group_service.get(id)
+
+        if not tracker_group:
+            return self.notfound()
+
+        current_user_email = self.session['user'].email
+        if tracker_group.user.email != current_user_email:
+            return self.forbidden()
+
         form = TrackerGroupForm(obj=tracker_group)
         return self.view({'form': form})
 
@@ -55,6 +64,15 @@ class TrackerGroupController(WebMonitorController):
 
 
         tracker_group = self.tracker_group_service.get(id)
+
+        if not tracker_group:
+            return self.notfound()
+
+        current_user_email = self.session['user'].email
+        if tracker_group.user.email != current_user_email:
+            return self.forbidden()
+
+
         form = TrackerGroupForm(obj=tracker_group)
         return self.view({'form': form})
  
@@ -87,7 +105,18 @@ class TrackerGroupController(WebMonitorController):
         if form.validate():
             tracker_group = TrackerGroup()
             form.populate_obj(tracker_group)
-            tracker_group.user_email = self.session['user'].email
+
+            tg = self.tracker_group_service.get(tracker_group.id)
+            if not tg:
+                return self.notfound()
+
+            tracker_group = Session().merge(tracker_group)
+
+            current_user_email = self.session['user'].email
+            if tracker_group.user.email != current_user_email:
+                return self.forbidden()
+
+
             tracker_group = self.tracker_group_service.update(tracker_group.id, tracker_group)
             if not tracker_group:
                 self.session['flash-error'] = \
@@ -105,6 +134,14 @@ class TrackerGroupController(WebMonitorController):
     def delete(self, request):
         id = request.POST.get('id', None)
         tracker_group = self.tracker_group_service.get(id)
+
+        if not tracker_group:
+            return self.notfound()
+
+        current_user_email = self.session['user'].email
+        if tracker_group.user.email != current_user_email:
+            return self.forbidden()
+
         rows = self.tracker_group_service.delete(tracker_group)
         if not rows:
             self.session['flash-error'] = \
