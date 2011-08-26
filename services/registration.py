@@ -37,6 +37,7 @@ class RegistrationService(StorageService):
             self.session.refresh(user)
             self.session.expunge(user)
             self.session.delete(reg)
+            self.session.commit()
             ret = user 
         return ret
                    

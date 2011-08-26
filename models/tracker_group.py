@@ -3,10 +3,10 @@ from forms.tracker_group import TrackerGroupForm
 
 class TrackerGroup(Model):
 
-    def __init__(self, name=None, comment=None, user_email=None):
+    def __init__(self, name=None, comment=None, user_id=None):
         self.name = name
         self.comment = comment
-        self.user_email = user_email
+        self.user_id = user_id
 
 class TrackerGroupTable(TableModel):
 

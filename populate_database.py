@@ -20,6 +20,8 @@ def populate():
             last_name='Arruda', password='123')
     session.add_all([u1,u2])
     session.commit()
+    session.refresh(u1)
+    session.refresh(u2)
 
     # Webpage
    # wp1 = Webpage('http://dustyfeet.com', contents, datetime.now())
@@ -27,9 +29,9 @@ def populate():
    # session.commit()
 
     # Tracker groups
-    tg1 = TrackerGroup(name='Search engines', user_email=u1.email, 
+    tg1 = TrackerGroup(name='Search engines', user_id=u1.id, 
             comment='Trackers for search engines.')
-    tg2 = TrackerGroup(name='Tests', user_email=u2.email,
+    tg2 = TrackerGroup(name='Tests', user_id=u2.id,
             comment='Testing trackers 2')
     session.add_all([tg1,tg2])
     session.commit()

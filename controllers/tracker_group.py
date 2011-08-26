@@ -41,8 +41,8 @@ class TrackerGroupController(WebMonitorController):
         if not tracker_group:
             return self.notfound()
 
-        current_user_email = self.session['user'].email
-        if tracker_group.user.email != current_user_email:
+        current_user_id = self.session['user'].id
+        if tracker_group.user.id != current_user_id:
             return self.forbidden()
 
         form = TrackerGroupForm(obj=tracker_group)
@@ -68,8 +68,8 @@ class TrackerGroupController(WebMonitorController):
         if not tracker_group:
             return self.notfound()
 
-        current_user_email = self.session['user'].email
-        if tracker_group.user.email != current_user_email:
+        current_user_id = self.session['user'].id
+        if tracker_group.user.id != current_user_id:
             return self.forbidden()
 
 
@@ -80,11 +80,13 @@ class TrackerGroupController(WebMonitorController):
     @post
     def create(self, request):
         form = TrackerGroupForm(request.POST)
+        setattr(form, '_check_name', True)
         setattr(form, '_tracker_group_service', self.tracker_group_service)
+
         if form.validate():
             tracker_group = TrackerGroup()
             form.populate_obj(tracker_group)
-            tracker_group.user_email = self.session['user'].email
+            tracker_group.user_id = self.session['user'].id
             tracker_group = self.tracker_group_service.insert(tracker_group)
             if not tracker_group:
                 self.session['flash-error'] = \
@@ -112,9 +114,9 @@ class TrackerGroupController(WebMonitorController):
         if form.validate():
          
             form.populate_obj(tracker_group)
-            current_user_email = self.session['user'].email
+            current_user_id = self.session['user'].id
 
-            if tracker_group.user.email != current_user_email:
+            if tracker_group.user.id != current_user_id:
                 return self.forbidden()
 
             tracker_group = self.tracker_group_service.update(tracker_group.id, tracker_group)
@@ -138,8 +140,8 @@ class TrackerGroupController(WebMonitorController):
         if not tracker_group:
             return self.notfound()
 
-        current_user_email = self.session['user'].email
-        if tracker_group.user.email != current_user_email:
+        current_user_id = self.session['user'].id
+        if tracker_group.user.id != current_user_id:
             return self.forbidden()
 
         rows = self.tracker_group_service.delete(tracker_group)

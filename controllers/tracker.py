@@ -18,7 +18,6 @@ class TrackerController(WebMonitorController):
     tracker_service = TrackerService
     tracker_group_service = TrackerGroupService
     fetcher_service = FetcherService
-    task_service = TaskService
 
 
     @get
@@ -45,8 +44,8 @@ class TrackerController(WebMonitorController):
         tracker = self.tracker_service.get(id)
         if not tracker:
             return self.notfound()
-        current_user_email = self.session['user'].email
-        if tracker.tracker_group.user.email != current_user_email:
+        current_user_id = self.session['user'].id
+        if tracker.tracker_group.user.id != current_user_id:
             return self.forbidden()
 
 
@@ -66,8 +65,8 @@ class TrackerController(WebMonitorController):
         if not tracker:
             return self.notfound()
 
-        current_user_email = self.session['user'].email
-        if tracker.tracker_group.user.email != current_user_email:
+        current_user_id = self.session['user'].id
+        if tracker.tracker_group.user.id != current_user_id:
             return self.forbidden()
 
 
@@ -116,9 +115,9 @@ class TrackerController(WebMonitorController):
                 return self.notfound()
 
             form.populate_obj(tracker)
-            current_user_email = self.session['user'].email
+            current_user_id = self.session['user'].id
 
-            if tracker.tracker_group.user.email != current_user_email:
+            if tracker.tracker_group.user.id != current_user_id:
                 return self.forbidden()
 
             tracker = self.tracker_service.update(tracker.id, tracker)
@@ -143,8 +142,8 @@ class TrackerController(WebMonitorController):
             return self.notfound()
 
 
-        current_user_email = self.session['user'].email
-        if tracker.tracker_group.user.email != current_user_email:
+        current_user_id = self.session['user'].id
+        if tracker.tracker_group.user.id != current_user_id:
             return self.forbidden()
 
 

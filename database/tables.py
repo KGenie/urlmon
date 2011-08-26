@@ -4,6 +4,14 @@ from custom_types import StringList
 
 metadata = MetaData()
 
+#./controllers/tracker.py
+#./controllers/tracker_group.py
+#./services/tracker.py
+#./services/tracker_group.py
+#./populate_database.py
+#./database/tables.py
+#./models/tracker_group.py
+
 
 webpage = Table('webpage', metadata,
         # 2083 is the maximum url length supported by IE
@@ -15,8 +23,9 @@ webpage = Table('webpage', metadata,
 
 
 user = Table('user', metadata,
+        Column('id', Integer, primary_key=True),
         # 320 seems to be the maximum length of email addresses
-        Column('email', String(320), primary_key=True),
+        Column('email', String(320), unique=True, index=True),
         Column('first_name', String(50)),
         Column('last_name', String(50)),
         Column('password', String(50)),
@@ -36,9 +45,9 @@ tracker_group = Table('tracker_group', metadata,
         Column('id', Integer, primary_key=True),
         Column('name', String(75)),
         Column('comment', String(550)),
-        Column('user_email', ForeignKey('user.email'))
+        Column('user_id', ForeignKey('user.id'))
         )
-Index('idx_name_user', tracker_group.c.name, tracker_group.c.user_email,
+Index('idx_name_user', tracker_group.c.name, tracker_group.c.user_id,
         unique=True)
 
 

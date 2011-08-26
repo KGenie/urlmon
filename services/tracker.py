@@ -66,6 +66,6 @@ class TrackerService(StorageService):
 
     def get_all_by_user(self, user):
         return self.session.query(Tracker).join(TrackerGroup).\
-                filter(TrackerGroup.user_email == user.email).all()
+                filter(TrackerGroup.user_id == user.id).all()
 
 
