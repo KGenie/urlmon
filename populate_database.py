@@ -23,11 +23,7 @@ def populate():
     session.refresh(u1)
     session.refresh(u2)
 
-    # Webpage
-   # wp1 = Webpage('http://dustyfeet.com', contents, datetime.now())
-   # session.add(wp1)
-   # session.commit()
-
+  
     # Tracker groups
     tg1 = TrackerGroup(name='Search engines', user_id=u1.id, 
             comment='Trackers for search engines.')
@@ -37,31 +33,7 @@ def populate():
     session.commit()
 
 
-    # Trackers
-   # tr1 = Tracker(name='Google tracker', url='http://www.google.com',
-   #         tracker_group_id=tg1.id, frequency=20)
-   # tr2 = Tracker(name='Yahoo tracker', url='http://www.yahoo.com',
-   #         tracker_group_id=tg1.id, frequency=5)
-   # tr3 = Tracker(name='Dusty Feet', url='http://dustyfeet.com',
-   #         tracker_group_id=tg1.id, frequency=30, 
-   #         css_selector='#center-font')
-   # tr4 = Tracker(name='Dusty Feet2', url='http://dustyfeet.com',
-   #         tracker_group_id=tg2.id, frequency=30, 
-   #         css_selector='#non-existent')
-   # session.add_all([tr1,tr2,tr3,tr4])
-   # session.commit()
-
-
-    #Tasks
-   # t1 = UpdateResource(url='http://dustyfeet.com',
-   #         next_run=datetime.now() + timedelta(seconds=20))
-   # t2 = TrackResource(tracker_id=tr3.id, last_content=text,
-   #         next_run=datetime.now() + timedelta(seconds=5))
-   # t3 = TrackResource(tracker_id=tr4.id, last_content='non-existent',
-   #         next_run=datetime.now() + timedelta(seconds=5))
-   # session.add_all([t1,t2,t3])
-   # session.commit()
-
+   
 
 text=u""" elcome to my Small-But-Intense Home Page! There's not
 much here yet, but at least I'm avoiding those obnoxious under construction tags, so if

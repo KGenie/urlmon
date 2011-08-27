@@ -87,7 +87,7 @@ class TrackerController(WebMonitorController):
         page = self.fetcher_service.fetch(url, selector)
         if not page:
             return self.content('Server error ocurred!')
-        return self.content(page.contents)
+        return self.content(page.content)
 
 
     @post

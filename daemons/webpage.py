@@ -1,7 +1,7 @@
 import urllib2, datetime, logging
 from traceback import format_exc
 from controllable import ControllableDaemon
-from models.webpage import Webpage
+from models.webpage_version import WebpageVersion
 from urlparse import urlparse, urlunparse
 from lxml import etree, html
 from lxml.html import builder as E
@@ -45,7 +45,7 @@ class WebpageDaemon(ControllableDaemon):
             body_dom = select_content(body_dom, current_selector)
         body = etree.tostring(body_dom, method='html')
 
-        page = Webpage(url, body, datetime.datetime.now())
+        page = WebpageVersion(url, body, datetime.datetime.now())
         return page
 
 

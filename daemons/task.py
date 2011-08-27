@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy import desc
 from traceback import format_exc
 from datetime import datetime, timedelta
 from multiprocessing.dummy import Pool
@@ -7,6 +8,8 @@ from models.task import Task
 from models.update_resource import UpdateResource
 from models.user import User
 from models.webpage import Webpage
+from models.webpage_version import WebpageVersion
+from models.tracker_change import TrackerChange
 from daemons.daemon import Daemon
 from daemons.mailer import DAEMON as mailer_daemon
 from daemons.webpage import DAEMON as webpage_daemon
@@ -101,23 +104,18 @@ def run_track_resource(task):
         warn('Tracker not found, skipping task')
         return
 
-    stored_page = tracker.webpage
-
     now = datetime.now()
+   
+    webpage = tracker.webpage
 
-    ur_task = session.query(UpdateResource).filter(\
+    time_since_last_checked = now - webpage.last_checked
+    # Checking if the page should be updated
+    if time_since_last_checked.total_seconds() >= tracker.frequency +\
+            INTERVAL_BETWEEN_TASK_CHECKS:
+
+        ur_task = session.query(UpdateResource).filter(\
             UpdateResource.url == tracker.url).first()
 
-    update = False
-    if stored_page:
-        time_since_last_updated = now - stored_page.last_updated
-        if time_since_last_updated.total_seconds() >= tracker.frequency +\
-                INTERVAL_BETWEEN_TASK_CHECKS:
-            update = True
-    else:
-        update = True
-
-    if update:
         if not ur_task:
             ur_task = UpdateResource(url=tracker.url)
             session.add(ur_task)
@@ -132,8 +130,10 @@ def run_track_resource(task):
         return
 
 
+    stored_version = get_last_page_version(tracker.url)
+
     selector = tracker.css_selector
-    dom = html.fromstring(stored_page.contents, base_url=tracker.url)
+    dom = html.fromstring(stored_version.content, base_url=tracker.url)
     debug('Stored page successfully retrieved and parsed')
     h = sha1()
     selected = list(dom.cssselect(selector))
@@ -148,11 +148,21 @@ def run_track_resource(task):
                 encoding=unicode, method='text')
         h.update(updated_content.encode('utf-8'))
     digest = h.digest()
-    if digest != task.last_digest:
-        debug('Page at %s was updated' % tracker.url)
-        old_content = task.last_content
-        task.last_content = updated_content
+
+    last_tracker_change = get_last_tracker_change(tracker.id)
+    old_digest = None
+    old_content = None
+    if last_tracker_change:
+        old_digest = last_tracker_change.digest
+        old_content = last_tracker_change.content
+    # Here we need to query the tracker_changes table for the last change
+    if digest != old_digest:
+        # TODO now we should store a new record in the tracker_changes table
+        # and send an email to the user
+        debug('Tracked content at %s was updated' % tracker.url)
+        change = TrackerChange(tracker.id, stored_version.id, updated_content)
         send_mail(task, updated_content, old_content)
+        session.add(change)
     else:
         debug('There wasnt any relevant modification to %s' % tracker.url)
 
@@ -160,34 +170,51 @@ def run_track_resource(task):
     debug('Next run is scheduled for %s' % task.next_run)
 
 
+def get_last_tracker_change(tracker_id):
+    session = Session()
+    return session.query(TrackerChange)\
+            .filter(TrackerChange.tracker_id == tracker_id)\
+            .order_by(desc(TrackerChange.id))\
+            .first()
+
+
+def get_last_page_version(url):
+    session = Session()
+    return session.query(WebpageVersion)\
+            .filter(WebpageVersion._url == url)\
+            .order_by(desc(WebpageVersion.id))\
+            .first()
+
 
 def run_update_resource(task):
     session = Session()
     now = datetime.now()
     debug('Downloading web page at %s...', task.url)
-    new_page = webpage_daemon.fetch(task.url)
+    new_version = webpage_daemon.fetch(task.url)
     debug('Web page downloaded. Retrieving the stored version...')
-    stored_page = task.webpage
 
-    if stored_page:
-        stored_page.last_updated = now
+    task.webpage.last_checked = now
 
-    if stored_page != None and new_page != None and\
-            stored_page.digest != new_page.digest:
-        debug('Stored version is outdated, updating it now')
-        now = datetime.now()
-        stored_page.contents = new_page.contents
-        debug('Web page at %s was updated' % task.url)
-    elif stored_page == None:
-        debug('This is the first time we are downloading this page')
-        now = datetime.now()
-        new_page.last_updated = now
-        session.add(new_page)
-        debug('Web page successfully stored')
-    elif new_page == None:
-        error('There was an error when retrieving %s. Exiting.' % task.url)
+    stored_version = get_last_page_version(task.url)
+
+    if new_version != None:
+        add = False
+        if stored_version != None:
+            if stored_version.digest != new_version.digest:
+                debug('Last version of %s is outdated, adding a new version'\
+                        % task.url)
+                add = True
+        else:
+            debug('This is the first time we are downloading %s' % task.url)
+            add = True
+        if add:
+            session.add(new_version)
+            debug('New version of %s successfully stored' % task.url)
+        else:
+            debug('Stored version of %s was up to date' % task.url)
     else:
-        debug('Stored version is up to date')
+        error('There was an error when retrieving %s. Exiting' % task.url)
+
     session.delete(task)
 
 

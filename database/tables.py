@@ -1,6 +1,6 @@
 from sqlalchemy import Table, MetaData, Column, Index, ForeignKey, Boolean,\
         Integer, String, DateTime, LargeBinary, PickleType
-from custom_types import StringList
+from custom_types import StringList, GzipBlob
 
 metadata = MetaData()
 
@@ -16,9 +16,16 @@ metadata = MetaData()
 webpage = Table('webpage', metadata,
         # 2083 is the maximum url length supported by IE
         Column('url', String(2083), primary_key=True),
-        Column('contents', LargeBinary),
-        Column('last_updated', DateTime),
-        Column('digest', LargeBinary(20))
+        Column('last_checked', DateTime)
+        )
+
+
+webpage_version = Table('webpage_version', metadata,
+        Column('id', Integer, primary_key=True),
+        Column('url', ForeignKey('webpage.url')),
+        Column('content', GzipBlob),
+        Column('digest', LargeBinary(20)),
+        Column('date', DateTime)
         )
 
 
@@ -70,11 +77,18 @@ task = Table('task', metadata,
         )
 
 
+tracker_change = Table('tracker_change', metadata,
+        Column('id', Integer, primary_key=True),
+        Column('tracker_id', ForeignKey('tracker.id')),
+        Column('webpage_version_id', ForeignKey('webpage_version.id')),
+        Column('content', GzipBlob),
+        Column('digest', LargeBinary(20))
+        )
+
+
 track_resource = Table('track_resource', metadata,
         Column('id', ForeignKey('task.id'), primary_key=True),
-        Column('tracker_id', ForeignKey('tracker.id')),
-        Column('last_content', LargeBinary),
-        Column('last_digest', LargeBinary(20))
+        Column('tracker_id', ForeignKey('tracker.id'))
         )
 
 

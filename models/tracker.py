@@ -1,3 +1,4 @@
+from util import normalize_url
 from app_components.model import Model
 from app_components.model import TableModel
 from forms.tracker import TrackerForm
@@ -13,6 +14,20 @@ class Tracker(Model):
         self.tracker_group_id = tracker_group_id
         self.css_selector = css_selector
         self.comment = comment
+
+
+    @property
+    def url(self):
+        return self._url
+
+
+    @url.setter
+    def url(self, value):
+        if value:
+            self._url = normalize_url(value)
+        else:
+            self._url = None
+
 
 
 class TrackerTable(TableModel):
