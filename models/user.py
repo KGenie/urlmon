@@ -1,5 +1,6 @@
 from app_components.model import Model, TableModel
 from forms.user import UserForm
+from hashlib import sha512
 
 class User(Model):
 
@@ -14,6 +15,22 @@ class User(Model):
         self.last_login = last_login
 
 
-class UserTable(TableModel):
+    @property
+    def password(self):
+        return self._pass
 
+
+    @password.setter
+    def password(self, value):
+        if value:
+            h = sha512()
+            h.update(value)
+            self._pass = h.digest()
+        else:
+            self._pass = value
+
+
+
+
+class UserTable(TableModel):
     form = UserForm

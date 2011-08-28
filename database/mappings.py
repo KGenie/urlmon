@@ -24,7 +24,10 @@ mapper(WebpageVersion, tables.webpage_version,
             })
             
 
-mapper(User, tables.user)
+mapper(User, tables.user,
+        properties={
+            '_pass': tables.user.c.password
+            })
 
 
 mapper(Registration, tables.registration,

@@ -17,9 +17,12 @@ class UserService(StorageService):
 
 
     def authenticate(self, email, password):
+        u = User()
+        u.email = email
+        u.password = password
         ret = self.session.query(User).\
-                filter(User.email == email).\
-                filter(User.password == password).first()
+                filter(User.email == u.email).\
+                filter(User._pass == u.password).first()
         if ret:
             self.session.refresh(ret)
             self.session.expunge(ret)

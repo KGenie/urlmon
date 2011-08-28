@@ -35,7 +35,7 @@ user = Table('user', metadata,
         Column('email', String(320), unique=True, index=True),
         Column('first_name', String(50)),
         Column('last_name', String(50)),
-        Column('password', String(50)),
+        Column('password', LargeBinary(64)),
         Column('roles', StringList(200)),
         Column('last_login', DateTime)
         )
