@@ -1,0 +1,63 @@
+{% extends "shared/page.htmljinja" %}
+
+{% block title %}
+Changes for tracker group
+{% endblock %}
+
+{% block headers %}
+<link rel="stylesheet" href="{{ u.static('/css/changelist.css') }}" type="text/css" />
+{% endblock %}
+
+{% block help %}
+<p>This is a list of your changes for this tracker group</p>
+{% endblock %}
+
+{% block main_title %}
+Changes for tracker group
+{% endblock %}
+
+{% block main %}
+
+<div id="{{ id }}" class="change-list">
+  {% for change in changes %}
+  <div class="change">
+    <div class="title">
+      <div class="name">
+        <a href="{{ 
+        u.action('edit', controller='tracker', id=change.tracker_id) 
+        }}">{{ change.tracker_name }}</a>
+      </div>
+      <div class="url">
+        <a href="{{ 
+          change.tracker_url }}"
+           target="_blank">{{ change.tracker_url_short }}</a>
+      </div>
+      <div class="time-ago">
+        {{ change.time_ago }}
+      </div>
+    </div>
+    <div class="content">
+      {{ change.content }}
+    </div>
+    <div class="actions">
+      <div class="label">
+	view details: 
+      </div>
+      <div class="diff">
+       <a href="{{ u.action('diff', 
+	controller='tracker_change', id=change.id)}}">changes</a>
+      </div>
+      <div class="old-content">
+	<a href="{{ u.action('old_content', 
+	controller='tracker_change', id=change.id)}}">previous content</a>
+      </div>
+      <div class="new-content">
+	<a href="{{ u.action('new_content', 
+	controller='tracker_change', id=change.id)}}">new content</a>
+      </div>
+     </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

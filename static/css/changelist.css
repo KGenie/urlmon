@@ -1,0 +1,45 @@
+.change-list {
+    margin-left: 2.5%;
+    width: 90%;
+}
+
+.change-list > .change {
+    width: 100%;
+    padding: 0.3em;
+    background: white;
+    margin-top: 0.5em;
+    border: 1px solid black;
+    clear: both;
+}
+
+.change-list > .change > .title {
+    width: 100%;
+}
+
+.change-list > .change > .title > .name {
+    width: 10%;
+}
+
+.change-list > .change > .title > .url {
+    margin-left: 0.5em;
+}
+
+.change-list > .change > .title > .time-ago {
+    float: right;
+}
+
+.change-list > .change > .content {
+    margin-top: 0.7em;
+    height: 2.5em;
+    clear: both;
+}
+
+.change-list > .change > .actions {
+    margin-top: 0.5em;
+    font-size: 0.8em;
+    float: right;
+}
+
+.change-list > .change > .actions > div {
+    margin-left: 0.7em;
+}

@@ -1,5 +1,5 @@
 {% extends "shared/page.htmljinja" %}
-{% from "macros/form.htmljinja" import table %}
+{% from "tracker_group/macros.htmljinja" import tracker_group_table %}
 
 {% block title %}
 View tracker groups
@@ -14,8 +14,8 @@ Your current Tracker Groups
 {% endblock %}
 
 {% block main %}
-{{ table(
+{{ tracker_group_table(
 	id='tracker-group-list',
         u=u,
-        table_model=table_model) }}
+        tracker_groups=tracker_groups) }}
 {% endblock %}

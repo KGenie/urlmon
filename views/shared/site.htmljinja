@@ -18,7 +18,6 @@
     <script type="text/javascript"
       src="{{ u.action('helpers', controller='js') }}"></script>
 
-
     <script type="text/javascript" 
       src="{{ u.static('/js/umon.js') }}"></script>
 

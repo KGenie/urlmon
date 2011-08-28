@@ -1,0 +1,39 @@
+{% macro tracker_group_table(id, u, tracker_groups) -%}
+
+<div class="table-container">
+  <table class="simple-table">
+    <thead>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+          Name
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in tracker_groups %}
+      <tr>
+        <td>
+          <a href="{{ u.action('edit', id=obj.id )}}">Edit</a>
+        </td>
+        <td>
+          <a href="{{ u.action('confirm_delete', id=obj.id )}}">Delete</a>
+        </td>
+        <td>
+          <a href="{{ 
+            u.action('index',
+            controller='tracker_change', 
+            tracker_group_id=obj.id) }}">View changes</a>
+        </td>
+        <td>
+          {{ obj.name }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{%- endmacro %}

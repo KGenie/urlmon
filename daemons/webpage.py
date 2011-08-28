@@ -4,11 +4,11 @@ from controllable import ControllableDaemon
 from models.webpage_version import WebpageVersion
 from urlparse import urlparse, urlunparse
 from lxml import etree, html
-from lxml.html import builder as E
-from udammit import UnicodeDammit
+from lxml.html.clean import Cleaner
 from util import normalize_url
+from helpers import UrlHelper
 
-
+u = UrlHelper()
 __logger = logging.getLogger('daemons.controllable.webpage')
 debug = __logger.debug
 warn = __logger.warn
@@ -43,7 +43,7 @@ class WebpageDaemon(ControllableDaemon):
         body_dom = get_processed_dom(response)
         if current_selector:
             body_dom = select_content(body_dom, current_selector)
-        body = etree.tostring(body_dom, method='html')
+        body = etree.tostring(body_dom, method='html', pretty_print=True)
 
         page = WebpageVersion(url, body, datetime.datetime.now())
         return page
@@ -70,17 +70,18 @@ def select_content(body_dom, current_selector):
 
 
 __filtered_tags = set(['html', 'head', 'body'])
-__parser = etree.HTMLParser(recover=True)
+       
 
 def get_processed_dom(response):
     url = urlparse(response.geturl())
-    dammit = UnicodeDammit(response.read(), isHTML=True)
-    dom = html.fromstring(dammit.unicode, base_url=url.geturl())
+    dom = html.fromstring(response.read(), base_url=url.geturl())
+    clean_html(dom)
 
     _process_links(url, dom)
     _process_scripts(dom)
     _process_selectable_elements(dom)
     _process_ids(dom)
+
     return dom
 
 
@@ -93,17 +94,7 @@ def _process_selectable_elements(dom):
 
 
 def _process_scripts(dom):
-    script_tags = dom.cssselect('script')
-    for script_tag in script_tags:
-        script_tag.getparent().remove(script_tag)
-
-    for el in dom.cssselect('*'):
-        for ev in ('onload', 'onunload', 'onclick', 'onfocus', 'onblur'\
-                'onchange', 'onsubmit', 'onmouseover', 'onerror'):
-            if ev in el.attrib:
-                del el.attrib[ev]
-
-    body = dom.cssselect('body')[0].attrib['onload'] =\
+    body = dom.body.attrib['onload'] =\
             'parent.uMon.iFrameLoaded();' 
 
 
@@ -167,3 +158,27 @@ def _increase_id(id):
     else:
         stripped = id[:idx]
         return stripped + '_' + str(int(num)+1)
+
+
+class UMonCleaner(Cleaner):
+    #scripts = True
+    javascript = False
+    #comments = True
+    #style = False
+    links = False 
+    meta = False
+    page_structure = False
+    #processing_instructions = True
+    #embedded = False
+    #frames = True
+    forms = False
+    #annoying_tags = True
+    #remove_tags = None
+    #allow_tags = None
+    #remove_unknown_tags = True
+    #safe_attrs_only = False
+    #add_nofollow = False
+    #host_whitelist = ()
+    #whitelist_tags = set(['iframe', 'embed'])
+
+clean_html = UMonCleaner()

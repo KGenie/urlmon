@@ -1,5 +1,6 @@
 from app_components.controller import WebMonitorController
-from models.tracker_group import TrackerGroup, TrackerGroupTable
+from models.tracker_group import TrackerGroup
+from models.tracker_change_view import TrackerChangeView
 from forms.tracker_group import TrackerGroupForm
 from services.tracker_group import TrackerGroupService
 from services.tracker import TrackerService
@@ -13,12 +14,12 @@ class TrackerGroupController(WebMonitorController):
     tracker_group_service = TrackerGroupService
     tracker_service = TrackerService
 
+
     @get
     @menu(label='Manage')
     def index(self, request):
         tracker_groups = self.tracker_group_service.get_all_by_user(self.session['user'])
-        table_model = TrackerGroupTable(tracker_groups)
-        return self.view({'table_model': table_model})
+        return self.view({'tracker_groups': tracker_groups})
 
 
 
@@ -27,6 +28,7 @@ class TrackerGroupController(WebMonitorController):
     def new(self, request):
         form = TrackerGroupForm()
         return self.view({'form': form})
+
 
 
     @get
@@ -75,7 +77,6 @@ class TrackerGroupController(WebMonitorController):
 
         form = TrackerGroupForm(obj=tracker_group)
         return self.view({'form': form})
- 
 
     @post
     def create(self, request):
@@ -153,3 +154,8 @@ class TrackerGroupController(WebMonitorController):
             'Tracker group sucessfully deleted'
 
         return self.redirect('index')
+
+
+
+
+
