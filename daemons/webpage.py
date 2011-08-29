@@ -142,7 +142,7 @@ def _generate_id(tag, existing_ids):
     while id in existing_ids:
         id = _increase_id(id)
     tag.attrib['id'] = id
-    tag.attrib['title'] = 'CSS Selector: #%s' % id
+    #tag.attrib['title'] = 'CSS Selector: #%s' % id
     existing_ids.add(id)
 
 

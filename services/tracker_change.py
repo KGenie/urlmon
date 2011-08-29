@@ -10,7 +10,7 @@ from daemons.webpage import select_content
 
 u = UrlHelper()
 
-def diff(old_version, new_version):
+def diff(old_version, new_version, css_selector):
     dom = html.fromstring(new_version.content)
     diffed = htmldiff(old_version.content, new_version.content)
     diffed_dom = html.fromstring(diffed)
@@ -18,10 +18,11 @@ def diff(old_version, new_version):
     dom.body.clear()
     dom.body.append(diffed_dom)
 
-    dom.appen(E.LINK(rel='stylesheet', type='text/css',\
+    dom.append(E.LINK(rel='stylesheet', type='text/css',\
             href=u.static('/css/diff.css')))
-    dom.appen(E.LINK(rel='stylesheet', type='text/css',\
+    dom.append(E.LINK(rel='stylesheet', type='text/css',\
             href=u.static('/css/frame.css')))
+    select_content(dom, css_selector)
 
     return etree.tostring(dom)
 
@@ -75,14 +76,12 @@ class TrackerChangeService(StorageService):
         return etree.tostring(dom)
 
 
-
-
-
     def get_page_diff(self, tracker_change):
         last_two_changes = self.get_last_two_changes(tracker_change)
 
         new_version = tracker_change.webpage_version
         if len(last_two_changes) == 2:
-            return diff(last_two_changes[1].webpage_version, new_version)
+            return diff(last_two_changes[1].webpage_version, new_version,
+                    tracker_change.tracker.css_selector)
         else:
             return new_version.content
