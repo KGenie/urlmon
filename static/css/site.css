@@ -29,6 +29,10 @@ a:active {
     color: black;
 }
 
+.maxpager {
+    float: right;
+}
+
 button {
     overflow: visible;
     width: auto;

@@ -30,16 +30,40 @@ def diff(old_version, new_version, css_selector):
 class TrackerChangeService(StorageService):
     entity = TrackerChange
 
-    def get_changes(self, tracker_group):
+
+    def get_change_count(self, tracker_group, tracker_id):
         s = self.session
 
-        tracker_ids_query = s.query(Tracker.id)\
-                .filter(Tracker.tracker_group_id == tracker_group.id)
+        if tracker_id:
+            tracker_ids_query = s.query(Tracker.id)\
+                    .filter(Tracker.id == tracker_id)
+        else:
+            tracker_ids_query = s.query(Tracker.id)\
+                    .filter(Tracker.tracker_group_id == tracker_group.id)
+
+        return s.query(TrackerChange)\
+                .filter(TrackerChange.tracker_id.in_(tracker_ids_query))\
+                .count()
+
+
+    def get_changes(self, tracker_group, page, tracker_id):
+        first = ((page - 1) * 5) + 1
+        s = self.session
+
+        if tracker_id:
+            tracker_ids_query = s.query(Tracker.id)\
+                    .filter(Tracker.id == tracker_id)
+        else:
+            tracker_ids_query = s.query(Tracker.id)\
+                    .filter(Tracker.tracker_group_id == tracker_group.id)
 
         return s.query(TrackerChange)\
                 .filter(TrackerChange.tracker_id.in_(tracker_ids_query))\
                 .order_by(TrackerChange.id.desc())\
+                .limit(5)\
+                .offset(first)\
                 .all()
+
 
     def get_last_two_changes(self, tracker_change):
         s = self.session

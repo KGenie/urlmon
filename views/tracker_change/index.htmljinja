@@ -17,8 +17,23 @@ Changes for tracker group
 {% endblock %}
 
 {% block main %}
-
 <div id="{{ id }}" class="change-list">
+  <form id="query" method="GET" action="{{ u.action('index') }}">
+    <input type="hidden" name="id" value="{{ id }}" />
+    <label for="tracker_id">Tracker: </label>
+    <select id="tracker_id" name="tracker_id">
+      <option value="">All trackers</option>
+      {% for tracker in trackers %}
+      {% if tracker.id == tracker_id %}
+      <option value="{{ tracker.id }}" selected="selected">{{ tracker.name }}</option>
+      {% else %}
+      <option value="{{ tracker.id }}">{{ tracker.name }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+    <input type="submit" value="Filter" />
+  </form>
+
   {% for change in changes %}
   <div class="change">
     <div class="title">
@@ -37,7 +52,15 @@ Changes for tracker group
       </div>
     </div>
     <div class="content">
-      {{ change.content }}
+      <div class="content-short">
+        {{ change.content_short }}
+      </div>
+      {% if change.content_remaining %}
+      <div class="content-remaining">
+        <a target="_blank" href="{{ u.action('change_content', 
+          id=change.id) }}">{{ change.content_remaining }}</a>
+      </div>
+      {% endif %}
     </div>
     <div class="actions">
       <div class="label">
@@ -58,6 +81,24 @@ Changes for tracker group
      </div>
   </div>
   {% endfor %}
+  <div class="minpager">
+    {% if page > 1 %}
+    <a href="{{ u.action('index', id=id, page=1, tracker_id=tracker_id) }}">First</a>
+    <a href="{{ u.action('index', id=id, page=(page - 1), tracker_id=tracker_id) }}">Previous</a>
+    {% else %}
+    First
+    Previous
+    {% endif %}
+   </div>
+   <div class="maxpager">
+     {% if (page + 1) <= maxpage %}
+     <a href="{{ u.action('index', id=id, page=(page + 1), tracker_id=tracker_id) }}">Next</a>
+     <a href="{{ u.action('index', id=id, page=maxpage, tracker_id=tracker_id) }}">Last</a>
+     {%else %}
+     Next
+     Last
+     {% endif %}
+   </div>
 </div>
 
 {% endblock %}

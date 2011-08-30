@@ -69,3 +69,8 @@ class TrackerService(StorageService):
                 filter(TrackerGroup.user_id == user.id).all()
 
 
+    def get_all_by_group(self, group):
+         return self.session.query(Tracker)\
+                .filter(Tracker.tracker_group_id == group.id).all()
+
+

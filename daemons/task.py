@@ -10,6 +10,7 @@ from models.user import User
 from models.webpage import Webpage
 from models.webpage_version import WebpageVersion
 from models.tracker_change import TrackerChange
+from models.tracker_change_view import TrackerChangeView
 from daemons.daemon import Daemon
 from daemons.mailer import DAEMON as mailer_daemon
 from daemons.webpage import DAEMON as webpage_daemon
@@ -160,8 +161,15 @@ def run_track_resource(task):
         # TODO now we should store a new record in the tracker_changes table
         # and send an email to the user
         debug('Tracked content at %s was updated' % tracker.url)
-        change = TrackerChange(tracker.id, stored_version.id, updated_content)
-        send_mail(task, updated_content, old_content)
+        change = TrackerChange(tracker.id, stored_version.id,
+                updated_content)
+        change.tracker = tracker
+        change.webpage_version = stored_version
+
+        if last_tracker_change:
+            send_mail(tracker, TrackerChangeView(change, now),
+                TrackerChangeView(last_tracker_change, now))
+
         session.add(change)
     else:
         debug('There wasnt any relevant modification to %s' % tracker.url)
@@ -233,22 +241,15 @@ def send_warning_mail(task):
     debug('Warning successfully sent')
 
 
-def send_mail(task, updated_content, old_content):
-    tracker = task.tracker
+def send_mail(tracker, tracker_change, last_tracker_change):
     tracker_group = tracker.tracker_group
     user = tracker_group.user
     debug('Sending notification to %s' % user.email)
 
-    if old_content:
-        subject = 'The page at %s has changed' % tracker.url
-        template_name = 'tracker_updated'
-        template_context = { 'url': tracker.url, 'new_content': updated_content,
-                'old_content': old_content }
-    else:
-        subject = 'Tracking %s' % tracker.url
-        template_name = 'tracker_started'
-        template_context = { 'url': tracker.url, 'new_content': updated_content }
-
+    subject = 'The page at %s has changed' % tracker.url
+    template_name = 'tracker_updated'
+    template_context = { 'tracker_change': tracker_change, 
+            'last_tracker_change': last_tracker_change }
 
     mailer_daemon.send_template_mail(user.email, subject, template_name,
             template_context)

@@ -1,9 +1,9 @@
 webob
+paste
 beaker
 jinja2
 sqlalchemy
 routes
 chardet
 lxml
-html-tree-diff
-html5lib
+wtforms

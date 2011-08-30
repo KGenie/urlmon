@@ -25,7 +25,7 @@
           <a href="{{ 
             u.action('index',
             controller='tracker_change', 
-            tracker_group_id=obj.id) }}">View changes</a>
+            id=obj.id) }}">View changes</a>
         </td>
         <td>
           {{ obj.name }}
