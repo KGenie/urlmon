@@ -21,6 +21,8 @@ class TrackerChangeController(WebMonitorController):
         tracker_id = request.GET.get('tracker_id', None)
         if tracker_id:
             tracker_id = int(tracker_id)
+        else:
+            tracker_id = 0
 
         page = int(page)
         id = request.GET.get('id', None)
