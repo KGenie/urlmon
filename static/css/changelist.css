@@ -43,3 +43,11 @@
 .change-list > .change > .actions > div {
     margin-left: 0.7em;
 }
+
+.pager {
+    float: right;
+}
+
+.pager * { 
+    margin-left: 2px;
+}

@@ -6,6 +6,7 @@ from services.tracker_change import TrackerChangeService
 from services.tracker_group import TrackerGroupService
 from wsgi.http_method import get, post
 from helpers import menu
+from util import get_page_range
 
 
 class TrackerChangeController(WebMonitorController):
@@ -18,6 +19,7 @@ class TrackerChangeController(WebMonitorController):
     @menu(exclude=True)
     def index(self, request):
         page = request.GET.get('page', 1)
+        page_size = request.GET.get('page_size', 10)
         tracker_id = request.GET.get('tracker_id', None)
         if tracker_id:
             tracker_id = int(tracker_id)
@@ -39,21 +41,23 @@ class TrackerChangeController(WebMonitorController):
         count = self.tracker_change_service.get_change_count(tracker_group,
                 tracker_id)
 
-        maxpage = count / 5
-        if count % 5 != 0:
+        maxpage = count // page_size
+        if count % page_size != 0:
             maxpage += 1
 
         if page > maxpage:
             return self.notfound()
 
+        page_range = get_page_range(maxpage, page, 5)
+
         changes = self.tracker_change_service.get_changes(tracker_group, 
-                page, tracker_id)
+                page, page_size, tracker_id)
         trackers = self.tracker_service.get_all_by_group(tracker_group)
         
         results = (TrackerChangeView(c, now) for c in changes)
         return self.view({'changes': results, 'page' : page, 
             'maxpage': maxpage, 'id': id, 'trackers': trackers, 
-            'tracker_id': tracker_id  })
+            'tracker_id': tracker_id, 'page_range': page_range  })
 
     @get
     @menu(exclude=True)

@@ -46,8 +46,8 @@ class TrackerChangeService(StorageService):
                 .count()
 
 
-    def get_changes(self, tracker_group, page, tracker_id):
-        first = ((page - 1) * 5) + 1
+    def get_changes(self, tracker_group, page, page_size, tracker_id):
+        first = ((page - 1) * page_size) + 1
         s = self.session
 
         if tracker_id:
@@ -60,7 +60,7 @@ class TrackerChangeService(StorageService):
         return s.query(TrackerChange)\
                 .filter(TrackerChange.tracker_id.in_(tracker_ids_query))\
                 .order_by(TrackerChange.id.desc())\
-                .limit(5)\
+                .limit(page_size)\
                 .offset(first)\
                 .all()
 
