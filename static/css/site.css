@@ -279,3 +279,7 @@ form.post-link-form {
 .hovermenu ul li:hover ul {
     display: block;
 }
+
+#select-frame {
+    height: 350px;
+}

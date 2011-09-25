@@ -62,12 +62,13 @@ class Mailer(ControllableDaemon):
         msg['From'] = self.sender
         msg['to'] = to
 
-        conn = smtplib.SMTP(self.smtp_server, self.port)
-        conn.starttls()
-        conn.ehlo()
-        conn.login(self.username, self.password)
-        conn.sendmail(self.sender, [to], msg.as_string())
-        conn.quit()
+        # TODO activate this when we have a working smtp server
+        #conn = smtplib.SMTP(self.smtp_server, self.port)
+        #conn.starttls()
+        #conn.ehlo()
+        #conn.login(self.username, self.password)
+        #conn.sendmail(self.sender, [to], msg.as_string())
+        #conn.quit()
 
 
     def __send_template_mail(self, to, subject, template_name, 
@@ -90,12 +91,12 @@ class Mailer(ControllableDaemon):
         msg['From'] = self.sender
         msg['to'] = to
 
-        conn = smtplib.SMTP(self.smtp_server, self.port)
-        conn.starttls()
-        conn.ehlo()
-        conn.login(self.username, self.password)
-        conn.sendmail(self.sender, [to], msg.as_string())
-        conn.quit()
+#        conn = smtplib.SMTP(self.smtp_server, self.port)
+#        conn.starttls()
+#        conn.ehlo()
+#        conn.login(self.username, self.password)
+#        conn.sendmail(self.sender, [to], msg.as_string())
+#        conn.quit()
 
 
     def send_mail(self, email, subject, msg):

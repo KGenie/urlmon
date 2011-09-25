@@ -7,24 +7,13 @@ from lxml.html import builder as E
 from lxml.html.diff import htmldiff
 from helpers import UrlHelper
 from daemons.webpage import select_content
+from htmldiff import htmldiff
 
 u = UrlHelper()
 
+
 def diff(old_version, new_version, css_selector):
-    dom = html.fromstring(new_version.content)
-    diffed = htmldiff(old_version.content, new_version.content)
-    diffed_dom = html.fromstring(diffed)
-       
-    dom.body.clear()
-    dom.body.append(diffed_dom)
-
-    dom.append(E.LINK(rel='stylesheet', type='text/css',\
-            href=u.static('/css/diff.css')))
-    dom.append(E.LINK(rel='stylesheet', type='text/css',\
-            href=u.static('/css/frame.css')))
-    select_content(dom, css_selector)
-
-    return etree.tostring(dom)
+    return htmldiff(old_version.content, new_version.content, True)
 
 
 class TrackerChangeService(StorageService):

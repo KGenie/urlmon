@@ -23,8 +23,8 @@ class Daemon(object):
         try:
             pid = os.fork()
             if pid > 0:
-                # Don't exit from the first the parent since it is the web app.
-                # Just return since it still has work to do.
+                # Don't exit from the first the parent since it is the
+                # web app. Just return since it still has work to do.
                 return False
            
         except OSError, e:
