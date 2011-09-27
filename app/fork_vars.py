@@ -5,3 +5,5 @@ TEMP_DIR = tempfile.mkdtemp()
 IPC_SOCKET_DIR = TEMP_DIR
 LOG_DIR = TEMP_DIR
 PID_DIR = TEMP_DIR
+LOG_READ = None
+LOG_WRITE = None

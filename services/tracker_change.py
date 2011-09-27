@@ -1,4 +1,4 @@
-import cgi
+import logging
 from storage import StorageService
 from models.tracker_change import TrackerChange
 from models.tracker import Tracker
@@ -7,24 +7,20 @@ from lxml.html import builder as E
 from lxml.html.diff import htmldiff
 from helpers import UrlHelper
 from daemons.webpage import select_content
+from htmldiff import htmldiff
 
 u = UrlHelper()
 
+__logger = logging.getLogger('services.tracker_change')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
+
+
+
 def diff(old_version, new_version, css_selector):
-    dom = html.fromstring(new_version.content)
-    diffed = htmldiff(old_version.content, new_version.content)
-    diffed_dom = html.fromstring(diffed)
-       
-    dom.body.clear()
-    dom.body.append(diffed_dom)
-
-    dom.append(E.LINK(rel='stylesheet', type='text/css',\
-            href=u.static('/css/diff.css')))
-    dom.append(E.LINK(rel='stylesheet', type='text/css',\
-            href=u.static('/css/frame.css')))
-    select_content(dom, css_selector)
-
-    return etree.tostring(dom)
+    return htmldiff(old_version.content, new_version.content, True)
 
 
 class TrackerChangeService(StorageService):
@@ -46,8 +42,8 @@ class TrackerChangeService(StorageService):
                 .count()
 
 
-    def get_changes(self, tracker_group, page, tracker_id):
-        first = ((page - 1) * 5) + 1
+    def get_changes(self, tracker_group, page, page_size, tracker_id):
+        first = ((page - 1) * page_size) + 1
         s = self.session
 
         if tracker_id:
@@ -60,7 +56,7 @@ class TrackerChangeService(StorageService):
         return s.query(TrackerChange)\
                 .filter(TrackerChange.tracker_id.in_(tracker_ids_query))\
                 .order_by(TrackerChange.id.desc())\
-                .limit(5)\
+                .limit(page_size)\
                 .offset(first)\
                 .all()
 
@@ -82,22 +78,27 @@ class TrackerChangeService(StorageService):
 
 
     def get_new_page(self, tracker_change):
-        dom = html.fromstring(tracker_change.webpage_version.content)
-        select_content(dom, tracker_change.tracker.css_selector)
-        return etree.tostring(dom)
+        #dom = html.fromstring(tracker_change.webpage_version.content)
+        #select_content(dom, tracker_change.tracker.css_selector)
+        #return etree.tostring(dom)
+        return tracker_change.webpage_version.content
     
 
 
     def get_previous_page(self, tracker_change):
         last_two_changes = self.get_last_two_changes(tracker_change)
         if len(last_two_changes) == 2:
+            warn('OK')
             version = last_two_changes[1].webpage_version
         else:
+            warn('ERRR')
             version = last_two_changes[0].webpage_version
 
-        dom = html.fromstring(version.content)
-        select_content(dom, tracker_change.tracker.css_selector)
-        return etree.tostring(dom)
+        #FIXME 'select_content' function is breaking html
+        #dom = html.fromstring(version.content)
+        #select_content(dom, tracker_change.tracker.css_selector)
+        #return etree.tostring(dom)
+        return version.content
 
 
     def get_page_diff(self, tracker_change):

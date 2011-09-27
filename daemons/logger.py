@@ -37,10 +37,8 @@ class Logger(Daemon):
 
 
     def run(self):
-        pattern = fork_vars.LOG_DIR + '/*.log'
-        self.logpipes = list(f for f in glob.glob(pattern))
-        self.pipestreams = list(PipeStream(f) for f in self.logpipes)
-        logs = self.pipestreams
+        os.close(fork_vars.LOG_WRITE)
+        logs = [PipeStream(fork_vars.LOG_READ)]
         self.go = True
 
         while self.go:

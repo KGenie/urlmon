@@ -6,24 +6,13 @@ DEFAULT_BUFSIZE = 1024
 
 class PipeStream(object):
 
-    def __init__(self, path, read=True, write=False, encoding='utf-8'):
-        if not os.path.exists(path):
-            raise Exception('FIFO ''%s'' does not exist!' % path)
-
-        if write:
-            mode = os.O_RDWR
-        elif read:
-            mode = os.O_RDONLY
-        else:
-            raise Exception('Must open for writing or reading')
-
-        mode = mode | os.O_NONBLOCK
-        self.path = path
+    def __init__(self, fd=None, write=True, read=True, encoding='utf-8'):
+        
         self.canread = read
         self.canwrite = write
         self.buff = ''
         self.encoding = encoding
-        self.fd = os.open(path, mode)
+        self.fd = fd
 
        
     def __iter__(self):

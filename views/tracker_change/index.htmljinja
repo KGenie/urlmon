@@ -78,27 +78,38 @@ Changes for tracker group
 	<a href="{{ u.action('new_content', 
 	controller='tracker_change', id=change.id)}}">new content</a>
       </div>
-     </div>
+    </div>
   </div>
   {% endfor %}
-  <div class="minpager">
+  <div class="pager">
     {% if page > 1 %}
-    <a href="{{ u.action('index', id=id, page=1, tracker_id=tracker_id) }}">First</a>
-    <a href="{{ u.action('index', id=id, page=(page - 1), tracker_id=tracker_id) }}">Previous</a>
+    <a href="{{ u.action('index', id=id, page=1, tracker_id=tracker_id)
+      }}">{{ '<<'|e }}</a>
+    <a href="{{ u.action('index', id=id, page=(page - 1),
+      tracker_id=tracker_id) }}">{{ '<'|e }}</a>
     {% else %}
-    First
-    Previous
+    <span>{{ '<<'|e }}</span>
+    <span>{{ '<'|e }}</span>
     {% endif %}
-   </div>
-   <div class="maxpager">
-     {% if (page + 1) <= maxpage %}
-     <a href="{{ u.action('index', id=id, page=(page + 1), tracker_id=tracker_id) }}">Next</a>
-     <a href="{{ u.action('index', id=id, page=maxpage, tracker_id=tracker_id) }}">Last</a>
-     {%else %}
-     Next
-     Last
-     {% endif %}
-   </div>
+    {% for p in page_range %}
+    {% if page == p %}
+    <span>{{ p|e }}</span>
+    {% else %}
+    <a href="{{ u.action('index', id=id, page=p, 
+      tracker_id=tracker_id) }}">{{ p|e }}</a>
+    {% endif %}
+    {% endfor %}
+    {% if (page + 1) <= maxpage %}
+    <a href="{{ u.action('index', id=id, page=(page + 1),
+      tracker_id=tracker_id) }}">{{ '>'|e }}</a>
+    <a href="{{ u.action('index', id=id, page=maxpage, 
+      tracker_id=tracker_id)}}">{{ '>>'|e }}</a>
+    {%else %}
+    <span>{{ '>'|e }}</span>  
+    <span>{{ '>>'|e }}</span>
+    {% endif %}
+  </div>
+
 </div>
 
 {% endblock %}

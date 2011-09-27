@@ -105,6 +105,8 @@ def stop_daemons():
     for daemon in daemons:
         daemon.stop()
 
+    os.close(fork_vars.LOG_WRITE)
+
 
 
 def start_daemons():
@@ -112,6 +114,7 @@ def start_daemons():
 
     from daemons import logger
     start_daemon(logger.DAEMON, parent_pid)
+    os.close(fork_vars.LOG_READ)
 
     from daemons import mailer
     start_daemon(mailer.DAEMON, parent_pid)
@@ -128,14 +131,13 @@ def start_daemons():
     
 
 def setup_logging():
-    #print 'log directory is %s' % fork_vars.LOG_DIR
-    logging_file = os.path.join(fork_vars.LOG_DIR, 'logpipe.log')
     print 'Temp directory is %s' % fork_vars.LOG_DIR
-    if os.path.exists(logging_file):
-        os.unlink(logging_file)
-    os.mkfifo(logging_file)
 
-    stream = PipeStream(logging_file,read=False, write=True)
+    readfd, writefd = os.pipe()
+    fork_vars.LOG_READ = readfd
+    fork_vars.LOG_WRITE = writefd
+
+    stream = PipeStream(writefd, read=False, write=True)
     formatter =\
             logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
