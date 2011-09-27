@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from app_components.controller import WebMonitorController
 from models.tracker_change_view import TrackerChangeView
@@ -7,6 +8,12 @@ from services.tracker_group import TrackerGroupService
 from wsgi.http_method import get, post
 from helpers import menu
 from util import get_page_range
+
+__logger = logging.getLogger('controllers.tracker_change')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
 
 
 class TrackerChangeController(WebMonitorController):
@@ -45,7 +52,8 @@ class TrackerChangeController(WebMonitorController):
         if count % page_size != 0:
             maxpage += 1
 
-        if page > maxpage:
+        if page > maxpage and page != 1:
+            warn(page)
             return self.notfound()
 
         page_range = get_page_range(maxpage, page, 5)

@@ -16,5 +16,6 @@ LEVELS = {
         'dispatcher': ERROR,
         'daemons': WARNING,
         'daemons.task': DEBUG,
-        'services': WARNING
+        'services': DEBUG,
+        'controllers': DEBUG
         }
