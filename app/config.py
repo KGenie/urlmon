@@ -105,6 +105,8 @@ def stop_daemons():
     for daemon in daemons:
         daemon.stop()
 
+    os.close(fork_vars.LOG_WRITE)
+
 
 
 def start_daemons():

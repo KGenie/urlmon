@@ -72,7 +72,7 @@ class TrackerChangeController(WebMonitorController):
         if tracker_change.tracker.tracker_group.user.id != current_user_id:
             return self.forbidden()
 
-        new = tracker_change.webpage_version.content
+        new = self.tracker_change_service.get_new_page(tracker_change)
         return self.content(new)
 
 
@@ -105,7 +105,7 @@ class TrackerChangeController(WebMonitorController):
         if tracker_change.tracker.tracker_group.user.id != current_user_id:
             return self.forbidden()
 
-        old = tracker_change.webpage_version.content
+        old = self.tracker_change_service.get_previous_page(tracker_change)
         return self.content(old)
 
 

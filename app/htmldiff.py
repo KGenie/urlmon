@@ -62,7 +62,8 @@ class HTMLMatcher(SequenceMatcher):
             if item.startswith('<'):
                 result.append(item)
             else:
-                result.extend(self.splitWords(item))
+                #result.extend(self.splitWords(item))
+                result.append(' '.join(item.strip().split()))
         return result
 
     def htmlDiff(self, addStylesheet=False):
@@ -124,10 +125,8 @@ class HTMLMatcher(SequenceMatcher):
 
     def stylesheet(self):
         return '''
-.insert { background-color: #aaffaa }
-.delete { background-color: #ff8888 }
-.tagInsert { background-color: #007700; color: #ffffff }
-.tagDelete { background-color: #770000; color: #ffffff }
+ins { background-color: #CCFF00; }
+del { background-color: #FDC6C6; }
 '''
 
     def addStylesheet(self, html, ss):
@@ -140,122 +139,20 @@ class HTMLMatcher(SequenceMatcher):
                 % (html[:pos], ss, html[pos:]))
 
     def startInsertText(self):
-        return '<span class="insert">'
+        return '<ins>'
     def endInsertText(self):
-        return '</span> '
+        return '</ins> '
     def startDeleteText(self):
-        return '<span class="delete">'
+        return '<del>'
     def endDeleteText(self):
-        return '</span> '
+        return '</del> '
     def formatInsertTag(self, tag):
-        return ('<span class="tagInsert">insert: <tt>%s</tt></span> '
-                % htmlEncode(tag))
+        return ''
     def formatDeleteTag(self, tag):
-        return ('<span class="tagDelete">delete: <tt>%s</tt></span> '
-                % htmlEncode(tag))
+        return ''
 
-class NoTagHTMLMatcher(HTMLMatcher):
-    def formatInsertTag(self, tag):
-        return ''
-    def formatDeleteTag(self, tag):
-        return ''
 
 def htmldiff(source1, source2, addStylesheet=False):
-    """
-    Return the difference between two pieces of HTML
-
-        >>> htmldiff('test1', 'test2')
-        '<span class="delete">test1 </span> <span class="insert">test2 </span> '
-        >>> htmldiff('test1', 'test1')
-        'test1 '
-        >>> htmldiff('<b>test1</b>', '<i>test1</i>')
-        '<span class="tagDelete">delete: <tt>&lt;b&gt;</tt></span> <span class="tagInsert">insert: <tt>&lt;i&gt;</tt></span> <i> test1 <span class="tagDelete">delete: <tt>&lt;/b&gt;</tt></span> <span class="tagInsert">insert: <tt>&lt;/i&gt;</tt></span> </i> '
-    """
+    
     h = HTMLMatcher(source1, source2)
     return h.htmlDiff(addStylesheet)
-
-def diffFiles(f1, f2):
-    source1 = open(f1).read()
-    source2 = open(f2).read()
-    return htmldiff(source1, source2, True)
-
-class SimpleHTMLMatcher(HTMLMatcher):
-    """
-    Like HTMLMatcher, but returns a simpler diff
-    """
-    def startInsertText(self):
-        return '+['
-    def endInsertText(self):
-        return ']'
-    def startDeleteText(self):
-        return '-['
-    def endDeleteText(self):
-        return ']'
-    def formatInsertTag(self, tag):
-        return '+[%s]' % tag
-    def formatDeleteTag(self, tag):
-        return '-[%s]' % tag
-
-def simplehtmldiff(source1, source2):
-    """
-    Simpler form of htmldiff; mostly for testing, like:
-
-        >>> simplehtmldiff('test1', 'test2')
-        '-[test1 ]+[test2 ]'
-        >>> simplehtmldiff('<b>Hello world!</b>', '<i>Hello you!</i>')
-        '-[<b>]+[<i>]<i> Hello -[world! ]-[</b>]+[you! ]+[</i>]</i> '
-    """
-    h = SimpleHTMLMatcher(source1, source2)
-    return h.htmlDiff()
-
-class TextMatcher(HTMLMatcher):
-
-
-    def set_seq1(self, a):
-        SequenceMatcher.set_seq1(self, a.split('\n'))
-
-    def set_seq2(self, b):
-        SequenceMatcher.set_seq2(self, b.split('\n'))
-
-    def htmlDiff(self, addStylesheet=False):
-        opcodes = self.get_opcodes()
-        a = self.a
-        b = self.b
-        out = StringIO()
-        for tag, i1, i2, j1, j2 in opcodes:
-            if tag == 'equal':
-                self.writeLines(a[i1:i2], out)
-            if tag == 'delete' or tag == 'replace':
-                out.write(self.startDeleteText())
-                self.writeLines(a[i1:i2], out)
-                out.write(self.endDeleteText())
-            if tag == 'insert' or tag == 'replace':
-                out.write(self.startInsertText())
-                self.writeLines(b[j1:j2], out)
-                out.write(self.endInsertText())
-        html = out.getvalue()
-        out.close()
-        if addStylesheet:
-            html = self.addStylesheet(html, self.stylesheet())
-        return html
-
-    def writeLines(self, lines, out):
-        for line in lines:
-            line = htmlEncode(line)
-            line = line.replace('  ', '&nbsp; ')
-            line = line.replace('\t', '&nbsp; &nbsp; &nbsp; &nbsp; ')
-            if line.startswith(' '):
-                line = '&nbsp;' + line[1:]
-            out.write('<tt>%s</tt><br>\n' % line)
-
-if __name__ == '__main__':
-    import sys
-    if not sys.argv[1:]:
-        print "Usage: %s file1 file2" % sys.argv[0]
-        print "or to test: %s test" % sys.argv[0]
-    elif sys.argv[1] == 'test' and not sys.argv[2:]:
-        import doctest
-        doctest.testmod()
-    else:
-        print diffFiles(sys.argv[1], sys.argv[2])
-    
