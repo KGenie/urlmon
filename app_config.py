@@ -13,6 +13,7 @@ NUMBER_OF_TASK_RUNNERS = 5
 
 # Logging
 LEVELS = {
+        'htmldiff': DEBUG,
         'dispatcher': ERROR,
         'daemons': WARNING,
         'daemons.task': DEBUG,

@@ -7,7 +7,7 @@ from lxml.html import builder as E
 from lxml.html.diff import htmldiff
 from helpers import UrlHelper
 from daemons.webpage import select_content
-from htmldiff import htmldiff
+from htmldiff import htmldiff, change_start_index
 
 u = UrlHelper()
 

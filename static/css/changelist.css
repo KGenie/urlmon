@@ -30,7 +30,7 @@
 
 .change-list > .change > .content {
     margin-top: 0.7em;
-    height: 2.5em;
+    height: 3em;
     clear: both;
 }
 
@@ -38,7 +38,9 @@
     margin-top: 0.5em;
     font-size: 0.8em;
     float: right;
+    clear:both;
 }
+
 
 .change-list > .change > .actions > div {
     margin-left: 0.7em;

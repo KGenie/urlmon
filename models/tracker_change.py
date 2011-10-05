@@ -3,10 +3,12 @@ from app_components.model import Model
 
 class TrackerChange(Model):
 
-    def __init__(self, tracker_id=None, webpage_version_id=None, content=''):
+    def __init__(self, tracker_id=None, webpage_version_id=None, content='',
+            start_index=0):
         self.tracker_id = tracker_id
         self.webpage_version_id = webpage_version_id
         self.content = content
+        self.start_index = start_index
 
 
     @property

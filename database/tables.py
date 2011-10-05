@@ -82,7 +82,8 @@ tracker_change = Table('tracker_change', metadata,
         Column('tracker_id', ForeignKey('tracker.id')),
         Column('webpage_version_id', ForeignKey('webpage_version.id')),
         Column('content', GzipBlob),
-        Column('digest', LargeBinary(20))
+        Column('digest', LargeBinary(20)),
+        Column('start_index', Integer)
         )
 
 

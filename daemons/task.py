@@ -19,6 +19,7 @@ from app_config import NUMBER_OF_TASK_RUNNERS, \
 from lxml import etree, html
 from database.sqlalch import Session
 from hashlib import sha1
+from htmldiff import change_start_index, htmldiff
 
 
 __logger = logging.getLogger('daemons.task')
@@ -145,8 +146,9 @@ def run_track_resource(task):
         send_warning_mail(task)
         return
     else:
-        updated_content = etree.tostring(selected[0],\
-                encoding=unicode, method='text')
+        updated_content = etree.tostring(selected[0],method='text', encoding=unicode)
+        words = updated_content.split()
+        updated_content = ' '.join(words)
         h.update(updated_content.encode('utf-8'))
     digest = h.digest()
 
@@ -156,15 +158,19 @@ def run_track_resource(task):
     if last_tracker_change:
         old_digest = last_tracker_change.digest
         old_content = last_tracker_change.content
-    # Here we need to query the tracker_changes table for the last change
     if digest != old_digest:
-        # TODO now we should store a new record in the tracker_changes table
-        # and send an email to the user
         debug('Tracked content at %s was updated' % tracker.url)
         change = TrackerChange(tracker.id, stored_version.id,
                 updated_content)
+
+        # get the index on where the change begins
+        idx = 0
+        if old_content:
+            idx = change_start_index(old_content, change.content)
+
         change.tracker = tracker
         change.webpage_version = stored_version
+        change.start_index = idx
 
         if last_tracker_change:
             send_mail(tracker, TrackerChangeView(change, now),

@@ -14,6 +14,7 @@ Better results if you use mxTidy first.  The output is HTML.
 
 from difflib import SequenceMatcher
 import re
+import logging
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -26,6 +27,15 @@ def htmlEncode(s, esc=cgi.escape):
 commentRE = re.compile('<!--.*?-->', re.S)
 tagRE = re.compile('<.*?>', re.S)
 headRE = re.compile('<\s*head\s*>', re.S | re.I)
+
+
+__logger = logging.getLogger('htmldiff')
+debug = __logger.debug
+warn = __logger.warn
+error = __logger.error
+info = __logger.info
+
+
 
 class HTMLMatcher(SequenceMatcher):
 
@@ -151,8 +161,32 @@ del { background-color: #FDC6C6; }
     def formatDeleteTag(self, tag):
         return ''
 
+class CharMatcher(SequenceMatcher):
+
+    def __init__(self, source1, source2):
+        SequenceMatcher.__init__(self, None, source1, source2, autojunk=False)
+
+
+    def change_start_index(self):
+        opcodes = self.get_opcodes()
+        ret = 0
+        for tag, i1, i2, j1, j2 in opcodes:
+            if tag != 'equal':
+                debug('%s AT INDEX %s' % (tag, j1))
+                debug('SEQ A COUNT : %s' % len(self.a))
+                ret = j1
+                break
+        return ret
+
+
 
 def htmldiff(source1, source2, addStylesheet=False):
     
     h = HTMLMatcher(source1, source2)
     return h.htmlDiff(addStylesheet)
+
+
+def change_start_index(source1, source2):
+    h = CharMatcher(source1, source2)
+    return h.change_start_index()
+

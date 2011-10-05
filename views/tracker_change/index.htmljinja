@@ -54,13 +54,13 @@ Changes for tracker group
     <div class="content">
       <div class="content-short">
         {{ change.content_short }}
+        {% if change.content_remaining %}
+        <span class="content-remaining">
+          <a target="_blank" href="{{ u.action('change_content', 
+            id=change.id) }}">{{ change.content_remaining }}</a>
+        </span>
+        {% endif %}
       </div>
-      {% if change.content_remaining %}
-      <div class="content-remaining">
-        <a target="_blank" href="{{ u.action('change_content', 
-          id=change.id) }}">{{ change.content_remaining }}</a>
-      </div>
-      {% endif %}
     </div>
     <div class="actions">
       <div class="label">
@@ -68,15 +68,18 @@ Changes for tracker group
       </div>
       <div class="diff">
        <a href="{{ u.action('diff', 
-	controller='tracker_change', id=change.id)}}">changes</a>
+         controller='tracker_change', id=change.id)}}"
+         target="_blank">changes</a>
       </div>
       <div class="old-content">
 	<a href="{{ u.action('old_content', 
-	controller='tracker_change', id=change.id)}}">previous content</a>
+          controller='tracker_change', id=change.id)}}"
+          target="_blank">previous content</a>
       </div>
       <div class="new-content">
 	<a href="{{ u.action('new_content', 
-	controller='tracker_change', id=change.id)}}">new content</a>
+          controller='tracker_change', id=change.id)}}"
+          target="_blank">new content</a>
       </div>
     </div>
   </div>

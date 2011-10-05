@@ -3,7 +3,7 @@ from app_components.model import Model
 
 class TrackerChangeView(Model):
 
-    MAX_CONTENT_LENGTH = 170
+    MAX_CONTENT_LENGTH = 250
     MAX_URL_LENGTH = 50
 
     def __init__(self, tracker_change, now):
@@ -14,6 +14,7 @@ class TrackerChangeView(Model):
         self.content = tracker_change.content
         self.date = tracker_change.webpage_version.date
         self.now = now
+        self.start_index = tracker_change.start_index
 
 
 
@@ -44,14 +45,18 @@ class TrackerChangeView(Model):
 
     @property
     def content_short(self):
-        if len(self.content) > self.MAX_CONTENT_LENGTH:
-            return self.content[:self.MAX_CONTENT_LENGTH] + ' ...'
+        s = self.content[self.start_index:]
+        if len(s) > self.MAX_CONTENT_LENGTH:
+            ret = s[:self.MAX_CONTENT_LENGTH] + ' ...'
+            print 'SAKJHSDKHSD  %s' % len(ret)
+            return ret
         return self.content
 
 
     @property
     def content_remaining(self):
-        l = len(self.content)
+        s = self.content[self.start_index:]
+        l = len(s)
         if l > self.MAX_CONTENT_LENGTH:
             remaining = l - self.MAX_CONTENT_LENGTH
             return '[%s more characters]' % remaining 
