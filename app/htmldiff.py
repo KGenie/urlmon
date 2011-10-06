@@ -135,8 +135,14 @@ class HTMLMatcher(SequenceMatcher):
 
     def stylesheet(self):
         return '''
-ins { background-color: #CCFF00; }
-del { background-color: #FDC6C6; }
+ins { 
+    background-color: #CCFF00; 
+    color: #000000
+}
+del { 
+    background-color: #FDC6C6;
+    color: #000000
+}
 '''
 
     def addStylesheet(self, html, ss):
@@ -172,8 +178,6 @@ class CharMatcher(SequenceMatcher):
         ret = 0
         for tag, i1, i2, j1, j2 in opcodes:
             if tag != 'equal':
-                debug('%s AT INDEX %s' % (tag, j1))
-                debug('SEQ A COUNT : %s' % len(self.a))
                 ret = j1
                 break
         return ret

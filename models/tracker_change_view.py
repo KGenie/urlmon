@@ -48,7 +48,6 @@ class TrackerChangeView(Model):
         s = self.content[self.start_index:]
         if len(s) > self.MAX_CONTENT_LENGTH:
             ret = s[:self.MAX_CONTENT_LENGTH] + ' ...'
-            print 'SAKJHSDKHSD  %s' % len(ret)
             return ret
         return self.content
 

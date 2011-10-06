@@ -29,12 +29,16 @@ class TrackerService(StorageService):
         if not tracker.css_selector:
             tracker.css_selector = 'body'
         s = self.session
-        u = tracker.url
-        if s.query(Webpage).filter(Webpage._url == u).count() == 0:
+        if s.query(Webpage).filter(Webpage._url == tracker.url).count() == 0:
             wp = Webpage(url=tracker.url)
             # The merge is used in case of a race condition
             # (It will insert or update)
             tracker.webpage = wp
+
+    def update(self, tracker_id, tracker):
+        self.before_insert(tracker)
+        ret = super(TrackerService, self).update(tracker_id, tracker)
+        return ret
 
 
     def insert(self, tracker):
@@ -57,6 +61,7 @@ class TrackerService(StorageService):
         self.before_delete(tracker)
         ret = super(TrackerService, self).delete(tracker)
         return ret
+
 
 
     def any_with_group(self, group_id):

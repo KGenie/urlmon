@@ -114,12 +114,14 @@ class TrackerController(WebMonitorController):
             if not tracker:
                 return self.notfound()
 
-            form.populate_obj(tracker)
             current_user_id = self.session['user'].id
 
             if tracker.tracker_group.user.id != current_user_id:
                 return self.forbidden()
 
+
+            tracker = Tracker()
+            form.populate_obj(tracker)
             tracker = self.tracker_service.update(tracker.id, tracker)
             if not tracker:
                 self.session['flash-error'] = \
