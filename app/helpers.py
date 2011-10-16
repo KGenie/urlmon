@@ -30,7 +30,7 @@ class UrlHelper(object):
         if path.startswith('/'):
             # Absolute path, strip the '/' since we are appending it
             path = path[1:]
-        return '%s/%s' % (self.app_directory, path)
+        return '%s/static/%s' % (self.app_directory, path)
 
     def action(self, name=None, controller=None, **parameters):
         if not controller:
