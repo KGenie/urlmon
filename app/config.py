@@ -150,7 +150,7 @@ def setup_logging():
 
 
 
-def make_app():
+def make_app(production=True):
     setup_logging() # logging before daemons so we will share logger setup
     start_daemons() # this is where we fork
 
@@ -181,8 +181,8 @@ def make_app():
 
     app = RoutesMiddleware(app, make_routes())
     app = SessionMiddleware(app, make_beaker_options())
-#    path = os.path.join(app_globals.APP_ROOT, 'static')
-    app = Cascade([app, StaticURLParser(app_globals.APP_ROOT)])
+    if not production:
+        app = Cascade([app, StaticURLParser(app_globals.APP_ROOT)])
 
     
 

@@ -1,16 +1,91 @@
 #!/usr/bin/env python
-import env, os
+import env, os, sys, atexit
+from signal import SIGINT
 from config import make_app
 from flup.server.fcgi import WSGIServer
+from time import sleep
 
 
-if __name__ == '__main__':
+pid_file = 'fcgi.pid'
+socket_file = 'fcgi.socket'
+output_file = 'fcgi.log'
+
+
+def delpid():
+    print 'Exiting URL Monitor...'
+    if os.path.exists(pid_file):
+        os.remove(pid_file)
+    if os.path.exists(socket_file):
+        os.remove(socket_file)
+
+def daemonize():
+    pid = os.fork()
+    if pid:
+        sys.exit(0)
+
+    os.setsid()
+    os.umask(0)
+
+
+    pid = os.fork()
+    if pid:
+        sys.exit(0)
+
+    stdin = open('/dev/null', 'r')
+    stdout = open(output_file, 'a+')
+    stderr = open(output_file, 'a+')
+    os.dup2(stdin.fileno(), sys.stdin.fileno())
+    os.dup2(stdout.fileno(), sys.stdout.fileno())
+    os.dup2(stderr.fileno(), sys.stderr.fileno())
+
+    pid = str(os.getpid())
+    pf = open(pid_file, 'w')
+    pf.write("%s\n" % pid)
+    pf.close()
+    atexit.register(delpid)
+
+
+def start():
+    try: 
+        pf = open(pid_file, 'r')
+        pid = int(pf.read().strip())
+        pf.close()
+    except IOError:
+        pid = None
+
+    if pid:
+        print >> sys.stderr, 'URL Monitor server already started.'
+        sys.exit(0)
+
+    daemonize()
+    run()
+
+
+def stop():
+    try: 
+        pf = open(pid_file, 'r')
+        pid = int(pf.read().strip())
+        pf.close()
+    except IOError:
+        pid = None
+
+    if not pid:
+        print >> sys.stderr, 'PID file for the URL Monitor server not found.'
+        sys.exit(0)
+        return
+
+    os.kill(pid, SIGINT)
+    
+    print 'URL Monitor server stopped successfully'
+
+
+def run():    
     wsgi_app = make_app()
+
     try:
-        sock_file='/tmp/urlmon.sock'
-        if os.path.exists(sock_file):
-            os.remove(sock_file)
-        WSGIServer(wsgi_app, bindAddress=sock_file).run() 
+        if os.path.exists(socket_file):
+            os.remove(socket_file)
+        WSGIServer(wsgi_app, bindAddress=socket_file, umask=7).run() 
 
     except KeyboardInterrupt:
         # TODO This block will not execute.
@@ -20,3 +95,27 @@ if __name__ == '__main__':
         # shut down in case of a interrupt signal.
         print 'this will not execute'
         sys.exit(1)
+
+
+def usage():
+    print >> sys.stderr, 'Usage : \'./fcgi.py [start|stop|restart]\''
+    sys.exit(1)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        usage()
+
+    command = sys.argv[1]
+    if command == 'start':
+        start()
+    elif command == 'stop':
+        stop()
+    elif command == 'restart':
+        stop()
+        sleep(1)
+        start()
+    else:
+        usage()
+
+

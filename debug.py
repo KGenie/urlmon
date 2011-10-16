@@ -5,7 +5,7 @@ from paste import httpserver
 
 
 if __name__ == '__main__':
-    wsgi_app = make_app()
+    wsgi_app = make_app(False)
     try:
         httpserver.serve(wsgi_app, host='0.0.0.0', port=8080)
     except KeyboardInterrupt:

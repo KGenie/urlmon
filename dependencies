@@ -7,3 +7,4 @@ routes
 chardet
 lxml
 wtforms
+flup # Only needed for production (FastCGI server)
