@@ -181,8 +181,8 @@ def make_app():
 
     app = RoutesMiddleware(app, make_routes())
     app = SessionMiddleware(app, make_beaker_options())
-    path = os.path.join(app_globals.APP_ROOT, 'static')
-    app = Cascade([StaticURLParser(path), app])
+#    path = os.path.join(app_globals.APP_ROOT, 'static')
+    app = Cascade([app, StaticURLParser(app_globals.APP_ROOT)])
 
     
 
