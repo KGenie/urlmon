@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-import env, os, sys, atexit
+import env, os, sys, atexit, fork_vars
 from signal import SIGINT
-from config import make_app
 from flup.server.fcgi import WSGIServer
 from time import sleep
 
@@ -22,6 +21,7 @@ def daemonize():
     print 'Starting URL Monitor server...'
     pid = os.fork()
     if pid > 0:
+        print 'URL Monitor server started successfully on %s' % fork_vars.APP_DIRECTORY
         sys.exit(0)
 
     os.setsid()
@@ -30,7 +30,6 @@ def daemonize():
 
     pid = os.fork()
     if pid > 0:
-        print 'URL Monitor server started successfully'
         sys.exit(0)
 
     stdin = open('/dev/null', 'r')
@@ -81,6 +80,7 @@ def stop():
 
 
 def run():    
+    from config import make_app
     wsgi_app = make_app()
 
     try:
@@ -99,13 +99,18 @@ def run():
 
 
 def usage():
-    print >> sys.stderr, 'Usage : \'./fcgi.py [start|stop|restart]\''
+    print >> sys.stderr, 'Usage : \'./fcgi.py start|stop|restart [virtual_dir]\''
     sys.exit(1)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    l = len(sys.argv)
+    if l < 2:
         usage()
+
+    if l > 2:
+        virtual_dir = sys.argv[2]
+        fork_vars.APP_DIRECTORY = '/' + virtual_dir
 
     command = sys.argv[1]
     if command == 'start':
@@ -118,5 +123,3 @@ if __name__ == '__main__':
         start()
     else:
         usage()
-
-

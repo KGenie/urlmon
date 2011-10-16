@@ -1,4 +1,5 @@
 import urllib
+from fork_vars import APP_DIRECTORY
 
 _CONTROLLER_MISSING_ERROR = \
         'controller argument is necessary when initialized without a default'
@@ -21,7 +22,7 @@ def menu(label=None, exclude=False):
 
 class UrlHelper(object):
 
-    def __init__(self, app_directory='', action_name=None, controller_name=None):
+    def __init__(self, app_directory=APP_DIRECTORY, action_name=None, controller_name=None):
         self.app_directory = app_directory
         self.controller_name = controller_name
         self.action_name = action_name
@@ -29,6 +30,7 @@ class UrlHelper(object):
     def static(self, path):
         if path.startswith('/'):
             # Absolute path, strip the '/' since we are appending it
+            # (virtual directories should always start with /)
             path = path[1:]
         return '%s/static/%s' % (self.app_directory, path)
 
