@@ -19,8 +19,9 @@ def delpid():
         os.remove(socket_file)
 
 def daemonize():
+    print 'Starting URL Monitor server...'
     pid = os.fork()
-    if pid:
+    if pid > 0:
         sys.exit(0)
 
     os.setsid()
@@ -28,7 +29,8 @@ def daemonize():
 
 
     pid = os.fork()
-    if pid:
+    if pid > 0:
+        print 'URL Monitor server started successfully'
         sys.exit(0)
 
     stdin = open('/dev/null', 'r')
@@ -53,7 +55,7 @@ def start():
     except IOError:
         pid = None
 
-    if pid:
+    if pid > 0:
         print >> sys.stderr, 'URL Monitor server already started.'
         sys.exit(0)
 
@@ -71,7 +73,6 @@ def stop():
 
     if not pid:
         print >> sys.stderr, 'PID file for the URL Monitor server not found.'
-        sys.exit(0)
         return
 
     os.kill(pid, SIGINT)
