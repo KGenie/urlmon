@@ -78,10 +78,9 @@ class TrackerChangeService(StorageService):
 
 
     def get_new_page(self, tracker_change):
-        #dom = html.fromstring(tracker_change.webpage_version.content)
-        #select_content(dom, tracker_change.tracker.css_selector)
-        #return etree.tostring(dom)
-        return tracker_change.webpage_version.content
+        dom = html.fromstring(tracker_change.webpage_version.content)
+        select_content(dom, tracker_change.tracker.css_selector)
+        return etree.tostring(dom,method='html', pretty_print=True)
     
 
 
@@ -95,10 +94,9 @@ class TrackerChangeService(StorageService):
             version = last_two_changes[0].webpage_version
 
         #FIXME 'select_content' function is breaking html
-        #dom = html.fromstring(version.content)
-        #select_content(dom, tracker_change.tracker.css_selector)
-        #return etree.tostring(dom)
-        return version.content
+        dom = html.fromstring(version.content)
+        select_content(dom, tracker_change.tracker.css_selector)
+        return etree.tostring(dom, method='html', pretty_print=True)
 
 
     def get_page_diff(self, tracker_change):

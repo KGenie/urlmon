@@ -27,6 +27,7 @@ webpage_version = Table('webpage_version', metadata,
         Column('digest', LargeBinary(20)),
         Column('date', DateTime)
         )
+Index('idx_webpage_date', webpage_version.c.date)
 
 
 user = Table('user', metadata,
@@ -83,6 +84,7 @@ tracker_change = Table('tracker_change', metadata,
         Column('webpage_version_id', ForeignKey('webpage_version.id')),
         Column('content', GzipBlob),
         Column('digest', LargeBinary(20)),
+        Column('current_css_selector', String(300)),
         Column('start_index', Integer)
         )
 

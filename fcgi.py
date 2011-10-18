@@ -108,9 +108,9 @@ if __name__ == '__main__':
     if l < 2:
         usage()
 
-    if l > 2:
-        virtual_dir = sys.argv[2]
-        fork_vars.APP_DIRECTORY = '/' + virtual_dir
+    #if l > 2:
+    #    virtual_dir = sys.argv[2]
+    #    fork_vars.APP_DIRECTORY = '/' + virtual_dir
 
     command = sys.argv[1]
     if command == 'start':
