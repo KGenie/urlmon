@@ -19,13 +19,10 @@ def populate():
          last_name='Padilha', password='123', roles=['admin', 'normal'])
     u2 = User(email='tap@cin.ufpe.br', first_name='Thiago',
             last_name='Arruda', password='123')
-    u3 = User(email='bazin.frederic@gmail.com', first_name='fred',
-            last_name='bazin',password='test')
-    session.add_all([u1,u2, u3])
+    session.add_all([u1,u2])
     session.commit()
     session.refresh(u1)
     session.refresh(u2)
-    session.refresh(u3)
 
   
     # Tracker groups
