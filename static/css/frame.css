@@ -1,9 +1,9 @@
 .hovered-element {
     border: 1px solid maroon;
-    z-index: 1000;
+    z-index: 9999;
 }
 
 .selected-element {
-    border: 3px solid green;
-    z-index: 1001;
+    border: 1px solid green;
+    z-index: 10000;
 }

@@ -56,16 +56,18 @@ class TrackerChangeController(WebMonitorController):
             warn(page)
             return self.notfound()
 
-        page_range = get_page_range(maxpage, page, 5)
+        page_range = get_page_range(maxpage, page, 15)
 
         changes = self.tracker_change_service.get_changes(tracker_group, 
                 page, page_size, tracker_id)
         trackers = self.tracker_service.get_all_by_group(tracker_group)
         
-        results = (TrackerChangeView(c, now) for c in changes)
+        results = list(TrackerChangeView(c, now) for c in changes)
+        has_changes = len(results) > 0
         return self.view({'changes': results, 'page' : page, 
             'maxpage': maxpage, 'id': id, 'trackers': trackers, 
-            'tracker_id': tracker_id, 'page_range': page_range  })
+            'tracker_id': tracker_id, 'page_range': page_range,
+            'has_changes': has_changes})
 
     @get
     @menu(exclude=True)

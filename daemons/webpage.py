@@ -63,21 +63,10 @@ DAEMON = WebpageDaemon()
 
 def highlight_selected(body_dom, current_selector):
     if current_selector != 'body':
-        body_dom.body.append(html.fromstring(
-        '<div id="shadow-box"></div>')) 
         body_dom.head.append(html.fromstring(
-        '''<link rel="stylesheet" href="../static/css/highlight_selected.css"
+        '''<link rel="stylesheet" href="../static/css/frame.css"
         type="text/css" />''')) 
 
-        body_dom.head.append(html.fromstring('''
-          <script type="text/javascript"
-          src="../static/js/jquery-1.6.4.min.js"></script>
-        '''))
-
-        body_dom.head.append(html.fromstring('''
-          <script type="text/javascript"
-          src="../static/js/highlight_selected.js"></script>
-        '''))
 
 
 def select_content(body_dom, current_selector):

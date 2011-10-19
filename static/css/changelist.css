@@ -46,10 +46,24 @@
     margin-left: 0.7em;
 }
 
-.pager {
+.bottom-pager {
+    clear: both;
     float: right;
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
+.top-pager {
+    clear: both;
+    float: right;
+    margin-bottom: 0.5em;
+}
+
+.pager a, .pager span {
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .pager * { 
-    margin-left: 2px;
+    font-size: 13px;
 }
