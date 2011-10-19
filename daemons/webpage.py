@@ -61,11 +61,32 @@ DAEMON = WebpageDaemon()
 
 # Page processing code
 
+def highlight_selected(body_dom, current_selector):
+    if current_selector != 'body':
+        body_dom.body.append(html.fromstring(
+        '<div id="shadow-box"></div>')) 
+        body_dom.head.append(html.fromstring(
+        '''<link rel="stylesheet" href="../static/css/highlight_selected.css"
+        type="text/css" />''')) 
+
+        body_dom.head.append(html.fromstring('''
+          <script type="text/javascript"
+          src="../static/js/jquery-1.6.4.min.js"></script>
+        '''))
+
+        body_dom.head.append(html.fromstring('''
+          <script type="text/javascript"
+          src="../static/js/highlight_selected.js"></script>
+        '''))
+
+
 def select_content(body_dom, current_selector):
-    for tag in body_dom.cssselect(current_selector):
-        classes = tag.attrib.get('class', '')
-        classes += ' selected-element'
-        tag.attrib['class'] = classes
+    if current_selector != 'body':
+        for tag in body_dom.cssselect(current_selector):
+            classes = tag.attrib.get('class', '')
+            classes += ' selected-element'
+            tag.attrib['class'] = classes
+
     return body_dom
 
 

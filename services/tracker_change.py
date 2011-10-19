@@ -2,11 +2,12 @@ import logging
 from storage import StorageService
 from models.tracker_change import TrackerChange
 from models.tracker import Tracker
+from models.webpage_version import WebpageVersion
 from lxml import etree, html
 from lxml.html import builder as E
 from lxml.html.diff import htmldiff
 from helpers import UrlHelper
-from daemons.webpage import select_content
+from daemons.webpage import select_content, highlight_selected
 from htmldiff import htmldiff, change_start_index
 
 u = UrlHelper()
@@ -53,9 +54,9 @@ class TrackerChangeService(StorageService):
             tracker_ids_query = s.query(Tracker.id)\
                     .filter(Tracker.tracker_group_id == tracker_group.id)
 
-        return s.query(TrackerChange)\
+        return s.query(TrackerChange).join(WebpageVersion)\
                 .filter(TrackerChange.tracker_id.in_(tracker_ids_query))\
-                .order_by(TrackerChange.id.desc())\
+                .order_by(WebpageVersion.date.desc())\
                 .limit(page_size)\
                 .offset(first)\
                 .all()
@@ -64,10 +65,10 @@ class TrackerChangeService(StorageService):
     def get_last_two_changes(self, tracker_change):
         s = self.session
 
-        last_two_changes = s.query(TrackerChange)\
+        last_two_changes = s.query(TrackerChange).join(WebpageVersion)\
                 .filter(TrackerChange.id <= tracker_change.id)\
                 .filter(TrackerChange.tracker_id == tracker_change.tracker.id)\
-                .order_by(TrackerChange.id.desc())\
+                .order_by(WebpageVersion.date.desc())\
                 .limit(2).all()
 
         assert len(last_two_changes) >= 1 and \
@@ -79,7 +80,9 @@ class TrackerChangeService(StorageService):
 
     def get_new_page(self, tracker_change):
         dom = html.fromstring(tracker_change.webpage_version.content)
-        select_content(dom, tracker_change.tracker.css_selector)
+        selector = tracker_change.current_css_selector
+        select_content(dom, selector)
+        highlight_selected(dom, selector)
         return etree.tostring(dom,method='html', pretty_print=True)
     
 
@@ -95,7 +98,9 @@ class TrackerChangeService(StorageService):
 
         #FIXME 'select_content' function is breaking html
         dom = html.fromstring(version.content)
-        select_content(dom, tracker_change.tracker.css_selector)
+        selector = tracker_change.current_css_selector
+        select_content(dom, selector)
+        highlight_selected(dom, selector)
         return etree.tostring(dom, method='html', pretty_print=True)
 
 
@@ -103,8 +108,15 @@ class TrackerChangeService(StorageService):
         last_two_changes = self.get_last_two_changes(tracker_change)
 
         new_version = tracker_change.webpage_version
+
         if len(last_two_changes) == 2:
-            return diff(last_two_changes[1].webpage_version, new_version,
+            html_diff = diff(last_two_changes[1].webpage_version, new_version,
                     tracker_change.tracker.css_selector)
         else:
-            return new_version.content
+            html_diff = new_version.content
+
+        dom = html.fromstring(html_diff)
+        selector = tracker_change.current_css_selector
+        select_content(dom, selector)
+        highlight_selected(dom, selector)
+        return etree.tostring(dom, method='html', pretty_print=True)

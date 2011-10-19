@@ -46,10 +46,17 @@ class TrackerChangeView(Model):
     @property
     def content_short(self):
         s = self.content[self.start_index:]
-        if len(s) > self.MAX_CONTENT_LENGTH:
+        l = len(s)
+        if l > self.MAX_CONTENT_LENGTH:
             ret = s[:self.MAX_CONTENT_LENGTH] + ' ...'
             return ret
-        return self.content
+        return s
+
+        #l = len(self.content)
+        #if l > self.MAX_CONTENT_LENGTH:
+        #    ret = self.content[:self.MAX_CONTENT_LENGTH] + '...'
+        #    return ret
+        #return self.content
 
 
     @property

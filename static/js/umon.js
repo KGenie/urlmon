@@ -35,7 +35,7 @@ var uMon = uMon || {};
         var iFrameChildren = iFrame.contents().find('.selectable-element');
         var iFrameHead = iFrame.contents().find('head');
         var input = $('input#css_selector');
-        iFrameHead.append('<link rel="stylesheet" href="../css/frame.css" type="text/css" />');
+        iFrameHead.append('<link rel="stylesheet" href="../static/css/frame.css" type="text/css" />');
 
         var clearSelection = function() {
             iFrameChildren.removeClass('selected-element');

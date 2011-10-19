@@ -171,6 +171,7 @@ def run_track_resource(task):
         change.tracker = tracker
         change.webpage_version = stored_version
         change.start_index = idx
+        change.current_css_selector = tracker.css_selector
 
         if last_tracker_change:
             send_mail(tracker, TrackerChangeView(change, now),
