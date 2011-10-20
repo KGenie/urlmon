@@ -1,6 +1,6 @@
 from app_components.response import JinjaResponse, RedirectResponse,\
         StaticContentResponse, ServerErrorResponse,NotAuthorizedResponse,\
-        NotFoundResponse
+        NotFoundResponse, BadRequestResponse
 from meta import WebMonitorControllerMetaclass
 
 class WebMonitorController(object):
@@ -53,6 +53,10 @@ class WebMonitorController(object):
 
     def notfound(self):
         return NotFoundResponse()
+
+    def badrequest(self):
+        return BadRequestResponse()
+
 
     def content(self, body):
         ret = StaticContentResponse()

@@ -2,6 +2,7 @@ import logging
 from storage import StorageService
 from models.tracker_change import TrackerChange
 from models.tracker import Tracker
+from models.tracker_group import TrackerGroup
 from models.webpage_version import WebpageVersion
 from lxml import etree, html
 from lxml.html import builder as E
@@ -28,38 +29,44 @@ class TrackerChangeService(StorageService):
     entity = TrackerChange
 
 
-    def get_change_count(self, tracker_group, tracker_id):
+    def get_change_base_query(self, user, tracker_group, tracker):
         s = self.session
 
-        if tracker_id:
+        tracker_ids_query = None
+
+        if tracker:
             tracker_ids_query = s.query(Tracker.id)\
-                    .filter(Tracker.id == tracker_id)
-        else:
+                    .filter(Tracker.id == tracker.id)
+
+        elif tracker_group:
             tracker_ids_query = s.query(Tracker.id)\
                     .filter(Tracker.tracker_group_id == tracker_group.id)
 
-        return s.query(TrackerChange)\
-                .filter(TrackerChange.tracker_id.in_(tracker_ids_query))\
-                .count()
-
-
-    def get_changes(self, tracker_group, page, page_size, tracker_id):
-        first = ((page - 1) * page_size) + 1
-        s = self.session
-
-        if tracker_id:
-            tracker_ids_query = s.query(Tracker.id)\
-                    .filter(Tracker.id == tracker_id)
-        else:
-            tracker_ids_query = s.query(Tracker.id)\
-                    .filter(Tracker.tracker_group_id == tracker_group.id)
+        if not tracker_ids_query:
+            tracker_ids_query = s.query(Tracker.id).join(TrackerGroup)\
+                    .filter(TrackerGroup.user_id == user.id)
 
         return s.query(TrackerChange).join(WebpageVersion)\
-                .filter(TrackerChange.tracker_id.in_(tracker_ids_query))\
-                .order_by(WebpageVersion.date.desc())\
+                .filter(TrackerChange.tracker_id.in_(tracker_ids_query))
+
+
+
+    def get_changes(self, user, tracker_group=None, tracker=None, page_size=10,
+            page=1):
+        
+        first = ((page - 1) * page_size) + 1
+        base_query = self.get_change_base_query(user, tracker_group, tracker)
+
+        return base_query.order_by(WebpageVersion.date.desc())\
                 .limit(page_size)\
                 .offset(first)\
                 .all()
+
+
+    def get_change_count(self, user, tracker_group, tracker):
+        base_query = self.get_change_base_query(user, tracker_group, tracker)
+        return base_query.count()
+
 
 
     def get_last_two_changes(self, tracker_change):
@@ -74,7 +81,6 @@ class TrackerChangeService(StorageService):
         assert len(last_two_changes) >= 1 and \
                 last_two_changes[0].id == tracker_change.id, 'Inconsistent db'
         return last_two_changes
-
 
 
 

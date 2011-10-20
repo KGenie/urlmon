@@ -3,7 +3,7 @@
 server=urlmon@107.20.248.100
 virtual_dir=$1
 echo "Deploying to /$virtual_dir"
-target_dir="/tmp/urlmon/$virtual_dir"
+target_dir="/srv/urlmon/$virtual_dir"
 
 ssh $server << EOF
 mkdir -p $target_dir

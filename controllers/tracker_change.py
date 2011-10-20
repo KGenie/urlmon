@@ -7,7 +7,7 @@ from services.tracker_change import TrackerChangeService
 from services.tracker_group import TrackerGroupService
 from wsgi.http_method import get, post
 from helpers import menu
-from util import get_page_range
+from util import get_page_range, is_int
 
 __logger = logging.getLogger('controllers.tracker_change')
 debug = __logger.debug
@@ -27,41 +27,56 @@ class TrackerChangeController(WebMonitorController):
     def index(self, request):
         page = request.GET.get('page', 1)
         page_size = request.GET.get('page_size', 10)
-        tracker_id = request.GET.get('tracker_id', None)
-        if tracker_id:
-            tracker_id = int(tracker_id)
-        else:
-            tracker_id = 0
+        tracker_id = request.GET.get('tracker_id', 0)
+        tracker_group_id = request.GET.get('tracker_group_id', 0)
 
+        if not (is_int(tracker_id) and is_int(tracker_group_id) and 
+                is_int(page) and is_int(page_size)):
+            return self.badrequest()
+
+        tracker_id = int(tracker_id)
+        tracker_group_id = int(tracker_group_id)
         page = int(page)
-        id = request.GET.get('id', None)
-        if id:
-            tracker_group = self.tracker_group_service.get(id)
-        else:
-            return self.notfound()
+        page_size = int(page_size)
 
-        current_user_id = self.session['user'].id
-        if tracker_group.user.id != current_user_id:
+        tracker = None
+        tracker_group = None
+
+        if tracker_id:
+            tracker = self.tracker_service.get(tracker_id)
+            if not tracker:
+                return self.notfound()
+
+        if tracker_group_id:
+            tracker_group = self.tracker_group_service.get(tracker_group_id)
+            if not tracker_group:
+                return self.notfound()
+        
+        current_user = self.session['user']
+        if tracker_group and tracker_group.user.id != current_user.id:
             return self.forbidden()
-         
-        now = datetime.now()
-        count = self.tracker_change_service.get_change_count(tracker_group,
-                tracker_id)
+        
+        if tracker and tracker.tracker_group.user.id != current_user.id:
+            return self.forbidden()
+
+
+        count = self.tracker_change_service.get_change_count(current_user,
+                tracker_group, tracker)
 
         maxpage = count // page_size
         if count % page_size != 0:
             maxpage += 1
 
         if page > maxpage and page != 1:
-            warn(page)
             return self.notfound()
 
         page_range = get_page_range(maxpage, page, 15)
 
-        changes = self.tracker_change_service.get_changes(tracker_group, 
-                page, page_size, tracker_id)
-        trackers = self.tracker_service.get_all_by_group(tracker_group)
-        
+        changes = self.tracker_change_service.get_changes(current_user, tracker_group, 
+                tracker, page_size, page)
+        trackers = self.tracker_service.get_all_by_user(current_user)
+
+        now = datetime.now()
         results = list(TrackerChangeView(c, now) for c in changes)
         has_changes = len(results) > 0
         return self.view({'changes': results, 'page' : page, 

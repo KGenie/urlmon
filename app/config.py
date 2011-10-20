@@ -29,7 +29,7 @@ def make_routes():
     map.always_scan = False
     map.minimization = True
     map.explicit = False
-    map.connect('/', controller='home', action='main')
+    map.connect('/', controller='tracker_change', action='index')
     map.connect('/{controller}', action='index')
     map.connect('/{controller}/{action}')
     return map

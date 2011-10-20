@@ -40,6 +40,13 @@ def get_controller_services(controller_dict):
                 if inspect.isclass(v) and\
                 issubclass(v, Service))
 
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 def get_controller_class_name(module_name):
     """
     Gets the controller class name from the module name.

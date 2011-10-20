@@ -7,7 +7,7 @@ framework(making easy to replace case it is necessary)
 """
 from webob import Response
 from webob.exc import _HTTPMove, HTTPNotFound, HTTPForbidden,\
-        HTTPMethodNotAllowed, HTTPInternalServerError
+        HTTPMethodNotAllowed, HTTPInternalServerError, HTTPBadRequest
 from helpers import UrlHelper
 from jinja2 import TemplateNotFound
 
@@ -48,6 +48,8 @@ class RedirectResponse(_HTTPMove):
                 **qsargs)
         super(RedirectResponse, self).__init__(location=location, **kwargs)
 
+class BadRequestResponse(HTTPBadRequest):
+    pass
 
 class StaticContentResponse(Response):
     pass

@@ -5,7 +5,7 @@ from models.webpage_version import WebpageVersion
 from urlparse import urlparse, urlunparse
 from lxml import etree, html
 from lxml.html.clean import Cleaner
-from util import normalize_url
+from util import normalize_url, is_int
 from helpers import UrlHelper
 
 u = UrlHelper()
@@ -126,14 +126,6 @@ def _process_ids(dom):
         _process_id(tag, existing_ids)
 
 
-def _is_int(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
-
-
 def _process_id(tag, existing_ids):
     if tag.tag not in __filtered_tags:
         _generate_id(tag, existing_ids)
@@ -163,7 +155,7 @@ def _increase_id(id):
         return id + '_1'
 
     num = id[idx+1:]
-    if not _is_int(num):
+    if not is_int(num):
         return id + '_1'
     else:
         stripped = id[:idx]
