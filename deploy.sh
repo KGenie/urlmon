@@ -10,6 +10,5 @@ mkdir -p $target_dir
 EOF
 rsync -avz --exclude-from=.gitignore ./ "$server:$target_dir/"
 ssh $server << EOF
-cd "$target_dir"
-./fcgi.py restart
+/home/urlmon/start_fcgi.sh $virtual_dir
 EOF
