@@ -23,14 +23,21 @@ class CleanupDaemon(Daemon):
         
 
     def run(self):
-        debug('Starting cleanup daemon')
-        sleep(2)
+        try:
+            debug('Starting cleanup daemon')
+            sleep(2)
+        except Exception, ex:
+            error('An error ocurred while starting the cleanup daemon: %s' %
+                        format_exc(ex))
+
+        tasks = None
+        session = None
 
         while 1:
             max_idle_interval = \
-                    timedelta(seconds=INTERVAL_BETWEEN_TASK_CHECKS)
-            debug('Looking for tasks that were running for a long time')
+                    timedelta(seconds=INTERVAL_BETWEEN_TASK_CHECKS * 2)
             try:
+            debug('Looking for tasks that were running for a long time')
                 session = Session()
                 now = datetime.now()
                 tasks = session.query(Task).\
@@ -53,6 +60,7 @@ class CleanupDaemon(Daemon):
                 else:
                     session.commit()
                     session.close()
-            sleep(INTERVAL_BETWEEN_TASK_CHECKS)
+            tasks = None
+            sleep(max_idle_interval.total_seconds())
 
 DAEMON = CleanupDaemon()
