@@ -1,7 +1,7 @@
 {% extends "shared/page.htmljinja" %}
 
 {% block title %}
-Changes for tracker group
+Tracker activity
 {% endblock %}
 
 {% block headers %}
@@ -9,11 +9,11 @@ Changes for tracker group
 {% endblock %}
 
 {% block help %}
-<p>This is a list of your changes for this tracker group</p>
+<p>You can filter the activity by tracker group/tracker</p>
 {% endblock %}
 
 {% block main_title %}
-Changes for tracker group
+Tracker activity
 {% endblock %}
 
 {% block main %}

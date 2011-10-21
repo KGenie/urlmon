@@ -1,5 +1,6 @@
 {% extends 'shared/site.htmljinja' %}
 {% from "macros/form.htmljinja" import wtform, post_link %}
+{% from "macros/sitemap.htmljinja" import static_sitemap %}
 
 {% block title %}
 Welcome to the Web Monitor
@@ -8,22 +9,7 @@ Welcome to the Web Monitor
 {% block body %}
 <div id="page">
   <div id="menu" class="hovermenu">
-    <ul>
-      {% for menu in sitemap %}
-      <li>
-      {% if menu.children %}
-      <a href="#">{{ menu.label }}</a></span>
-      <ul>
-        {% for menuitem in menu.children %}
-        <li><a href="{{ menuitem.url }}">{{ menuitem.label }}</a></li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <span><a href="{{ menu.url }}">{{ menu.label }}</a></span>
-      {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
+    {{ static_sitemap(map, u) }}
   </div>
   <div id="main">
     {% if flash %}

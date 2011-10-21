@@ -38,7 +38,7 @@ class InjectionMiddleware(object):
                 action_name=action)}
         menu_service = self.MenuService(request)
         sitemap = menu_service.sitemap()
-        ctx['sitemap'] = sitemap
+        ctx['map'] = sitemap
 
         session = environ['beaker.session']
         user = session.get('user', None)

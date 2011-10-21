@@ -1,0 +1,41 @@
+{% macro sitemap(map) -%}
+  <ul>
+    {% for menu in map %}
+    <li>
+    {% if menu.children %}
+    <a href="#">{{ menu.label }}</a></span>
+    <ul>
+      {% for menuitem in menu.children %}
+      <li><a href="{{ menuitem.url }}">{{ menuitem.label }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <span><a href="{{ menu.url }}">{{ menu.label }}</a></span>
+    {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+{%- endmacro %}
+
+{% macro static_sitemap(map, u) -%}
+<ul>
+  <li>
+  <span><a href="{{ u.action('index', controller='tracker_change')}}">Home</a></span>
+  </li>
+  <li>
+  <span><a href="{{ u.action('new', controller='tracker')}}">Create tracker</a></span>
+  </li>
+  <li>
+  <span><a href="{{ u.action('index', controller='tracker')}}">Manage trackers</a></span>
+  </li>
+  <li>
+  <span><a href="{{ u.action('new', controller='tracker_group')}}"
+      >Create tracker group</a></span>
+  </li>
+  <li>
+  <span><a href="{{ u.action('index', controller='tracker_group')}}"
+      >Manage tracker groups</a></span>
+  </li>
+</ul>
+{%- endmacro %}
+
