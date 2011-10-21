@@ -37,7 +37,7 @@ class CleanupDaemon(Daemon):
             max_idle_interval = \
                     timedelta(seconds=INTERVAL_BETWEEN_TASK_CHECKS * 2)
             try:
-            debug('Looking for tasks that were running for a long time')
+                debug('Looking for tasks that were running for a long time')
                 session = Session()
                 now = datetime.now()
                 tasks = session.query(Task).\
