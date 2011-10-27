@@ -23,6 +23,7 @@ attributes:</p>
   better organize your trackers.
   </li>
 </ul>
+
 {% endblock %}
 
 {% block main_title %}

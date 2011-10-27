@@ -32,6 +32,17 @@ class TrackerController(WebMonitorController):
     @menu(label='Create')
     def new(self, request):
         form = self.create_form()
+        url = request.GET.get('url', None)
+        name = request.GET.get('name', None)
+        if url:
+            form.url.data = url
+        if name:
+            name = name.ljust(5, ' ')
+            if len(name) > 25:
+                name = name[:25]
+            form.name.data = name
+
+
         return self.view({'form':form })
 
 

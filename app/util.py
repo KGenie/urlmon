@@ -20,6 +20,22 @@ def is_authorized(user_roles, authorized_roles, denied_roles):
             not user_roles.isdisjoint(authorized_roles)
 
 
+def reconstruct_url(environ):
+    url = environ['wsgi.url_scheme']+'://'
+    if environ.get('HTTP_HOST'):
+        url += environ['HTTP_HOST']
+    else:
+        url += environ['SERVER_NAME']
+        if environ['wsgi.url_scheme'] == 'https':
+            if environ['SERVER_PORT'] != '443':
+               url += ':' + environ['SERVER_PORT']
+        else:
+            if environ['SERVER_PORT'] != '80':
+               url += ':' + environ['SERVER_PORT']
+    return url
+
+
+
 def normalize_url(url):
     if '//' not in url:
         url = '//' + url

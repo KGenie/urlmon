@@ -8,22 +8,29 @@ Welcome to the Web Monitor
 
 {% block body %}
 <div id="page">
-  <div id="menu" class="hovermenu">
-    {{ static_sitemap(map, u) }}
-  </div>
+
+  <div id="left-column">
+    <div id="menu" class="hovermenu">
+      {{ static_sitemap(map, u, user) }}
+    </div>
+    <div id="below-menu">
+      {% block below_menu %}
+      {% endblock %}
+    </div>
+  </div>  
+
   <div id="main">
     {% if flash %}
     <div id="flash">
       <span class="{{ flash.type }}">{{ flash.message }}</span> 
     </div>
-   {% endif %}
-   <div id="main-title">
+    {% endif %}
+    <div id="main-title">
       <h3>
-        {% block main_title %}
-        {% endblock %}
+	{% block main_title %}
+	{% endblock %}
       </h3>
     </div>
-
     {% block main %}
     {% endblock %}
   </div>
@@ -57,6 +64,16 @@ Welcome to the Web Monitor
                   rc='home',
 		  ra='main'), 
 	      text='Logout') }}
+
+
+	  <div id="bookmarklet">
+	    <p>Drag this <a href="javascript: window.open('{{ base_url + 
+	      u.action('new', controller='tracker') }}?name=' + document.title + '&url=' + window.location.href);">link</a> 
+	    to your bookmark toolbar so you can use it to quickly create
+	    trackers: </p>  
+	  </div>
+
+
       {% endif %}
       {% endblock %}
       {% block help %}

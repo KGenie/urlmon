@@ -6,6 +6,7 @@ Tracker activity
 
 {% block headers %}
 <link rel="stylesheet" href="{{ u.static('/css/changelist.css') }}" type="text/css" />
+<script type="text/javascript" src="{{ u.static('/js/changelist.js') }}"></script>
 {% endblock %}
 
 {% block help %}
@@ -16,13 +17,26 @@ Tracker activity
 Tracker activity
 {% endblock %}
 
-{% block main %}
-<div id="{{ id }}" class="change-list">
-  <form id="query" method="GET" action="{{ u.action('index') }}">
-    <input type="hidden" name="id" value="{{ id }}" />
-    <label for="tracker_id">Tracker: </label>
-    <select id="tracker_id" name="tracker_id">
-      <option value="">All trackers</option>
+{% block below_menu %}
+<form id="query" method="GET" action="{{ u.action('index') }}">
+  <div class="form-cell">
+    <label class="form-label" for="tracker_group_id">Group: </label>
+    <select class="form-input" id="tracker_group_id" name="tracker_group_id">
+      <option value="0">All tracker groups</option>
+      {% for tracker_group in tracker_groups %}
+      {% if tracker_group.id == tracker_group_id %}
+      <option value="{{ tracker_group.id }}" selected="selected">{{ tracker_group.name }}</option>
+      {% else %}
+      <option value="{{ tracker_group.id }}">{{ tracker_group.name }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="form-cell">
+    <label class="form-label" for="tracker_id">Tracker: </label>
+    <select class="form-input" id="tracker_id" name="tracker_id">
+      <option value="0">All trackers</option>
       {% for tracker in trackers %}
       {% if tracker.id == tracker_id %}
       <option value="{{ tracker.id }}" selected="selected">{{ tracker.name }}</option>
@@ -31,9 +45,14 @@ Tracker activity
       {% endif %}
       {% endfor %}
     </select>
-    <input type="submit" value="Filter" />
-  </form>
+  </div>
+</form>
+{% endblock %}
 
+
+{% block main %}
+<div class="change-list">
+  
  {% if has_changes %}
  <div class="top-pager pager">
     {% if page > 1 %}

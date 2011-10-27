@@ -1,10 +1,11 @@
-import smtplib, logging
+import smtplib, logging, util
 from string import Template
 from storage import StorageService
 from daemons.mailer import DAEMON as mailer_daemon
 from models.registration import Registration
 from helpers import UrlHelper
 from urllib import quote
+
 
 __logger = logging.getLogger('services.registration')
 debug = __logger.debug
@@ -43,18 +44,7 @@ class RegistrationService(StorageService):
                    
 
     def reconstruct_url(self, reg_id):
-        environ = self.context.environ
-        url = environ['wsgi.url_scheme']+'://'
-        if environ.get('HTTP_HOST'):
-            url += environ['HTTP_HOST']
-        else:
-            url += environ['SERVER_NAME']
-            if environ['wsgi.url_scheme'] == 'https':
-                if environ['SERVER_PORT'] != '443':
-                   url += ':' + environ['SERVER_PORT']
-            else:
-                if environ['SERVER_PORT'] != '80':
-                   url += ':' + environ['SERVER_PORT']
+        url = util.reconstruct_url(self.context.environ)
         url += u.action(controller='registration', name='confirm_activation',
                 reg_id=reg_id)
         return url

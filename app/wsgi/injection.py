@@ -1,4 +1,5 @@
 import app_globals
+from util import reconstruct_url
 from helpers import UrlHelper
 from app_components.context import Context
 
@@ -39,6 +40,9 @@ class InjectionMiddleware(object):
         menu_service = self.MenuService(request)
         sitemap = menu_service.sitemap()
         ctx['map'] = sitemap
+
+        base_url = reconstruct_url(environ)
+        ctx['base_url'] = base_url
 
         session = environ['beaker.session']
         user = session.get('user', None)

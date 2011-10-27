@@ -53,13 +53,21 @@ button.link {
     margin-left: 5%;
 }
 
+#left-column {
+    width: 14%;
+}
+
 #main {
     padding-left: 2em;
     width: 57%;
 }
 
 #menu {
-    width: 14%;
+    width: 100%;
+}
+
+#below-menu {
+    width: 100%;
 }
 
 #help {
@@ -70,7 +78,7 @@ button.link {
 #login-logout {
 }
 
-#login-logout a {
+#login-logout > a {
     float: left;
 }
 
@@ -116,6 +124,17 @@ button.link {
 .form-cell, .form-cell-with-button {
     float: none;
     clear: left;
+}
+
+.centered {
+    float: none;
+}
+
+.centered > button {
+    width: 20%;
+    margin-left:  40%;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 

@@ -27,6 +27,11 @@
 
 
     {{ render_field(form.css_selector) }}
+
+    <div class="centered">  
+      <button type="submit" class="form-submit">{{ submit_text }}</button>
+    </div>
+
     <div class="form-cell">
       <span class="tip">Click on a region to automatically fill the 'CSS Selector'</span>
       <div id="select-region">
@@ -36,9 +41,7 @@
       </div>
     </div>
 
-    <div class="form-cell">  
-      <button type="submit" class="form-submit">{{ submit_text }}</button>
-    </div>
+
   </fieldset>
 </form>
 

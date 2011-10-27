@@ -17,8 +17,9 @@
   </ul>
 {%- endmacro %}
 
-{% macro static_sitemap(map, u) -%}
+{% macro static_sitemap(map, u, user) -%}
 <ul>
+  {% if user %}
   <li>
   <span><a href="{{ u.action('index', controller='tracker_change')}}">Home</a></span>
   </li>
@@ -36,6 +37,7 @@
   <span><a href="{{ u.action('index', controller='tracker_group')}}"
       >Manage tracker groups</a></span>
   </li>
+  {% endif %}
 </ul>
 {%- endmacro %}
 

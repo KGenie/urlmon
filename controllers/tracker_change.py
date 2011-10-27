@@ -30,10 +30,18 @@ class TrackerChangeController(WebMonitorController):
         tracker_id = request.GET.get('tracker_id', 0)
         tracker_group_id = request.GET.get('tracker_group_id', 0)
 
-        if not (is_int(tracker_id) and is_int(tracker_group_id) and 
-                is_int(page) and is_int(page_size)):
-            return self.badrequest()
+        if not is_int(tracker_id):
+            tracker_id = 0
 
+        if not is_int(tracker_group_id):
+            tracker_group_id = 0
+
+        if not is_int(page):
+            page = 1
+
+        if not is_int(page_size):
+            page_size = 10
+        
         tracker_id = int(tracker_id)
         tracker_group_id = int(tracker_group_id)
         page = int(page)
@@ -72,17 +80,28 @@ class TrackerChangeController(WebMonitorController):
 
         page_range = get_page_range(maxpage, page, 15)
 
+        if tracker_group and tracker and\
+                tracker.tracker_group != tracker_group:
+            tracker = None
+
         changes = self.tracker_change_service.get_changes(current_user, tracker_group, 
                 tracker, page_size, page)
-        trackers = self.tracker_service.get_all_by_user(current_user)
+
+        tracker_groups = self.tracker_group_service.get_all_by_user(current_user)
+
+        if tracker_group:
+            trackers = self.tracker_service.get_all_by_group(tracker_group)
+        else:
+            trackers = self.tracker_service.get_all_by_user(current_user)
 
         now = datetime.now()
         results = list(TrackerChangeView(c, now) for c in changes)
         has_changes = len(results) > 0
         return self.view({'changes': results, 'page' : page, 
             'maxpage': maxpage, 'id': id, 'trackers': trackers, 
-            'tracker_id': tracker_id, 'page_range': page_range,
-            'has_changes': has_changes})
+            'tracker_id': tracker_id, 'tracker_group_id': tracker_group_id,
+            'page_range': page_range, 'has_changes': has_changes,
+            'tracker_groups': tracker_groups})
 
     @get
     @menu(exclude=True)
