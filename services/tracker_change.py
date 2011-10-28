@@ -32,18 +32,18 @@ class TrackerChangeService(StorageService):
     def get_change_base_query(self, user, tracker_group, tracker):
         s = self.session
 
-        tracker_ids_query = None
+        tracker_ids_query = s.query(Tracker.id)
 
         if tracker:
-            tracker_ids_query = s.query(Tracker.id)\
+            tracker_ids_query = tracker_ids_query\
                     .filter(Tracker.id == tracker.id)
 
         elif tracker_group:
-            tracker_ids_query = s.query(Tracker.id)\
+            tracker_ids_query = tracker_ids_query\
                     .filter(Tracker.tracker_group_id == tracker_group.id)
 
-        if not tracker_ids_query:
-            tracker_ids_query = s.query(Tracker.id).join(TrackerGroup)\
+        else:
+            tracker_ids_query = tracker_ids_query.join(TrackerGroup)\
                     .filter(TrackerGroup.user_id == user.id)
 
         return s.query(TrackerChange).join(WebpageVersion)\
@@ -59,7 +59,7 @@ class TrackerChangeService(StorageService):
 
         return base_query.order_by(WebpageVersion.date.desc())\
                 .limit(page_size)\
-                .offset(first)\
+                .offset(first - 1)\
                 .all()
 
 

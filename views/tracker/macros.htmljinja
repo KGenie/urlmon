@@ -1,6 +1,10 @@
 {% from "macros/form.htmljinja" import render_field, validation_summary %}
 
-{% macro trackerform(id, form, action, refresh_img, submit_text='Submit', method='POST') -%}
+{% macro trackerform(id, form, action, refresh_img, u, submit_text='Submit', method='POST') -%}
+
+<script type="text/javascript" 
+      src="{{ u.static('/js/umon.js') }}"></script>
+
 <form id="{{ id }}" method="{{ method }}"
   action="{{ action }}">
   <fieldset>

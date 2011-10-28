@@ -36,6 +36,7 @@ Fill the form to create new trackers
       id='tracker-form',
       action=u.action('create'), 
       refresh_img=u.static('/images/refresh.png'),
+      u=u,
       form=form, 
       submit_text='Create tracker!') }}
 

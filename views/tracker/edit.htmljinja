@@ -17,6 +17,7 @@ Edit form fields to update the tracker
       id='tracker-form',
       action=u.action('update'), 
       refresh_img=u.static('/images/refresh.png'),
+      u=u,
       form=form, 
       submit_text='Update tracker!') }}
 {% endblock %}
