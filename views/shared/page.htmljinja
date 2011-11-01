@@ -60,17 +60,15 @@ Welcome to the Web Monitor
 	      id='logout-form',
 	      action=u.action(
 		  name='logout', 
-                  controller='credentials',
-                  rc='home',
-		  ra='main'), 
+                  controller='credentials'), 
 	      text='Logout') }}
 
 
 	  <div id="bookmarklet">
-	    <p>Drag this <a href="javascript: window.open('{{ base_url + 
-	      u.action('new', controller='tracker') }}?name=' + document.title + '&url=' + window.location.href);">link</a> 
-	    to your bookmark toolbar so you can use it to quickly create
-	    trackers: </p>  
+	    <p><a class="no-click" href="javascript: window.open('{{ base_url + 
+	      u.action('new', controller='tracker') }}?name=' + document.title + '&url=' + window.location.href);">KGenie</a> 
+	     (Drag this to your bookmark toolbar so you can use it to quickly create
+	    trackers)</p>  
 	  </div>
 
 

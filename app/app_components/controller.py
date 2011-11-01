@@ -39,6 +39,9 @@ class WebMonitorController(object):
                 model, content_type='text/javascript')
 
 
+    def redirect_url(self, url):
+        return RedirectResponse(url=url)
+
     def redirect(self, action, controller=None, **qsargs):
         if not controller:
             controller = self.request.environ['route']['controller']

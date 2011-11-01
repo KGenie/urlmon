@@ -43,8 +43,11 @@ class RedirectResponse(_HTTPMove):
     code = 303
     title = 'See other'
 
-    def __init__(self, controller, action, qsargs, **kwargs):
-        location = url_helper.action(name=action, controller=controller,
+    def __init__(self, controller=None, action=None, qsargs=None, url=None, **kwargs):
+        if url:
+            location = url
+        else:
+            location = url_helper.action(name=action, controller=controller,
                 **qsargs)
         super(RedirectResponse, self).__init__(location=location, **kwargs)
 

@@ -4,7 +4,8 @@ var uMon = uMon || {};
 
     uMon.action = function(name, controller, parameters) {
         var appDirectory = '';
-        if (uMon.globals.appDirectory) {
+       
+        if (uMon.globals && uMon.globals.appDirectory) {
             appDirectory = uMon.globals.appDirectory;
         }
 

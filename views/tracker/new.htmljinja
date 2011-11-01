@@ -5,6 +5,11 @@
 Create a new tracker
 {% endblock %}
 
+{% block headers %}
+<script type="text/javascript" 
+  src="{{ u.static('/js/umon.js') }}"></script>
+{% endblock %}
+
 {% block help %}
 <p>This page will assist you in creating trackers. Trackers have the following
 attributes:</p>

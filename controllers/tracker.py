@@ -32,8 +32,16 @@ class TrackerController(WebMonitorController):
     @menu(label='Create')
     def new(self, request):
         form = self.create_form()
-        url = request.GET.get('url', None)
-        name = request.GET.get('name', None)
+        try:
+            url = request.GET.get('url', None)
+        except UnicodeDecodeError:
+            url = 'invalid_url'
+
+        try: 
+            name = request.GET.get('name', None)
+        except UnicodeDecodeError:
+            name = 'Title'
+
         if url:
             form.url.data = url
         if name:

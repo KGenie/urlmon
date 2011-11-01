@@ -121,10 +121,20 @@ button.link {
     display: block;
 }
 
+.clear {
+    clear: both;
+}
+
 .form-cell, .form-cell-with-button {
     float: none;
     clear: left;
 }
+
+.form-cell-with-button > button {
+    width:20%;
+    margin-left:40%;
+}
+
 
 .centered {
     float: none;
@@ -143,6 +153,7 @@ button.link {
     border-color: red;
 }
 
+
 .form-label {
     width: 25%;
     float: left;
@@ -156,6 +167,18 @@ button.link {
     display: block;
     float: left;
     width: 70%;
+} 
+
+
+.form-label-2 {
+    margin-top: 0.5em;
+    display: block;
+    margin-left: 0.5em;
+}
+
+.form-input-2 {
+    display: block;
+    margin-left: 0.5em;
 } 
 
 .form-input-smaller {

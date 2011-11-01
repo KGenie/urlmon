@@ -2,13 +2,8 @@ var uMon = uMon || {};
 
 (function (uMon, $) {
 
-    $(document).ready(function() {
-        var iFrameButton = $('#refresh-iframe-button'); 
-        iFrameButton.click(uMon.iFrameRefresh); 
-        iFrameButton.trigger('click');
-    });
 
-    uMon.iFrameRefresh = function (event) {
+     uMon.iFrameRefresh = function (event) {
         var sender = $(this);
         var newUrl = sender.closest('form').find('#url').val();
         var cssSelector = sender.closest('form').find('#css_selector').val();
@@ -56,4 +51,11 @@ var uMon = uMon || {};
             $(this).removeClass('hovered-element');
         });
     };
+
+    $(document).ready(function() {
+        var iFrameButton = $('#refresh-iframe-button'); 
+        iFrameButton.click(uMon.iFrameRefresh); 
+        iFrameButton.trigger('click');
+    });
+
 })(uMon, jQuery);

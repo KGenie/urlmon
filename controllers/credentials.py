@@ -17,8 +17,8 @@ class CredentialsController(WebMonitorController):
     @post
     def login(self, request):
         form = LoginForm(request.POST)
-        redirect_controller = self.request.GET.get('rc',None) or 'home'
-        redirect_action = self.request.GET.get('ra',None) or 'main'
+        redirect_controller = self.request.GET.get('rc',None) or 'tracker_change'
+        redirect_action = self.request.GET.get('ra',None) or 'index'
         id = self.request.GET.get('id',None)
         qsargs = {}
         if id:
@@ -38,7 +38,5 @@ class CredentialsController(WebMonitorController):
 
     @post
     def logout(self, request):
-        redirect_controller = self.request.GET['rc']
-        redirect_action = self.request.GET['ra']
         self.session['user'] = None
-        return self.redirect(redirect_action, redirect_controller)
+        return self.redirect_url('/')

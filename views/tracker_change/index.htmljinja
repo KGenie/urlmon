@@ -18,35 +18,39 @@ Tracker activity
 {% endblock %}
 
 {% block below_menu %}
-<form id="query" method="GET" action="{{ u.action('index') }}">
-  <div class="form-cell">
-    <label class="form-label" for="tracker_group_id">Group: </label>
-    <select class="form-input" id="tracker_group_id" name="tracker_group_id">
-      <option value="0">All tracker groups</option>
-      {% for tracker_group in tracker_groups %}
-      {% if tracker_group.id == tracker_group_id %}
-      <option value="{{ tracker_group.id }}" selected="selected">{{ tracker_group.name }}</option>
-      {% else %}
-      <option value="{{ tracker_group.id }}">{{ tracker_group.name }}</option>
-      {% endif %}
-      {% endfor %}
-    </select>
-  </div>
+<div class="form-cell">
+  <label class="form-label-2">Tracker Group: </label>
+  <ul class="form-input-2 filter-list">
+    {% for tracker_group in tracker_groups %}
+    <li>
+    {% if tracker_group.id == tracker_group_id %}
+    <span>{{ tracker_group.name }}</span>
+    <a href="{{ u.action('index', tracker_id=tracker_id) }}">[X]</a>
+    {% else %}
+    <a href="{{ u.action('index', tracker_group_id=tracker_group.id) }}">{{ tracker_group.name }}</a>
+    {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
 
-  <div class="form-cell">
-    <label class="form-label" for="tracker_id">Tracker: </label>
-    <select class="form-input" id="tracker_id" name="tracker_id">
-      <option value="0">All trackers</option>
-      {% for tracker in trackers %}
-      {% if tracker.id == tracker_id %}
-      <option value="{{ tracker.id }}" selected="selected">{{ tracker.name }}</option>
-      {% else %}
-      <option value="{{ tracker.id }}">{{ tracker.name }}</option>
-      {% endif %}
-      {% endfor %}
-    </select>
-  </div>
-</form>
+<div class="form-cell">
+  <label class="form-label-2">Tracker: </label>
+
+  <ul class="form-input-2 filter-list">
+    {% for tracker in trackers %}
+    <li>
+    {% if tracker.id == tracker_id %}
+    <span>{{ tracker.name }}</span>
+    <a href="{{ u.action('index', tracker_group_id=tracker_group_id) }}">[X]</a>
+    {% else %}
+    <a href="{{ u.action('index', tracker_id=tracker.id, tracker_group_id=tracker_group_id) }}">{{ tracker.name }}</a>
+    {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+
+</div>
 {% endblock %}
 
 
@@ -56,9 +60,9 @@ Tracker activity
  {% if has_changes %}
  <div class="top-pager pager">
     {% if page > 1 %}
-    <a href="{{ u.action('index', id=id, page=1, tracker_id=tracker_id)
+    <a href="{{ u.action('index', tracker_group_id=tracker_group_id, page=1, tracker_id=tracker_id)
       }}">{{ '<<'|e }}</a>
-    <a href="{{ u.action('index', id=id, page=(page - 1),
+    <a href="{{ u.action('index', tracker_group_id=tracker_group_id, page=(page - 1),
       tracker_id=tracker_id) }}">{{ '<'|e }}</a>
     {% else %}
     <span>{{ '<<'|e }}</span>
@@ -68,14 +72,14 @@ Tracker activity
     {% if page == p %}
     <span>{{ p|e }}</span>
     {% else %}
-    <a href="{{ u.action('index', id=id, page=p, 
+    <a href="{{ u.action('index', tracker_group_id=tracker_group_id, page=p, 
       tracker_id=tracker_id) }}">{{ p|e }}</a>
     {% endif %}
     {% endfor %}
     {% if (page + 1) <= maxpage %}
-    <a href="{{ u.action('index', id=id, page=(page + 1),
+    <a href="{{ u.action('index', tracker_group_id=tracker_group_id, page=(page + 1),
       tracker_id=tracker_id) }}">{{ '>'|e }}</a>
-    <a href="{{ u.action('index', id=id, page=maxpage, 
+    <a href="{{ u.action('index', tracker_group_id=tracker_group_id, page=maxpage, 
       tracker_id=tracker_id)}}">{{ '>>'|e }}</a>
     {%else %}
     <span>{{ '>'|e }}</span>  

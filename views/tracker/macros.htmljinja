@@ -32,7 +32,7 @@
 
     {{ render_field(form.css_selector) }}
 
-    <div class="centered">  
+    <div class="form-cell-with-button">  
       <button type="submit" class="form-submit">{{ submit_text }}</button>
     </div>
 
