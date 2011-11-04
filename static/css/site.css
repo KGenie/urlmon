@@ -54,21 +54,21 @@ button.link {
 }
 
 #left-column {
-    width: 184px;
+    width: 14%;
 }
 
 #main {
-    margin-left: 1%;
-    max-width: 60%;
+    margin-left: 4%;
+    width: 60%;
     float: left;
 }
 
 #menu {
-    width: 100%;
+    width: 160px;
 }
 
 #below-menu {
-    width: 100%;
+    width: 160px;
 }
 
 #help {
@@ -223,8 +223,7 @@ form.post-link-form {
 
 
 .table-container {
-    width: 90%;
-    margin-left: 5%;
+    width: 100%;
 }
 
 .table-container .table-title {
@@ -241,9 +240,8 @@ form.post-link-form {
     border-collapse: collapse;
     font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
     font-size: 12px;
-    margin: 20px;
     text-align: left;
-    width: 480px;
+    width: 100%;
 }
 
 .simple-table th {
@@ -251,13 +249,13 @@ form.post-link-form {
     color: #003399;
     font-size: 14px;
     font-weight: normal;
-    padding: 10px 8px;
+    padding: 10px 4px;
 }
 
 .simple-table td {
     border-bottom: 1px solid #CCCCCC;
     color: #666699;
-    padding: 6px 8px;
+    padding: 6px 4px;
 }
 
 .simple-table tbody tr:hover td {

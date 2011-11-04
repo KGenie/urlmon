@@ -19,13 +19,16 @@ Tracker activity
 
 {% block below_menu %}
 <div class="form-cell">
-  <label class="form-label-2">Tracker Group: </label>
+  <label class="form-label-2">Tracker Group:
+    {% if tracker_group_id %}
+    <a href="{{ u.action('index', tracker_id=tracker_id) }}">All</a>
+    {% endif %}
+  </label>
   <ul class="form-input-2 filter-list">
     {% for tracker_group in tracker_groups %}
     <li>
     {% if tracker_group.id == tracker_group_id %}
     <span>{{ tracker_group.name }}</span>
-    <a href="{{ u.action('index', tracker_id=tracker_id) }}">[X]</a>
     {% else %}
     <a href="{{ u.action('index', tracker_group_id=tracker_group.id) }}">{{ tracker_group.name }}</a>
     {% endif %}
@@ -35,14 +38,16 @@ Tracker activity
 </div>
 
 <div class="form-cell">
-  <label class="form-label-2">Tracker: </label>
-
+  <label class="form-label-2">Tracker: 
+    {% if tracker_id %}
+    <a href="{{ u.action('index', tracker_group_id=tracker_group_id) }}">All</a>
+    {% endif %}
+  </label>
   <ul class="form-input-2 filter-list">
     {% for tracker in trackers %}
     <li>
     {% if tracker.id == tracker_id %}
     <span>{{ tracker.name }}</span>
-    <a href="{{ u.action('index', tracker_group_id=tracker_group_id) }}">[X]</a>
     {% else %}
     <a href="{{ u.action('index', tracker_id=tracker.id, tracker_group_id=tracker_group_id) }}">{{ tracker.name }}</a>
     {% endif %}
