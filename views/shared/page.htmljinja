@@ -19,21 +19,7 @@ Welcome to the Web Monitor
     </div>
   </div>  
 
-  <div id="main">
-    {% if flash %}
-    <div id="flash">
-      <span class="{{ flash.type }}">{{ flash.message }}</span> 
-    </div>
-    {% endif %}
-    <div id="main-title">
-      <h3>
-	{% block main_title %}
-	{% endblock %}
-      </h3>
-    </div>
-    {% block main %}
-    {% endblock %}
-  </div>
+
   <div id="help">
     <div id="login-logout">
       {% block login %}
@@ -76,6 +62,22 @@ Welcome to the Web Monitor
       {% block help %}
       {% endblock %}
     </div>
+  </div>
+
+  <div id="main">
+    {% if flash %}
+    <div id="flash">
+      <span class="{{ flash.type }}">{{ flash.message }}</span> 
+    </div>
+    {% endif %}
+    <div id="main-title">
+      <h3>
+	{% block main_title %}
+	{% endblock %}
+      </h3>
+    </div>
+    {% block main %}
+    {% endblock %}
   </div>
 </div>
 {% endblock %}

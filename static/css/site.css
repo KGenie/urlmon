@@ -11,7 +11,7 @@ ul {
     font-variant: normal;
     text-transform: none;
     text-decoration: none;
-    text-indent: 5px;
+    text-indent: 1px;
     list-style-type: none;
     padding: 6px;
     margin: 2px;
@@ -48,18 +48,19 @@ button.link {
 #page {
     background: #dcdcdc;
     float: left;
-    width: 90%;
-    margin-top: 5%;
-    margin-left: 5%;
+    width: 95%;
+    margin-top: 1%;
+    margin-left: 2.5%;
 }
 
 #left-column {
-    width: 14%;
+    width: 184px;
 }
 
 #main {
-    padding-left: 2em;
-    width: 57%;
+    margin-left: 1%;
+    max-width: 60%;
+    float: left;
 }
 
 #menu {
@@ -71,7 +72,7 @@ button.link {
 }
 
 #help {
-    width: 25%;
+    width: 20%;
     float: right;
 }
 

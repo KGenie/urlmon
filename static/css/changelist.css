@@ -1,6 +1,6 @@
 .change-list {
-    margin-left: 2.5%;
-    width: 90%;
+    margin-left: 1%;
+    width: 96%;
 }
 
 .change-list > .change {
@@ -30,7 +30,7 @@
 
 .change-list > .change > .content {
     margin-top: 0.7em;
-    height: 3em;
+    min-height: 3.0em;
     clear: both;
 }
 
