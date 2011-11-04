@@ -63,10 +63,9 @@ Welcome to the Web Monitor
                   controller='credentials'), 
 	      text='Logout') }}
 
-
 	  <div id="bookmarklet">
-	    <p><a class="no-click" href="javascript: window.open('{{ base_url + 
-	      u.action('new', controller='tracker') }}?name=' + document.title + '&url=' + window.location.href);">KGenie</a> 
+	    <p><a class="no-click" href="javascript:void(window.open('{{ base_url + 
+	      u.action('new', controller='tracker') }}?name=' + document.title + '&url=' + window.location.href));">KGenie</a> 
 	     (Drag this to your bookmark toolbar so you can use it to quickly create
 	    trackers)</p>  
 	  </div>
