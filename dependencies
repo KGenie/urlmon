@@ -3,16 +3,9 @@ Jinja2==2.6
 Paste==1.7.5.1
 Routes==1.12.3
 SQLAlchemy==0.7.2
-Tempita==0.5.1
 WTForms==0.6.3
 WebOb==1.1.1
 chardet==1.0.1
-decorator==3.3.2
-distribute==0.6.21
-flup==1.0.3.dev-20110405
-git-remote-helpers==0.1.0
-keyring==0.6.2
+flup==1.0.2
 lxml==2.3.1
-pyxdg==0.19
 sqlalchemy-migrate==0.7.1
-wsgiref==0.1.2
