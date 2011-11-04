@@ -1,0 +1,27 @@
+This will cover installation in a ubuntu/debian machine. but should be easily
+adaptable on other distros
+
+- system-requeriments :
+ - python2.7 installed, default since natty(ubuntu 11.04)
+ - python virtualenv
+ - development files for libxml/libxlst/python(to compile native extensions when installing python packages)
+ - gnu toolchain(make,gcc,etc...)
+
+to install everything on ubuntu, considering the source files are in $HOME/urlmon :
+
+$ sudo apt-get install python-virtualenv build-essential python-dev libxml2-dev libxlst1-dev
+$ mkdir "$HOME/python-virtualenv"
+$ virtualenv "$HOME/python-virtualenv"
+$ echo 'source $HOME/python-virtualenv/bin/activate' >> "$HOME/.bashrc"
+$ source $HOME/python-virtualenv/bin/activate 
+$ cd "$HOME/urlmon"
+$ cat dependencies | xargs easy_install
+$ ./dbmanage.py version_control
+$ ./dbmanage.py upgrade
+$ ./add_test_trackers.py
+
+
+At this point, everything needed to run locally should be installed. to run using
+python development server just type './debug.py' from the source directory.
+
+TODO: document steps necessary to configure a production server
