@@ -8,15 +8,15 @@ DATABASE_CONNECTION_STRING = 'sqlite:///%s/umon.db' % APP_ROOT
 
 
 # Task daemon
-INTERVAL_BETWEEN_TASK_CHECKS = 10
-NUMBER_OF_TASK_RUNNERS = 5
+INTERVAL_BETWEEN_TASK_CHECKS = 30
+NUMBER_OF_TASK_RUNNERS = 25
 
 # Logging
 LEVELS = {
-        'htmldiff': DEBUG,
+        'htmldiff': ERROR,
         'dispatcher': ERROR,
-        'daemons': WARNING,
-        'daemons.task': DEBUG,
-        'services': DEBUG,
-        'controllers': DEBUG
+        'daemons': ERROR,
+        #'daemons.task': DEBUG,
+        'services': ERROR,
+        'controllers': ERROR
         }

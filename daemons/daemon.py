@@ -84,6 +84,7 @@ class Daemon(object):
         # Start the daemon
         is_daemon = self.daemonize()
         if is_daemon:
+            os.nice(20) # lower priority
             self.run()
 
 
