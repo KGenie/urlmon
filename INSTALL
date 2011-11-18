@@ -1,27 +1,103 @@
 This will cover installation in a ubuntu/debian machine. but should be easily
 adaptable on other distros
 
-- system-requeriments :
+
+
+PART 1 - Setup environment for running in debug mode
+
+- system requeriments :
  - python2.7 installed, default since natty(ubuntu 11.04)
  - python virtualenv
  - development files for libxml/libxlst/python(to compile native extensions when installing python packages)
  - gnu toolchain(make,gcc,etc...)
 
-to install everything on ubuntu, considering the source files are in $HOME/urlmon :
+to install everything on ubuntu:
 
 $ sudo apt-get install python-virtualenv build-essential python-dev libxml2-dev libxlst1-dev
 $ mkdir "$HOME/python-virtualenv"
 $ virtualenv "$HOME/python-virtualenv"
 $ echo 'source $HOME/python-virtualenv/bin/activate' >> "$HOME/.bashrc"
 $ source $HOME/python-virtualenv/bin/activate 
-$ cd "$HOME/urlmon"
 $ cat dependencies | xargs easy_install
+
+to prepare the application for running, you need to create/populate the database.
+
+$ cd "$APP_DIR" # directory where the source files are installed
 $ ./dbmanage.py version_control
 $ ./dbmanage.py upgrade
-$ ./add_test_trackers.py
-
 
 At this point, everything needed to run locally should be installed. to run using
-python development server just type './debug.py' from the source directory.
+python development server just type './debug.py' from the source directory. To add
+stub data, use one of the scripts in the directory 'stub'.
 
-TODO: document steps necessary to configure a production server
+
+
+
+PART 2 - Setup for running a production server
+
+There are countless setups for running this application in a production web server,
+here I will document the setup I used on an EC2 instance running ubuntu 11.10 which
+consists of making the application server listen on a Unix socket with a FastCGI
+interface for the Nginx web server.
+
+The server process group will run with unprivileged UID/GID(I will use 'urlmon/urlmon' for 
+this tutorial). This allows for deployment/server restart without requiring root privileges.
+All the instructions ran in PART 1(except the first line which can be ran as any admin)
+should be ran as user 'urlmon', since that user should 'own' the python virtual environment.
+
+Here I will create two environments, one for testing and one for development.
+
+ - system requeriments :
+  - All the requeriments in PART 1
+  - Nginx web server with FastCGI module
+
+install/configure commands for ubuntu 11.10 (do this before PART 1), considering the 
+environments will be installed in '/srv/urlmon' (each environment will have a sub
+directory in '/srv/urlmon' containing a copy of the source files)
+
+$ sudo apt-get install nginx-full
+$ sudo su
+# groupadd urlmon
+# useradd -g urlmon -m urlmon
+# usermod -aG urlmon www-data
+# mkdir -p /srv/urlmon
+# chown -R urlmon:urlmon /srv/urlmon
+# cd /etc/nginx
+# mv sites-available/default ./default.bak
+# ENVIRONMENTS="test dev"  # adjust this variable if you need more/less environments
+# for env in $ENVIRONS; do 
+cat > ./sites-available/$env << EOF
+server {
+	server_name $env.kgenie.com;  # rename this to match the correct hostname defined in DNS
+
+	location / {
+		fastcgi_split_path_info ^(/)(.*)\$;
+		fastcgi_param PATH_INFO /\$fastcgi_path_info;
+		fastcgi_param PATH_TRANSLATED \$document_root/\$fastcgi_path_info;
+
+		include fastcgi_params;
+		fastcgi_pass unix:/srv/urlmon/$env/fcgi.socket;
+	}
+
+	location /static {
+		alias /srv/urlmon/$env/static
+        }
+
+}
+EOF
+done
+# cd sites-enabled
+# for env in `ls ../sites-available`; do
+ln -s ../sites-available/$env
+done
+# service nginx restart
+# exit
+
+At this point nginx should be properly configured(after you adjust the 'server_name'
+parameter according to your DNS configuration). The only thing left is login as user 'urlmon'
+and execute the steps described in PART1(replacing $APP_DIR for the directory of the desired
+environment. To deploy the application to a specific environment
+just run './deploy.sh $env' from the application directory in a computer that had its ssh key
+authorized for the 'urlmon' user in the server(need to adjust the script if the server IP changes. 
+To manually stop/start/restart the server in an environment just run 
+'./fcgi.py stop/start/restart' from the directory '/srv/urlmon/$env'.
