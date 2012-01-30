@@ -8,12 +8,12 @@ PART 1 - Setup environment for running in debug mode
 - system requeriments :
  - python2.7 installed, default since natty(ubuntu 11.04)
  - python virtualenv
- - development files for libxml/libxlst/python(to compile native extensions when installing python packages)
+ - development files for libxml/libxslt/python(to compile native extensions when installing python packages)
  - gnu toolchain(make,gcc,etc...)
 
 to install everything on ubuntu:
 
-$ sudo apt-get install python-virtualenv build-essential python-dev libxml2-dev libxlst1-dev
+$ sudo apt-get install python-virtualenv build-essential python-dev libxml2-dev libxslt1-dev
 $ mkdir "$HOME/python-virtualenv"
 $ virtualenv "$HOME/python-virtualenv"
 $ echo 'source $HOME/python-virtualenv/bin/activate' >> "$HOME/.bashrc"
