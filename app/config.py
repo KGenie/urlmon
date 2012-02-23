@@ -152,7 +152,7 @@ def setup_logging():
 
 def make_app(production=True):
     setup_logging() # logging before daemons so we will share logger setup
-    start_daemons() # this is where we fork
+#    start_daemons() # this is where we fork
 
     # Do these imports here to avoid having modules loaded before forking
     from wsgi.app import WebMonitorApp
