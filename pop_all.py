@@ -7,6 +7,7 @@ Created on Feb 20, 2012
 import env
 
 from database.sqlalch import Session
+from time import time
 from tests.pop_insert import pop_insert
 
 
@@ -21,29 +22,44 @@ def populate():
 # instantiate the insert code
     my_insert = pop_insert()
     
-# Create a user (in progress, mock it for now)
-    user_id = 1    
-        
     session = Session()
-# Create tracker group, retrieve group id    
-    my_tracker = my_insert.tracker_group_insert (session, "New Group",user_id,"New group test")
-# Commit at this ppoint and retrieve tracker insert    
-    session.commit()  
-    session.refresh(my_tracker)
-    group_id = my_tracker.id
     
-    print "Tracker group " + str(group_id) + " created"
+    my_time = str(time())
+    
+# Create a registration
 
-    session = Session()
-     
+    user = "User " + my_time
+    email = "register@a222.biz"
+# Bug, skip for now.
+#    my_insert.registration_insert(session, user, email)
+    
+# Create a user (fudge uniqueness using timestamp)
+ 
+    email = my_time + "@a222.biz"
+    user_id = my_insert.user_insert(session,email,"Andy","Ellis","secret")    
+    print "User " + str(user_id) + " created"
+      
+
+# Use time to generate unique tracker name
+    group_name = "Group name " + my_time    
+    
+    print group_name
+    
+# Create tracker group, retrieve group id
+    
+    group_id = my_insert.tracker_group_insert (session, group_name,user_id,"New group test")
+   
+    print "Tracker group " + str(group_id) + " created"
+         
 # With built in defaults.
     my_insert.tracker_insert(session,"Heathfield","http://www.heathfield-ecology.org.uk/home.php",group_id)
+    my_insert.tracker_insert(session,"A222 - 1","HTTP://www.a222.net/home.php",group_id)
 # Apply customer defaults for future inserts.
     my_insert.tracker_default ("header",600)
 # With custom defaults.
-    my_insert.tracker_insert(session,"Dragon","http://www.electricvandandcar.co.uk",group_id,"Make a comment")
+    my_insert.tracker_insert(session,"Dragon","HTTP://www.electricvandandcar.co.uk",group_id,"Make a comment")
 # No defaults
-    my_insert.tracker_insert(session,"A222","http://www.a222,net/home.php",group_id, "A comment","body",12345)
+    my_insert.tracker_insert(session,"A222 - 2","HTTP://www.a222.net/home.php",group_id, "A comment","body",12345)
 # With custom defaults again.
     my_insert.tracker_insert(session,"Banana Leaf","http://www.thebananaleaf.com",group_id)
 
