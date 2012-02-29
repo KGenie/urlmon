@@ -53,8 +53,8 @@ def populate():
     my_insert.pop_add("first_name","Neon")
     my_insert.pop_add("last_name","is inert")
     my_insert.pop_add("password","test")
-    user_id2 = my_insert.user_insert(session,0)    
-    print "User " + str(user_id2) + " created"
+    print my_insert.user_insert(session,0)    
+  
     
 # Use time to generate unique tracker name
     group_name = "Group name " + my_time    
@@ -70,6 +70,11 @@ def populate():
     group_id = my_insert.tracker_group_insert (session, rowdata)
    
     print "Tracker group " + str(group_id) + " created"
+
+# Constraint test,create tracker without user.
+    rowdata.group_name = "Null user " + my_time
+    rowdata.user_id=None
+    print my_insert.tracker_group_insert(session,rowdata)
          
 # TRACKERS
     
@@ -77,6 +82,14 @@ def populate():
     web_pages[1] = "http://www.a222.net/home.php" 
     web_pages[2] = "http://www.a222.net/links.php"
     web_pages[3] = "http://www.a222.net/portfolio.php"
+
+# Constraint test 1. Create tracker with no group.
+   
+    rowdata = pop_data
+    rowdata.name = "No group"
+    rowdata.url = web_pages[1]
+    rowdata.tracker_group_id = None
+    my_insert.tracker_insert(session,rowdata)
 
 # Turn off result return:
     my_insert.config_return_result(0)
@@ -92,7 +105,11 @@ def populate():
 # With custom defaults and overwrite result return
     rowdata.name = "Test2"
     rowdata.url = web_pages[2]
-    print my_insert.tracker_insert(session,rowdata,1)
+    my_delete = my_insert.tracker_insert(session,rowdata,1)
+    print my_delete
+
+    
+
 
 # Turn on result return:
     my_insert.config_return_result(1)
@@ -102,7 +119,9 @@ def populate():
     rowdata.url = web_pages[3]
     rowdata.frequency = 123
     rowdata.css_selector = "custom"
-    print my_insert.tracker_insert(session,rowdata)
+    my_tracker = my_insert.tracker_insert(session,rowdata)
+    print my_tracker
+    
 # With custom defaults again but no result
     rowdata.tracker_group_id = group_id
     rowdata.name = "Test4"
@@ -112,9 +131,18 @@ def populate():
     del (rowdata.frequency)
     print my_insert.tracker_insert(session,rowdata,0)
     
-    
-    
-    
+# Update tracker
+    rowdata = pop_data
+    rowdata.id = my_tracker
+    rowdata.name = "Modified"
+    print "updating tracker " + str(my_tracker)
+    my_insert.tracker_update(session,rowdata)
+
+# Delete earlier tracker
+    rowdata.id = my_delete
+    my_insert.tracker_delete (session, rowdata)
+    print "Deleted " + str(my_delete)
+       
     # TASK
     
     rowdata = pop_data

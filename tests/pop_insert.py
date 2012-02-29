@@ -85,9 +85,10 @@ class pop_insert:
             result_arg = self.return_result
         if result_arg:            
         # Return new used ID (I don't like this, must be better way)
-           my_query = session.query(Task).order_by("task.id DESC").first()
-           my_id = my_query.id
+           session.flush()
+           my_id = t.id
            return my_id
+    
     
     
     def tracker_default (self,css_selector,frequency):
@@ -95,6 +96,10 @@ class pop_insert:
         self.default_data["tracker_frequency"] = frequency
     
     
+    def tracker_delete(self, session, rowdata):
+       id = rowdata.id
+       session.query(Tracker).filter(Tracker.id==id).delete()
+                  
     def tracker_group_insert (self,session,rowdata,result_arg=None):
     # Insert group, return group id.
         user = rowdata.user_id
@@ -109,9 +114,11 @@ class pop_insert:
         if result_arg == None:
             result_arg = self.return_result
         if result_arg:            
-            my_query = session.query(TrackerGroup).filter(TrackerGroup.name == name).first()
-            my_id = my_query.id
+            session.flush()
+            my_id = g.id
             return my_id
+    
+    
         
     def tracker_insert(self, session, rowdata, result_arg=None):
         name = rowdata.name
@@ -152,10 +159,21 @@ class pop_insert:
         if result_arg == None:
             result_arg = self.return_result
         if result_arg:            
-            my_query = session.query(Tracker).order_by("tracker.id DESC").first()
-            my_id = my_query.id
+            session.flush()
+            my_id = t.id
             return my_id
-    
+
+    def tracker_update(self, session, rowdata):
+       id = rowdata.id
+       ret = session.query(Tracker).filter(Tracker.id == id)
+       if ret:
+           for row in ret:
+               try:
+                   row.name=rowdata.name
+               except:
+                   pass
+
+            
     def user_insert (self,session,result_arg=None):
         email = self.pop_rowdata["email"]
         first_name = self.pop_rowdata["first_name"]
@@ -178,8 +196,10 @@ class pop_insert:
             result_arg = self.return_result
         if  result_arg:
             # Return new user ID
-            my_query = session.query(User).filter(User.email == email).first()
-            my_id = my_query.id
+#            my_query = session.query(User).filter(User.email == email).first()
+#            my_id = my_query.id
+            session.flush()
+            my_id = u.id
             return my_id
                
 
