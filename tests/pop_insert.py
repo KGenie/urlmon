@@ -99,6 +99,7 @@ class pop_insert:
     def tracker_delete(self, session, rowdata):
        id = rowdata.id
        session.query(Tracker).filter(Tracker.id==id).delete()
+  
                   
     def tracker_group_insert (self,session,rowdata,result_arg=None):
     # Insert group, return group id.
@@ -118,8 +119,8 @@ class pop_insert:
             my_id = g.id
             return my_id
     
-    
-        
+  
+ 
     def tracker_insert(self, session, rowdata, result_arg=None):
         name = rowdata.name
         url = rowdata.url 
@@ -131,8 +132,7 @@ class pop_insert:
             comment=None
 
 # Default selector and frequency.
-        
-                
+                        
         try:
             frequency = rowdata.frequency
         except:
@@ -143,7 +143,6 @@ class pop_insert:
         except:
             css_selector = self.default_data["tracker_css_frequency"] = frequency
       
-        
 # Make sure there is a corresponding webpage record. Create if there is none.
 
         my_url = normalize_url(url)
@@ -162,6 +161,13 @@ class pop_insert:
             session.flush()
             my_id = t.id
             return my_id
+
+    def tracker_select (self,session,rowdata):
+        id = rowdata.id
+        ret = session.query(Tracker).filter(Tracker.id > id)
+        for row in ret:
+            print row.name
+
 
     def tracker_update(self, session, rowdata):
        id = rowdata.id
@@ -209,3 +215,10 @@ class pop_insert:
         session.add(w)
         return 0
     
+
+    def zztracker_delete (self,session,rowdata):
+        id = rowdata.id
+        t = Tracker
+        t.id = id
+        session.delete(t)
+        

@@ -72,6 +72,7 @@ def populate():
     print "Tracker group " + str(group_id) + " created"
 
 # Constraint test,create tracker without user.
+    
     rowdata.group_name = "Null user " + my_time
     rowdata.user_id=None
     print my_insert.tracker_group_insert(session,rowdata)
@@ -143,13 +144,13 @@ def populate():
     my_insert.tracker_delete (session, rowdata)
     print "Deleted " + str(my_delete)
        
-    # TASK
+# TASK
     
     rowdata = pop_data
     my_id = my_insert.task_insert(session,rowdata)
     print "Task " + str(my_id) + " created"
     
-    # Task with current date and time.
+# Task with current date and time.
     
     my_now = datetime.now()
     rowdata = pop_data
@@ -157,10 +158,17 @@ def populate():
     my_id = my_insert.task_insert(session,rowdata)
     print "Task " + str(my_id) + " created"
     
+    rowdata.id = 99
     
-    
-    
+    print my_insert.tracker_select(session,rowdata)
+      
     session.commit()
+    
+    session = Session()
+    rowdata.id = 99
+    print my_insert.zztracker_delete(session,rowdata)
+    session.commit()
+   
    
 if __name__ == '__main__':
     populate()

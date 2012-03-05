@@ -14,6 +14,8 @@ class Tracker(Model):
         self.tracker_group_id = tracker_group_id
         self.css_selector = css_selector
         self.comment = comment
+        
+       
 
 
     @property

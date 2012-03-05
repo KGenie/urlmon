@@ -5,7 +5,7 @@ from hashlib import sha512
 class User(Model):
 
     def __init__(self, email=None, first_name=None, last_name=None,  
-            password=None, full_name=None, roles=None, last_login=None, id=None):
+            password=None, full_name=None, roles=None, last_login=None):
 
         self.email = email
         self.first_name = first_name
@@ -20,9 +20,6 @@ class User(Model):
         self.roles = roles or ['normal']
         self.last_login = last_login
 
-        if id:
-            self.id = id
-            
             
 
     @property
