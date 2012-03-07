@@ -29,6 +29,7 @@ class RegistrationService(StorageService):
 
 
     def activate_user(self, reg_id):
+        
         ret = None
         reg = self.session.query(Registration).get(reg_id)
         if reg:

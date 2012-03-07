@@ -42,6 +42,7 @@ class TrackerService(StorageService):
 
 
     def insert(self, tracker):
+        print "insert"
         self.before_insert(tracker)
         tracker = super(TrackerService, self).insert(tracker)
         self.after_insert(tracker)
@@ -61,8 +62,6 @@ class TrackerService(StorageService):
         self.before_delete(tracker)
         ret = super(TrackerService, self).delete(tracker)
         return ret
-
-
 
     def any_with_group(self, group_id):
         return self.session.query(self.entity).\
