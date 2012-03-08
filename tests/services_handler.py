@@ -6,17 +6,19 @@ Test handler (though parts might have permanent uses) for the Services layer.
 Each method expects the same arguments:
 
 session:           A current sqlalchemy session.
-service_data:      Collection of row data. Simplest techniqueto (re-) initialise is to instantiate from service_data (from this module)   
+service_data:      Collection of row data. Simplest technique to (re-)initialise is to instantiate from 'service_data' (from this module)   
 
 Returned data:
 
-Is either datum, collection or array.
+is either datum, collection or array.
 
-datum return are named *_id. Most are numeric, not all.
+datum return are named *_id. Most are numeric, not all. This will generally be the ID created when adding a record or a 0/1 fail/success.
+ 
 collection occurs where a row of data is returned. Named my_row. Typical in _get methods.
+
 array occurs where more than one row could be returned. Named my_result. Typical in _get_all methods.
 
-A null or false result indicates that the operation has failed.
+A zero, null or false result indicates that the operation has failed.
 
 NOTES:
 
@@ -24,7 +26,7 @@ DELETE methods have been fudged because of a general problem with session.delete
 As a workround, these methods change the unique key to something meaningless thus 
 effectively deleting for test purposes. 
 
-Method tracker_retrieve_id is failing with an unexplained SQL error. Calls have been bypassed for the moment.
+Method 'tracker_retrieve_id' is failing with an unexplained SQL error. Calls have been bypassed for the moment.
 
 '''
 
