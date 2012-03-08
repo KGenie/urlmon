@@ -1,19 +1,37 @@
 '''
-Created on Feb 20, 2012
+20-02-2012    Created
 
-@author: bernard
+Test handler (though parts might have permanent uses) for the Services layer.
+
+Each method expects the same arguments:
+
+session:           A current sqlalchemy session.
+service_data:      Collection of row data. Simplest techniqueto (re-) initialise is to instantiate from service_data (from this module)   
+
+Returned data:
+
+Is either datum, collection or array.
+
+datum return are named *_id. Most are numeric, not all.
+collection occurs where a row of data is returned. Named my_row. Typical in _get methods.
+array occurs where more than one row could be returned. Named my_result. Typical in _get_all methods.
+
+A null or false result indicates that the operation has failed.
+
+NOTES:
 
 DELETE methods have been fudged because of a general problem with session.delete()
 As a workround, these methods change the unique key to something meaningless thus 
 effectively deleting for test purposes. 
 
-.tracker_retrieve_id is failing with an unexplained SQL error. Calls have been bypassed for the moment.
+Method tracker_retrieve_id is failing with an unexplained SQL error. Calls have been bypassed for the moment.
 
 '''
 
 import env
 
 from database.sqlalch import Session
+from models.registration import Registration
 from models.user import User
 from models.tracker import Tracker
 from models.tracker_group import TrackerGroup
@@ -31,12 +49,36 @@ def service_data():
 
 class services_handler:
     
-    def registration_insert (self,service_data):
-         my_service = RegistrationService
-         my_email = service_data.email
-         my_user = User()
-         my_user.email = my_email
-         my_result = RegistrationService(my_service).request_registration(my_user)
+    def registration_insert (self,session,service_data):
+        my_service = RegistrationService
+        my_email = service_data.email
+        my_reg = Registration()
+        my_reg.email = my_email
+        my_reg.reg_id = service_data.reg_id
+        my_result = RegistrationService(my_service).insert(my_reg)
+        my_id = self.registration_retrieve(session, service_data)
+        return my_id
+        
+    def registration_request (self,session,service_data):
+        my_service = RegistrationService
+        my_email = service_data.email
+        my_user = User()
+        my_user.email = my_email
+        my_result = RegistrationService(my_service).request_registration(my_user)
+        my_id = self.registration_retrieve(session, service_data)
+        return my_id
+         
+    def registration_retrieve(self,session,service_data):
+                   
+        my_email = service_data.email
+        
+                        
+        my_result = session.query(Registration).filter(Registration.email==my_email).first()
+        try:
+            reg_id = my_result.reg_id
+        except:
+            reg_id = 0
+        return reg_id
 
     def tracker_any_with_group (self,session, service_data):
         my_service = TrackerService
@@ -83,6 +125,13 @@ class services_handler:
         my_ok = TrackerGroupService(my_service).update(my_id,t)
         return 1
     
+    def tracker_group_get (self,session,service_data):       
+        my_service = TrackerGroupService
+        t = TrackerGroup()
+        my_id = service_data.id
+        my_result = TrackerGroupService(my_service).get(my_id)
+        return my_result
+        
     def tracker_group_insert (self,session, service_data):
         my_service = TrackerGroupService
         t = TrackerGroup()
@@ -243,21 +292,17 @@ class services_handler:
        user_id = 0
        my_exists = UserService(user_service).exists(email)
        if my_exists:
-           my_result = session.query(User).filter(User.email==email).first()
-           try:
-               user_id = my_result.id
-           except:
-               user_id = 0
-               
-       return user_id
+           return 1
+       else:
+           return 0
     
 
     def user_get (self,session,service_data):
         my_service = UserService
         my_id = service_data.id
         
-        my_result = UserService(my_service).get(my_id)
-        return my_result
+        my_row = UserService(my_service).get(my_id)
+        return my_row
     
     def user_get_all (self,session,service_data):
         my_service = UserService
@@ -284,7 +329,7 @@ class services_handler:
         my_result = UserService(my_service).insert(my_user)
         
         my_id = self.user_retrieve_id (session,service_data) 
-        
+        return my_id
         
     def user_register (self,session,service_data):
        registration_service = RegistrationService
@@ -296,7 +341,7 @@ class services_handler:
         u = User()
                           
         my_email = service_data.email
-                
+        
         my_result = session.query(User).filter(User.email==my_email).first()
         try:
             id = my_result.id

@@ -14,3 +14,5 @@ class TrackerGroupService(StorageService):
         return bool(self.session.query(TrackerGroup).\
                 filter(TrackerGroup.user_id == user.id).\
                 filter(TrackerGroup.name == name).first())
+
+        
