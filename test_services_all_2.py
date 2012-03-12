@@ -4,7 +4,7 @@ Unit Test for Services.
 This is an initial shallow test. It tests basic functions,e.g : Is record created? Does it retrieve?
 It does not do comprehensive tests on every single column.
 
-Under development, intermediate test layer service_handler being progessively removed.
+Intermediate service layer retained temporarily for the setUp method.
 
 Be warned: produces many rows of data! 
 
@@ -33,6 +33,28 @@ from time import time
 
 import unittest
 
+def create_tracker_group (session,t):
+# Needed for testing in several places.
+    my_service = TrackerGroupService
+    TrackerGroupService(my_service).insert(t)
+    session.flush();
+    return t.id
+
+def create_user (session,u,randomly=None):
+# Needed for testing in several places.
+    my_service = UserService
+    
+    if randomly:
+        my_time = str(time())
+        u.email = my_time + "@email.com"
+        u.first_name = my_time + ".first"
+        u.last_name = my_time + ".last"
+    
+    UserService(my_service).insert(u)
+    session.flush();
+    return u.id
+            
+
 def print_number (my_text,my_number):
 # Prints text then a number. Handles number if null or non-numeric.
         if my_number:
@@ -59,6 +81,8 @@ class testing(unittest.TestCase):
         self.email = "test" + self.my_time + "@polardog.co.uk"
         self.email2 = "mod" + self.my_time + "@polardog.co.uk"
         self.email3 = "base" + self.my_time + "@polardog.co.uk"
+        self.email4 = "old" + self.my_time + "@polardog.co.uk"
+        
         self.url = "http://www.polardog.co.uk/" + self.my_time
         
         self.reg_id = "abcd" + self.my_time
@@ -76,6 +100,8 @@ class testing(unittest.TestCase):
         rowdata.last_name = "Ellis"
         
         self.user_id = my_service.user_insert(self.session,rowdata)
+        
+        
                
     def tearDown(self):
         self.session.commit()      
@@ -92,20 +118,50 @@ class testing(unittest.TestCase):
         self.assertEqual(self.reg_id,my_reg.reg_id)
                
     def test_registration_request(self):
-    # Test is failing. Left with original test handler for now.
-        my_service = services_handler() 
-        rowdata = service_data
-        rowdata.email = "x_" + self.email
-        rowdata.password = "test"
-        rowdata.first_name = "Lord"
-        rowdata.last_name = "Ellis"
+    # Test unworkable because of project structure. Fudged to fai.
         my_id = 0
 #       my_id = my_service.registration_request(self.session,rowdata)
         self.assertTrue(my_id)
         
-
-            
+           
+    def test_user_authenticate(self):
+    # Test unworkable because of project structure. Fudged to fai.
+        my_id = 0
+#       my_id = my_service.registration_request(self.session,rowdata)
+        self.assertTrue(my_id)
         
+        
+        
+    def test_tracker_group_get_all_by_user(self):
+        u = User()
+        my_id = create_user (self.session,u,1)
+        name_1 = "Name 1"
+        name_2 = "Name 2"
+        t = TrackerGroup()
+        
+        print_number ("TG for user",my_id)
+        
+        t.user_id = my_id
+        t.name = name_1
+        create_tracker_group (self.session,t)
+        
+        t = TrackerGroup()
+        t.user_id = my_id
+        t.name = name_2
+        create_tracker_group (self.session,t)
+
+        my_service = TrackerGroupService
+        t = User()
+        t.id = my_id
+        my_result = TrackerGroupService(my_service).get_all_by_user(t)
+        self.assertEqual (name_1, my_result[0].name)
+        self.assertEqual (name_2, my_result[1].name)
+        my_count = 0
+    # Messy - cannot find attribute for number of rows!
+        for my_row in my_result:
+            my_count = my_count + 1
+        self.assertEqual (my_count,2)
+
     def test_tracker_group_insert(self):
     # Retrieve main user email.
         my_service = UserService
@@ -128,6 +184,7 @@ class testing(unittest.TestCase):
         my_result = TrackerGroupService(my_service).get(tracker_group_id)
         my_comment = my_result.comment
         self.assertEqual (my_email, my_comment)
+        
         
     def test_user_insert(self):
         
@@ -157,15 +214,25 @@ class testing(unittest.TestCase):
         self.assertTrue(my_ok)
         
     def test_user_update(self):
+    # Messy! Need to create user before update.
+        u = User()
+        u.email = self.email4
+        u.password = "test"
+        u.first_name = "Lord"
+        u.last_name = "Ellis"
+        this_id = create_user(self.session,u)
         
-        my_service = services_handler() 
-        rowdata = service_data
-        rowdata.email = self.email2
-        rowdata.id = self.user_id
-        my_service.user_update(self.session,rowdata)
-        my_id = my_service.user_exists(self.session,rowdata)
-        self.assertTrue(my_id)
-
+        print_number ("Test user update",this_id)
+        
+        my_service = UserService
+        my_email = self.email2
+                
+        u.email = my_email
+        
+        my_service = UserService
+        my_result = UserService(my_service).update(this_id, u)
+        my_row = UserService(my_service).get(this_id)
+        self.assertEqual(my_email,my_row.email)
     
 if __name__ == '__main__':
     unittest.main()
