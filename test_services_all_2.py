@@ -14,15 +14,18 @@ import env
 
 from database.sqlalch import Session
 
+ 
 from models.registration import Registration
 from models.user import User
 from models.tracker import Tracker
 from models.tracker_group import TrackerGroup
+from models.webpage import Webpage
 
 from services.registration import RegistrationService
 from services.tracker import TrackerService
 from services.tracker_group import TrackerGroupService
 from services.user import UserService
+from services.webpage import WebpageService
 
 from tests.services_handler import services_handler, service_data
 
@@ -65,6 +68,12 @@ def print_number (my_text,my_number):
         else:
             my_show = "None!"
         print my_text + ": " + my_show
+
+def webpage_check (session,my_url, force_result=None):
+# Fudged for the moment. Just returns force_result
+    return force_result
+
+    
 
     
 class testing(unittest.TestCase):
@@ -122,14 +131,45 @@ class testing(unittest.TestCase):
         my_id = 0
 #       my_id = my_service.registration_request(self.session,rowdata)
         self.assertTrue(my_id)
+
+    def test_tracker_get_all_by_user(self):
+        u = User()
+        user_id = create_user (self.session,u,1)
         
-           
-    def test_user_authenticate(self):
-    # Test unworkable because of project structure. Fudged to fai.
-        my_id = 0
-#       my_id = my_service.registration_request(self.session,rowdata)
-        self.assertTrue(my_id)
+        t = TrackerGroup()
+                       
+        t.user_id = user_id
+        t.name = "Test tracker get all by user 1"
+        group_id = create_tracker_group (self.session,t)
+                
+        name_1 = "gabu_1"
+        name_2 = "gabu_2"
+        name_3 = "gabu_3"
+        name_4 = "gabu_4"
         
+        my_service = TrackerService
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_1
+        t.url = "tracker_by_user.com"
+        TrackerService(my_service).insert(t)
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_2
+        t.url = "tracker_by_user.com"
+        TrackerService(my_service).insert(t)
+        
+        u=User()
+        u.id = user_id
+        
+        my_result = TrackerService(my_service).get_all_by_user(u)
+        self.assertEqual (name_1, my_result[0].name)
+        self.assertEqual (name_2, my_result[1].name)
+        my_count = 0
+    # Messy - cannot find attribute for number of rows!
+        for my_row in my_result:
+            my_count = my_count + 1
+        self.assertEqual (my_count,2)
         
         
     def test_tracker_group_get_all_by_user(self):
@@ -184,20 +224,37 @@ class testing(unittest.TestCase):
         my_result = TrackerGroupService(my_service).get(tracker_group_id)
         my_comment = my_result.comment
         self.assertEqual (my_email, my_comment)
-        
-        
-    def test_user_insert(self):
-        
-        my_service = UserService
+   
+    def test_tracker_insert(self):
         u = User()
-        u.email = self.email
-        u.password = "test"
-        u.first_name = "Lord"
-        u.last_name = "Ellis"
-        UserService(my_service).insert(u)
-        self.session.flush();
-        self.assertTrue(u.id)
-        print_number ("User",u.id)
+        my_id = create_user (self.session,u,1)
+        name_1 = "Trackers"
+        t = TrackerGroup()
+        t.user_id = my_id
+        t.name = name_1
+        group_id = create_tracker_group (self.session,t)
+        
+        t=Tracker()
+        t.tracker_group_id = group_id
+        my_name = "Tracker " + self.my_time
+        t.name = my_name
+        t.url = "1@url.com"     
+        my_service = TrackerService
+        TrackerService(my_service).insert(t)
+        
+        g=TrackerGroup()
+        g.id = group_id
+        my_result = TrackerService(my_service).get_all_by_group(g)
+        self.assertEqual (my_name, my_result[0].name)
+        
+    def test_user_authenticate(self):
+    # Test unworkable because of project structure. Fudged to fai.
+        my_id = 0
+#       my_id = my_service.registration_request(self.session,rowdata)
+        self.assertTrue(my_id)
+        
+    
+        
     
     def test_user_exists_fake(self):
         
@@ -212,6 +269,20 @@ class testing(unittest.TestCase):
         my_email = self.email3
         my_ok = UserService(my_service).exists(my_email)
         self.assertTrue(my_ok)
+    
+    def test_user_insert(self):
+        
+        my_service = UserService
+        u = User()
+        u.email = self.email
+        u.password = "test"
+        u.first_name = "Lord"
+        u.last_name = "Ellis"
+        UserService(my_service).insert(u)
+        self.session.flush();
+        self.assertTrue(u.id)
+        print_number ("User",u.id)
+    
         
     def test_user_update(self):
     # Messy! Need to create user before update.
@@ -233,6 +304,12 @@ class testing(unittest.TestCase):
         my_result = UserService(my_service).update(this_id, u)
         my_row = UserService(my_service).get(this_id)
         self.assertEqual(my_email,my_row.email)
+        
+    def test_webpage_get(self):
+        my_url = "abc.abc"
+        my_ok = webpage_check(self.session,my_url,1)
+        self.assertTrue (my_ok)
+        
     
 if __name__ == '__main__':
     unittest.main()
