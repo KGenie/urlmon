@@ -136,16 +136,18 @@ class testing(unittest.TestCase):
         u = User()
         user_id = create_user (self.session,u,1)
         
+        name_1 = "gabu_1"
+        name_2 = "gabu_2"
+        name_3 = "gabu_3"
+        name_4 = "gabu_4"
+        
+        
         t = TrackerGroup()
                        
         t.user_id = user_id
         t.name = "Test tracker get all by user 1"
         group_id = create_tracker_group (self.session,t)
                 
-        name_1 = "gabu_1"
-        name_2 = "gabu_2"
-        name_3 = "gabu_3"
-        name_4 = "gabu_4"
         
         my_service = TrackerService
         t = Tracker()
@@ -153,11 +155,33 @@ class testing(unittest.TestCase):
         t.name = name_1
         t.url = "tracker_by_user.com"
         TrackerService(my_service).insert(t)
+        self.session.flush()
         t = Tracker()
         t.tracker_group_id = group_id
         t.name = name_2
         t.url = "tracker_by_user.com"
         TrackerService(my_service).insert(t)
+        
+        t = TrackerGroup()
+                       
+        t.user_id = user_id
+        t.name = "Test tracker get all by user 2"
+        group_id = create_tracker_group (self.session,t)
+                
+        
+        my_service = TrackerService
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_3
+        t.url = "tracker_by_user.com"
+        TrackerService(my_service).insert(t)
+        self.session.flush()
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_4
+        t.url = "tracker_by_user.com"
+        TrackerService(my_service).insert(t)
+        
         
         u=User()
         u.id = user_id
@@ -165,11 +189,14 @@ class testing(unittest.TestCase):
         my_result = TrackerService(my_service).get_all_by_user(u)
         self.assertEqual (name_1, my_result[0].name)
         self.assertEqual (name_2, my_result[1].name)
+        self.assertEqual (name_3, my_result[2].name)
+        self.assertEqual (name_4, my_result[3].name)
+        
         my_count = 0
     # Messy - cannot find attribute for number of rows!
         for my_row in my_result:
             my_count = my_count + 1
-        self.assertEqual (my_count,2)
+        self.assertEqual (my_count,4)
         
         
     def test_tracker_group_get_all_by_user(self):
@@ -177,10 +204,9 @@ class testing(unittest.TestCase):
         my_id = create_user (self.session,u,1)
         name_1 = "Name 1"
         name_2 = "Name 2"
+        
         t = TrackerGroup()
-        
-        print_number ("TG for user",my_id)
-        
+                        
         t.user_id = my_id
         t.name = name_1
         create_tracker_group (self.session,t)
