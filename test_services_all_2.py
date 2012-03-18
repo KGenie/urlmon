@@ -70,10 +70,17 @@ def print_number (my_text,my_number):
         print my_text + ": " + my_show
 
 def webpage_check (session,my_url, force_result=None):
-# Fudged for the moment. Just returns force_result
-    return force_result
-
-    
+     if session.query(Webpage).filter(Webpage._url == my_url).count() == 0:
+         return False
+     else:
+         return True
+     
+def webpage_create(session,url):
+    if not webpage_check(session,url):
+        w = Webpage(url)
+        w.url = url
+        session.add(w)
+        
 
     
 class testing(unittest.TestCase):
@@ -332,8 +339,9 @@ class testing(unittest.TestCase):
         self.assertEqual(my_email,my_row.email)
         
     def test_webpage_get(self):
-        my_url = "abc.abc"
-        my_ok = webpage_check(self.session,my_url,1)
+        my_url = "http://www.test_page.abc.com"
+        webpage_create (self.session,my_url)
+        my_ok = webpage_check(self.session,my_url)
         self.assertTrue (my_ok)
         
     
