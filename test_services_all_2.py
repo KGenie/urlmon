@@ -69,7 +69,7 @@ def print_number (my_text,my_number):
             my_show = "None!"
         print my_text + ": " + my_show
 
-def webpage_check (session,my_url, force_result=None):
+def webpage_check (session,my_url):
      if session.query(Webpage).filter(Webpage._url == my_url).count() == 0:
          return False
      else:
@@ -270,15 +270,20 @@ class testing(unittest.TestCase):
         t=Tracker()
         t.tracker_group_id = group_id
         my_name = "Tracker " + self.my_time
+        my_url = self.my_time + "tracker.test"
         t.name = my_name
-        t.url = "1@url.com"     
+        t.url = my_url     
         my_service = TrackerService
         TrackerService(my_service).insert(t)
-        
+    # Check webpage was created as well
+        self.assertTrue(webpage_check(self.session,my_url))
+    
+    # Use 'get all by group' to test.
         g=TrackerGroup()
         g.id = group_id
         my_result = TrackerService(my_service).get_all_by_group(g)
         self.assertEqual (my_name, my_result[0].name)
+        
         
     def test_user_authenticate(self):
     # Test unworkable because of project structure. Fudged to fai.
