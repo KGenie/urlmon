@@ -139,6 +139,101 @@ class testing(unittest.TestCase):
 #       my_id = my_service.registration_request(self.session,rowdata)
         self.assertTrue(my_id)
 
+    def test_tracker_any_with_group(self):
+        u = User()
+        user_id = create_user (self.session,u,1)
+        
+        name_1 = "awg_1"
+        name_2 = "awg_2"
+        
+        
+        t = TrackerGroup()
+                       
+        t.user_id = user_id
+        t.name = "Test tracker any by group 1"
+        group_id = create_tracker_group (self.session,t)
+        
+        my_service = TrackerService
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_1
+        t.url = "any_by_group1.com"
+        TrackerService(my_service).insert(t)
+        self.session.flush()
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_2
+        t.url = "any_by_group2.com"
+        TrackerService(my_service).insert(t)
+        
+        self.assertTrue(TrackerService(my_service).any_with_group(group_id))
+        
+        self.assertTrue(not(TrackerService(my_service).any_with_group(group_id + 1)))
+                       
+        
+
+    def test_tracker_get_all_by_group(self):
+        u = User()
+        user_id = create_user (self.session,u,1)
+        
+        name_1 = "gabg_1"
+        name_2 = "gabg_2"
+        name_3 = "gabg_3"
+        name_4 = "gabg_4"
+        
+        
+        t = TrackerGroup()
+                       
+        t.user_id = user_id
+        t.name = "Test tracker get all by group 1"
+        group_id = create_tracker_group (self.session,t)
+        
+        my_service = TrackerService
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_1
+        t.url = "tracker_by_group.com"
+        TrackerService(my_service).insert(t)
+        self.session.flush()
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_2
+        t.url = "tracker_by_group.com"
+        TrackerService(my_service).insert(t)
+        
+        t = TrackerGroup()
+                       
+        t.user_id = user_id
+        t.name = "Test tracker get all by group 2"
+        group_id = create_tracker_group (self.session,t)
+                
+        my_service = TrackerService
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_3
+        t.url = "tracker_by_grou.com"
+        TrackerService(my_service).insert(t)
+        self.session.flush()
+        t = Tracker()
+        t.tracker_group_id = group_id
+        t.name = name_4
+        t.url = "tracker_by_group.com"
+        TrackerService(my_service).insert(t)
+        
+        g = TrackerGroup()
+        g.id = group_id
+                
+        my_result = TrackerService(my_service).get_all_by_group(g)
+        self.assertEqual (name_3, my_result[0].name)
+        self.assertEqual (name_4, my_result[1].name)
+        
+        my_count = 0
+    # Messy - cannot find attribute for number of rows!
+        for my_row in my_result:
+            my_count = my_count + 1
+        self.assertEqual (my_count,2)
+    
+
     def test_tracker_get_all_by_user(self):
         u = User()
         user_id = create_user (self.session,u,1)
@@ -175,7 +270,6 @@ class testing(unittest.TestCase):
         t.name = "Test tracker get all by user 2"
         group_id = create_tracker_group (self.session,t)
                 
-        
         my_service = TrackerService
         t = Tracker()
         t.tracker_group_id = group_id
@@ -257,6 +351,28 @@ class testing(unittest.TestCase):
         my_result = TrackerGroupService(my_service).get(tracker_group_id)
         my_comment = my_result.comment
         self.assertEqual (my_email, my_comment)
+        
+    def test_tracker_delete(self): 
+        u = User()
+        my_id = create_user (self.session,u,1)
+        name_1 = "Trackers for delete test "
+        t = TrackerGroup()
+        t.user_id = my_id
+        t.name = name_1
+        group_id = create_tracker_group (self.session,t)
+        
+        t=Tracker()
+        t.tracker_group_id = group_id
+        my_name = "Tracker to delete " + self.my_time
+        my_url = self.my_time + "tracker.test"
+        t.name = my_name
+        t.url = my_url     
+        my_service = TrackerService
+        TrackerService(my_service).insert(t)
+        self.session.flush()
+        TrackerService(my_service).delete(t)
+        my_result =  TrackerService(my_service).any_with_group(group_id)
+        self.assertTrue(not(my_result))
    
     def test_tracker_insert(self):
         u = User()
@@ -269,8 +385,8 @@ class testing(unittest.TestCase):
         
         t=Tracker()
         t.tracker_group_id = group_id
-        my_name = "Tracker " + self.my_time
-        my_url = self.my_time + "tracker.test"
+        my_name = "tracker_" + self.my_time
+        my_url = "http://www." + my_name + ".com"
         t.name = my_name
         t.url = my_url     
         my_service = TrackerService
