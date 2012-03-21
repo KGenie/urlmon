@@ -36,7 +36,13 @@ from time import time
 
 import unittest
 
-def create_tracker_group (session,t):
+def create_tracker_group (session,t,add_user=None):
+# Create a user as well?
+    if add_user:
+        u = User()
+        user_id = create_user(session,u,1)
+        t.user_id = user_id
+        
 # Needed for testing in several places.
     my_service = TrackerGroupService
     TrackerGroupService(my_service).insert(t)
@@ -399,7 +405,30 @@ class testing(unittest.TestCase):
         g.id = group_id
         my_result = TrackerService(my_service).get_all_by_group(g)
         self.assertEqual (my_name, my_result[0].name)
+    
+    def test_tracker_update(self): 
+        name_1 = "Trackers for update test "
+        t = TrackerGroup()
+        t.name = name_1
+        group_id = create_tracker_group (self.session,t,1)
         
+        t=Tracker()
+        t.tracker_group_id = group_id
+        my_name = "Tracker to update " + self.my_time
+        my_url = self.my_time + "tracker.test"
+        t.name = my_name
+        t.url = my_url     
+        my_service = TrackerService
+        TrackerService(my_service).insert(t)
+        self.session.flush()
+        my_id = t.id
+        my_name = "Tracker Updated" + self.my_time
+        t.name = my_name
+        TrackerService(my_service).update(my_id,t)
+        my_t =  TrackerService(my_service).get(my_id)
+        self.assertEqual (my_name, my_t.name)
+        self.assertEqual (my_id, my_t.id)
+       
         
     def test_user_authenticate(self):
     # Test unworkable because of project structure. Fudged to fai.
