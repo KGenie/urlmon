@@ -14,6 +14,7 @@ import env
 
 from database.sqlalch import Session
 
+from daemons.webpage import DAEMON as fetcher_daemon
  
 from models.registration import Registration
 from models.task import Task
@@ -101,6 +102,8 @@ def run_once():
     
     session.commit()
 
+    fetcher_daemon.start()
+
 
 def webpage_check (session,my_url):
      if session.query(Webpage).filter(Webpage._url == my_url).count() == 0:
@@ -159,13 +162,22 @@ class testing(unittest.TestCase):
         my_url = "http://www.electricvanandcar.co.uk/home.html"
         my_service = FetcherService
         my_result = FetcherService(my_service).fetch(my_url)
+        print "Fetcher"
         print my_result
+        my_content = my_result.content
+        print my_content
+        print "end"
         
     def test_fetcher_fetch_div(self):
         my_url = "http://www.electricvanandcar.co.uk/home.html"
         my_service = FetcherService
         my_result = FetcherService(my_service).fetch(my_url,"usual")
+        print "Fetcher usual"
         print my_result
+        print my_result.url
+        my_content = my_result.content
+        print my_content
+        print "end"
            
     def test_registration_insert(self):
         
