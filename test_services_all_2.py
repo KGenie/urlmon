@@ -16,11 +16,14 @@ from database.sqlalch import Session
 
  
 from models.registration import Registration
-from models.user import User
+from models.task import Task
 from models.tracker import Tracker
 from models.tracker_group import TrackerGroup
+from models.track_resource import TrackResource
+from models.user import User
 from models.webpage import Webpage
 
+from services.fetcher import FetcherService
 from services.registration import RegistrationService
 from services.tracker import TrackerService
 from services.tracker_group import TrackerGroupService
@@ -75,6 +78,30 @@ def print_number (my_text,my_number):
             my_show = "None!"
         print my_text + ": " + my_show
 
+def run_once():
+    session = Session()
+    print "Initial reset"
+    my_result = session.query(TrackResource).filter(TrackResource.tracker_id > 0)
+    for my_row in my_result:
+        session.delete(my_row)
+        
+    session.query(Task).filter(Task.id > 0).delete()
+    session.query(Tracker).filter(Tracker.id > 0).delete()
+    
+    my_result = session.query(Webpage)
+    for my_row in my_result:
+        session.delete(my_row)
+    
+    session.query(TrackerGroup).filter(TrackerGroup.id > 0).delete()
+    session.query(User).filter(User.id > 0).delete()
+    
+    my_result = session.query(Registration)
+    for my_row in my_result:
+        session.delete(my_row)
+    
+    session.commit()
+
+
 def webpage_check (session,my_url):
      if session.query(Webpage).filter(Webpage._url == my_url).count() == 0:
          return False
@@ -87,6 +114,7 @@ def webpage_create(session,url):
         w.url = url
         session.add(w)
         
+
 
     
 class testing(unittest.TestCase):
@@ -123,10 +151,21 @@ class testing(unittest.TestCase):
         
         self.user_id = my_service.user_insert(self.session,rowdata)
         
-        
                
     def tearDown(self):
         self.session.commit()      
+
+    def test_fetcher_fetch(self):
+        my_url = "http://www.electricvanandcar.co.uk/home.html"
+        my_service = FetcherService
+        my_result = FetcherService(my_service).fetch(my_url)
+        print my_result
+        
+    def test_fetcher_fetch_div(self):
+        my_url = "http://www.electricvanandcar.co.uk/home.html"
+        my_service = FetcherService
+        my_result = FetcherService(my_service).fetch(my_url,"usual")
+        print my_result
            
     def test_registration_insert(self):
         
@@ -397,6 +436,8 @@ class testing(unittest.TestCase):
         t.url = my_url     
         my_service = TrackerService
         TrackerService(my_service).insert(t)
+        self.session.flush()
+        tracker_id = t.id
     # Check webpage was created as well
         self.assertTrue(webpage_check(self.session,my_url))
     
@@ -405,6 +446,19 @@ class testing(unittest.TestCase):
         g.id = group_id
         my_result = TrackerService(my_service).get_all_by_group(g)
         self.assertEqual (my_name, my_result[0].name)
+    # Get tracjer resource
+        my_result = self.session.query(TrackResource).filter(TrackResource.tracker_id == tracker_id)
+        my_count = 0
+        for my_row in my_result:
+            my_tr = my_row.id
+            my_count = my_count + 1
+        
+        self.assertEqual(my_count,1)
+    
+        my_count = self.session.query(Task).filter(Task.id == my_tr).count()
+        self.assertEqual(my_count,1)
+        
+        
     
     def test_tracker_update(self): 
         name_1 = "Trackers for update test "
@@ -435,8 +489,6 @@ class testing(unittest.TestCase):
         my_id = 0
 #       my_id = my_service.registration_request(self.session,rowdata)
         self.assertTrue(my_id)
-        
-    
         
     
     def test_user_exists_fake(self):
@@ -493,7 +545,8 @@ class testing(unittest.TestCase):
         webpage_create (self.session,my_url)
         my_ok = webpage_check(self.session,my_url)
         self.assertTrue (my_ok)
-        
+
+run_once()    
     
 if __name__ == '__main__':
     unittest.main()
