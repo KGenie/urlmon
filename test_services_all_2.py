@@ -158,15 +158,6 @@ class testing(unittest.TestCase):
     def tearDown(self):
         self.session.commit()      
 
-    def test_fetcher_fetch(self):
-        my_url = "http://www.electricvanandcar.co.uk/home.html"
-        my_service = FetcherService
-        my_result = FetcherService(my_service).fetch(my_url)
-        print "Fetcher"
-        print my_result
-        my_content = my_result.content
-        print my_content
-        print "end"
         
     def test_fetcher_fetch_div(self):
         my_url = "http://www.electricvanandcar.co.uk/home.html"
