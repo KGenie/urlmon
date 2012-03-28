@@ -53,10 +53,9 @@ def create_user (session,u,randomly=None):
     my_service = UserService
     
     if randomly:
-        my_time = str(time())
-        u.email = my_time + "@email.com"
-        u.first_name = my_time + ".first"
-        u.last_name = my_time + ".last"
+        u.email = prefix_test ("user@test.com")
+        u.first_name = prefix_test("First",1)
+        u.last_name = prefix_test("Last",1)
     
     UserService(my_service).insert(u)
     session.flush();
@@ -64,11 +63,14 @@ def create_user (session,u,randomly=None):
 
 def create_user_and_tracker_group(session,t):
     u = User()
-    my_id = create_user(u,1)
+    my_id = create_user(session,u,1)
     t.user_id = my_id
     my_id = create_tracker_group(session,t)
     return my_id
     
+def prefix_test (arg_string, no_inc=None):
+    my_number = test_next(no_inc)
+    return str(my_number) + "_" + arg_string
 
 def print_number (my_text,my_number):
 # Prints text then a number. Handles number if null or non-numeric.
@@ -105,6 +107,23 @@ def run_once():
     session.commit()
 
     fetcher_daemon.start()
+
+def test_iteration():
+    null = 0
+    
+test_iteration.counter = 0
+test_iteration.name = ""
+
+def test_name(my_name=None):
+    if my_name:
+        test_iteration.name = my_name
+    return test_iteration.name + "_" + str(test_next(-1))
+
+def test_next(no_inc=None):
+    if not(no_inc):
+        test_iteration.counter = test_iteration.counter + 1
+    print_number ("Test", test_iteration.counter)
+    return test_iteration.counter
 
 
 def webpage_check (session,my_url):
@@ -162,11 +181,10 @@ class testing(unittest.TestCase):
 
         
     def test_fetcher_fetch_div(self):
+        test_name ("Fetcher Fetch")
         my_url = "http://www.electricvanandcar.co.uk/home.html"
         my_service = FetcherService
         my_result = FetcherService(my_service).fetch(my_url,"usual")
-        print "Fetcher usual"
-        print my_result
         print my_result.url
         my_content = my_result.content
         print my_content
