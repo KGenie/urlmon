@@ -40,13 +40,8 @@ from time import time
 
 import unittest
 
-def create_tracker_group (session,t,add_user=None):
-# Create a user as well?
-    if add_user:
-        u = User()
-        user_id = create_user(session,u,1)
-        t.user_id = user_id
-        
+def create_tracker_group (session,t):
+       
 # Needed for testing in several places.
     my_service = TrackerGroupService
     TrackerGroupService(my_service).insert(t)
@@ -66,7 +61,14 @@ def create_user (session,u,randomly=None):
     UserService(my_service).insert(u)
     session.flush();
     return u.id
-            
+
+def create_user_and_tracker_group(session,t):
+    u = User()
+    my_id = create_user(u,1)
+    t.user_id = my_id
+    my_id = create_tracker_group(session,t)
+    return my_id
+    
 
 def print_number (my_text,my_number):
 # Prints text then a number. Handles number if null or non-numeric.
@@ -467,8 +469,7 @@ class testing(unittest.TestCase):
         name_1 = "Trackers for update test "
         t = TrackerGroup()
         t.name = name_1
-        group_id = create_tracker_group (self.session,t,1)
-        
+        group_id = create_user_and_tracker_group (self.session,t)
         t=Tracker()
         t.tracker_group_id = group_id
         my_name = "Tracker to update " + self.my_time
