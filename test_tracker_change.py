@@ -5,7 +5,7 @@ Created on Mar 31, 2012
 '''
 
 '''
-Unit Test for Tracjer Change
+Unit Test for Tracker Change
 
 This is an initial shallow test. It tests basic functions,e.g : Is record created? Does it retrieve?
 It does not do comprehensive tests on every single column.
@@ -114,7 +114,7 @@ def create_tracker_change(session, arg_tc, arg_object=None):
     	return tc.id
 
 
-def create_tracker_group (session, t):
+def create_tracker_group (session, t, return_object=None):
        
 # Needed for testing in several places.
     my_service = TrackerGroupService
@@ -122,7 +122,10 @@ def create_tracker_group (session, t):
         t.name = test_name()
     TrackerGroupService(my_service).insert(t)
     session.flush();
-    return t.id
+    if return_object:
+        return t
+    else:
+        return t.id
 
 def create_user (session, u):
 # Needed for testing in several places.
@@ -168,7 +171,12 @@ def create_webpage_version (session, arg_url=None, arg_content=None, arg_digest=
         wv.digest = arg_digest
     else:
         wv.digest = test_prefix("Digest")
-    wv.datetime = datetime.now() 
+    wv.datetime = datetime.now()
+    
+    print wv.url
+    print wv.content
+    print wv.digest
+     
     session.add(wv)
     session.flush()
     return wv.id    
@@ -275,12 +283,20 @@ class testing(unittest.TestCase):
             print test_name() + " commit failed" 
             self.assertTrue(0)
             
-    def xtest_get_change_base_query_tracker(self):
+    def test_get_change_base_query_tracker(self):
         test_name("Get change base query tracker")
         
         version_id = create_webpage_version(self.session)
     
+        tg = TrackerGroup()
+    
+        tg = create_tracker_group(self.session, tg, -1)
+    
+        tracker_group_id = tg.id
+        user_id = tg.user_id
+        
         t = Tracker()
+        t.tracker_group_id = tracker_group_id
         tracker_1 = create_tracker(self.session, t)
         
         print_number("Tracker", tracker_1)
@@ -288,7 +304,7 @@ class testing(unittest.TestCase):
         tc = TrackerChange()
         tc.tracker_id = tracker_1
         tc.webpage_version_id = version_id
-        create_tracker_change(self.session, tc)
+        tracker_change_1 = create_tracker_change(self.session, tc)
         my_service = TrackerChangeService
         
         t = Tracker()
@@ -296,17 +312,28 @@ class testing(unittest.TestCase):
         my_result = TrackerChangeService(my_service).get_change_base_query(None, None, t)
         self.assertEqual(tracker_1, my_result[0].id)
     
+        my_count = TrackerChangeService(my_service).get_change_count(None, None, t)
+        self.assertEqual(my_count,1)
+        
+        u = User()
+        u.id = user_id
+        my_result = TrackerChangeService(my_service).get_changes(u, None, t)
+        self.assertEqual(tracker_change_1, my_result[0].id)
+        self.assertEqual(1, len(my_result))
     
-    def xtest_get_change_base_query_tracker_group(self):
+        
+    def test_get_change_base_query_tracker_group(self):
         test_name("Get change base query group")
-        
-        
+                
         version_id = create_webpage_version(self.session)
     
         tg = TrackerGroup()
     
-        tracker_group_id = create_tracker_group(self.session, tg)
+        tg = create_tracker_group(self.session, tg, -1)
     
+        tracker_group_id = tg.id
+        user_id = tg.user_id
+        
         t = Tracker()
         t.tracker_group_id = tracker_group_id
         tracker_1 = create_tracker(self.session, t)
@@ -315,23 +342,128 @@ class testing(unittest.TestCase):
         t.tracker_group_id = tracker_group_id
         tracker_2 = create_tracker(self.session, t)
        
+        tg = TrackerGroup()
+        tg.user_id = user_id
+        tracker_group_id = create_tracker_group(self.session, tg)
+       
+              
         tc = TrackerChange()
         tc.tracker_id = tracker_1
         tc.webpage_version_id = version_id
-        create_tracker_change(self.session, tc)
+        tracker_change_1 = create_tracker_change(self.session, tc)
         
         tc = TrackerChange()
         tc.tracker_id = tracker_2
         tc.webpage_version_id = version_id
-        create_tracker_change(self.session, tc)
+        tracker_change_2 = create_tracker_change(self.session, tc)
+       
         
         my_service = TrackerChangeService
         
-        tg = TrackerGroup()
-        tg.id = tracker_group_id
-        my_result = TrackerChangeService(my_service).get_change_base_query(None, tg, None)
+        u = User()
+        u.id = user_id
+        my_result = TrackerChangeService(my_service).get_change_base_query(u, None, None)
         self.assertEqual(tracker_1, my_result[0].id)
         self.assertEqual(tracker_2, my_result[1].id)
+        
+        my_count = TrackerChangeService(my_service).get_change_count(None, tg, None)
+        self.assertEqual(my_count,2)
+    
+        u = User()
+        u.id = user_id
+        my_result = TrackerChangeService(my_service).get_changes(u, tg)
+        self.assertEqual(tracker_change_1, my_result[0].id)
+        self.assertEqual(tracker_change_2, my_result[1].id)
+        self.assertEqual(2, len(my_result))
+        
+    def test_get_change_base_query_tracker_user(self):
+        test_name("Get change base query user")
+                
+        version_id = create_webpage_version(self.session)
+    
+        tg = TrackerGroup()
+    
+        tg = create_tracker_group(self.session, tg, -1)
+    
+        tracker_group_id = tg.id
+        user_id = tg.user_id
+        
+        t = Tracker()
+        t.tracker_group_id = tracker_group_id
+        tracker_1 = create_tracker(self.session, t)
+        
+        t = Tracker()
+        t.tracker_group_id = tracker_group_id
+        tracker_2 = create_tracker(self.session, t)
+       
+        t = Tracker()
+        t.tracker_group_id = tracker_group_id
+        tracker_3 = create_tracker(self.session, t)
+               
+        tc = TrackerChange()
+        tc.tracker_id = tracker_1
+        tc.webpage_version_id = version_id
+        tracker_change_1 = create_tracker_change(self.session, tc)
+        
+        tc = TrackerChange()
+        tc.tracker_id = tracker_2
+        tc.webpage_version_id = version_id
+        tracker_change_2 = create_tracker_change(self.session, tc)
+        
+        tc = TrackerChange()
+        tc.tracker_id = tracker_3
+        tc.webpage_version_id = version_id
+        tracker_change_3 = create_tracker_change(self.session, tc)
+              
+        my_service = TrackerChangeService
+        
+        u = User()
+        u.id = user_id
+        my_result = TrackerChangeService(my_service).get_change_base_query(None, None, None)
+        self.assertEqual(tracker_1, my_result[0].id)
+        self.assertEqual(tracker_2, my_result[1].id)
+        self.assertEqual(tracker_3, my_result[2].id)
+        
+        my_count = TrackerChangeService(my_service).get_change_count(None, tg, None)
+        self.assertEqual(my_count,3)
+    
+        u = User()
+        u.id = user_id
+        my_result = TrackerChangeService(my_service).get_changes(u)
+        self.assertEqual(tracker_change_1, my_result[0].id)
+        self.assertEqual(tracker_change_2, my_result[1].id)
+        self.assertEqual(tracker_change_3, my_result[2].id)
+        self.assertEqual(3, len(my_result))
+        
+    def test_get_last_two_changes(self):   
+        test_name("Get last two changes")
+        t = Tracker()
+        t = create_tracker(self.session,t,-1)
+        tracker_id = t.id
+        my_url = t.url
+        
+        my_content = test_prefix("Content1")
+        my_digest = test_prefix("Digest1")
+        wv_id = create_webpage_version (self.session,my_url, my_content, my_digest)
+        tc = TrackerChange()
+        tc.tracker_id = tracker_id
+        tc.webpage_version_id = wv_id
+        tc = create_tracker_change(self.session, tc, -1)
+        tracker_change_1 = tc.id
+        
+        my_content = test_prefix("Content2")
+        my_digest = test_prefix("Digest2")
+        wv_id = create_webpage_version (self.session,my_url, my_content, my_digest)
+        tc = TrackerChange()
+        tc.tracker_id = tracker_id
+        tc.webpage_version_id = wv_id
+        tc = create_tracker_change(self.session, tc, -1)
+        tracker_change_2 = tc.id
+        
+        my_service = TrackerChangeService
+        my_result = TrackerChangeService(my_service).get_last_two_changes(tc)
+        self.assertEqual(my_result[0].id, tracker_change_1)
+        self.assertEqual(my_result[1].id, tracker_change_2)
        
     def test_get_new_page(self):   
 # Context problems prevent testing.
@@ -370,6 +502,11 @@ class testing(unittest.TestCase):
         my_expected = "<p>" + my_content + "</p>\n"
         self.assertEqual(my_result, my_expected)
         
+        my_result = TrackerChangeService(my_service).get_page_diff(tc)
+        print "Diff"
+        print my_result
+        
+        
     def test_get_previous_pages(self):   
         test_name("Get previous pages")
         t = Tracker()
@@ -396,10 +533,11 @@ class testing(unittest.TestCase):
         my_service = TrackerChangeService
         my_result = TrackerChangeService(my_service).get_previous_page(tc)
         my_expected = "<p>" + my_content + "</p>\n"
-        print my_expected
-        print my_result
         self.assertEqual(my_result, my_expected)
         
+        my_result = TrackerChangeService(my_service).get_page_diff(tc)
+        print "Diff"
+        print my_result
         
 run_once()    
     
