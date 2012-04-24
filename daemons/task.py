@@ -1,3 +1,8 @@
+'''
+20-04-2012, AE    Moved email code to notifications service. This module now call notification service instead of emailing direct
+
+'''
+
 import logging
 from sqlalchemy import desc
 from traceback import format_exc
@@ -20,7 +25,7 @@ from lxml import etree, html
 from database.sqlalch import Session
 from hashlib import sha1
 from htmldiff import change_start_index, htmldiff
-
+from services.notifications import NotificationService
 
 __logger = logging.getLogger('daemons.task')
 debug = __logger.debug
@@ -234,30 +239,13 @@ def run_update_resource(task):
 
 
 def send_warning_mail(task):
-    tracker = task.tracker
-    tracker_group = tracker.tracker_group
-    user = tracker_group.user
-    debug('Sending warning to %s' % user.email)
-
-    subject = 'Warning: The page at %s has changed, but its tracker must be updated.' % tracker.url
-    template_name = 'tracker_not_found'
-    template_context = { 'url': tracker.url }
-
-    mailer_daemon.send_template_mail(user.email, subject, template_name,
-            template_context)
-    debug('Warning successfully sent')
-
+    my_service = NotificationService
+    NotificationService(my_service).notify_no_tracker(task.tracker.id)
+    
 
 def send_mail(tracker, tracker_change, last_tracker_change):
-    tracker_group = tracker.tracker_group
-    user = tracker_group.user
-    debug('Sending notification to %s' % user.email)
-
-    subject = 'The page at %s has changed' % tracker.url
-    template_name = 'tracker_updated'
-    template_context = { 'tracker_change': tracker_change, 
-            'last_tracker_change': last_tracker_change }
-
-    mailer_daemon.send_template_mail(user.email, subject, template_name,
-            template_context)
-    debug('Notification successfully sent')
+    my_service = NotificationService
+    NotificationService(my_service).notify_tracker_change(tracker.id, last_tracker_change.content_short, tracker_change.content_short)
+    
+    
+   

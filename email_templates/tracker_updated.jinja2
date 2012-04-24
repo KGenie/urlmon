@@ -1,14 +1,16 @@
+<!-- 20-04-2012, AE	arguments changed from collection to string -->
+
 <h2>One of your watched web pages has changed!<h2>
 
-<h3>The page is located at {{ tracker_change.tracker_url }}</h3>
+<h3>The page is located at {{ url }}</h3>
 
 <h4>Here is the status:</h4>
 
 <h5>
-"{{ last_tracker_change.content_short }}"</h5>
+"{{ old_content }}"</h5>
 
 <p>Changed to</p>
 
-<h5>"{{ tracker_change.content_short }}"</h5>
+<h5>"{{ new_content }}"</h5>
 
 <p>We will continue to track changes on that page for you!</p>
