@@ -325,6 +325,11 @@ class testing(unittest.TestCase):
         self.assertEqual(td.email, my_email)
         self.assertEqual(td.url,my_url)
         self.assertEqual(td.user_id,my_user_id)
+
+    def test_send_mail_simple(self):
+    # Dummy unit test - just to see if email works.
+        my_service =  NotificationService
+        td = NotificationService(my_service).send_mail_simple ("bazin.frederic@gmail.com","Test from Andy, KGenie VM","Simple non-template mail")        
         
 run_once()    
     

@@ -70,6 +70,10 @@ class TrackerChangeService(StorageService):
 
 
     def get_last_two_changes(self, tracker_change):
+        print "GLTC"
+        print tracker_change.id
+        print tracker_change.tracker_id
+        
         s = self.session
 
         last_two_changes = s.query(TrackerChange).join(WebpageVersion)\
@@ -77,9 +81,15 @@ class TrackerChangeService(StorageService):
                 .filter(TrackerChange.tracker_id == tracker_change.tracker.id)\
                 .order_by(WebpageVersion.date.desc())\
                 .limit(2).all()
-
-        assert len(last_two_changes) >= 1 and \
-                last_two_changes[0].id == tracker_change.id, 'Inconsistent db'
+        
+        print last_two_changes[0].id
+        try:
+            print last_two_changes[1].id
+        except:
+            print "no more"
+        
+   #     assert len(last_two_changes) >= 1 and \
+   #             last_two_changes[0].id == tracker_change.id, 'Inconsistent db'
         return last_two_changes
 
 

@@ -2,9 +2,16 @@ from storage import StorageService
 
 from daemons.mailer import DAEMON as mailer_daemon
 
+from email.mime.text import MIMEText
+
 from models.tracker_group import TrackerGroup
 from models.tracker import Tracker
 from models.user import User
+
+import smtplib, logging, app_globals, os
+
+def smtp_params():
+    null = 0
 
 def tracker_data():
     null = 0
@@ -24,7 +31,8 @@ class NotificationService(StorageService):
         u = self.session.query(User).get(g.user_id)
         tracker_data.email = u.email
         return tracker_data
-        
+    
+    
     def notify_no_tracker (self,tracker_id):
     # Send a warning message where tracker no longer relevant
         td = get_tracker_data(tracker_id) 
@@ -51,4 +59,26 @@ class NotificationService(StorageService):
             template_context)
         debug('Notification successfully sent')
         
-  
+    def send_mail_simple (self, mail_to, mail_subject, mail_content=None, mail_mime='PLAIN', mail_charset='utf-8'):
+        self.smtp_setup()
+        msg = MIMEText(mail_content, mail_mime, mail_charset)
+        msg['Subject'] = mail_subject
+        msg['From'] = smtp_params.sender
+        msg['to'] = mail_to
+        msg['cc'] = "net@a222.co.uk"
+
+        conn = smtplib.SMTP(smtp_params.server, smtp_params.port)
+        conn.ehlo()
+        conn.login(smtp_params.username, smtp_params.password)
+        conn.sendmail(smtp_params.sender, [mail_to], msg.as_string())
+        conn.quit()
+
+    def smtp_setup(self):
+        smtp_params.sender = 'kgenie@a222.biz'
+        smtp_params.server ='mail.a222.co.uk'
+        smtp_params.port = 587
+        smtp_params.username = 'oval@a222.co.uk'
+        smtp_params.password = 'gates98'
+
+        
+        return -1
