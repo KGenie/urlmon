@@ -41,7 +41,7 @@ class NotificationService(StorageService):
         subject = 'Warning: The page at %s has changed, but its tracker must be updated.' % td.url
         template_name = 'tracker_not_found'
         template_context = { 'url': td.url }
-        mailer_daemon.send_template_mail(td.email, subject, template_name,
+        self.send_template_mail(td.email, subject, template_name,
         template_context)
         debug('Warning successfully sent')
 
@@ -59,19 +59,38 @@ class NotificationService(StorageService):
             template_context)
         debug('Notification successfully sent')
         
-    def send_mail_simple (self, mail_to, mail_subject, mail_content=None, mail_mime='PLAIN', mail_charset='utf-8'):
+    def send_mail (self, mail_to, mail_subject, mail_content=None, mail_mime='PLAIN', mail_charset='utf-8',mail_from=None):
         self.smtp_setup()
         msg = MIMEText(mail_content, mail_mime, mail_charset)
         msg['Subject'] = mail_subject
-        msg['From'] = smtp_params.sender
+        if mail_from:
+            msg['From'] = mail_from
+        else:
+            msg['From'] = smtp_params.sender
         msg['to'] = mail_to
-        msg['cc'] = "net@a222.co.uk"
-
+        
         conn = smtplib.SMTP(smtp_params.server, smtp_params.port)
         conn.ehlo()
         conn.login(smtp_params.username, smtp_params.password)
         conn.sendmail(smtp_params.sender, [mail_to], msg.as_string())
         conn.quit()
+        return -1
+        
+    def send_template_mail(self, to, subject, template_name, 
+        template_context, mime='html', charset='utf-8',mail_from=None):
+
+        # Normalize template context
+        for k, v in template_context.items():
+            if isinstance(v, str):
+                template_context[k] = v.decode('utf-8')
+
+
+        env = app_globals.JINJA_EMAIL_ENV
+        templ = env.get_template(template_name + '.jinja2')
+
+        text = templ.render(template_context)
+        return self.send_mail(to, subject, text, mime, charset, mail_from)
+
 
     def smtp_setup(self):
         smtp_params.sender = 'kgenie@a222.biz'

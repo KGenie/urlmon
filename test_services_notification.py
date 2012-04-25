@@ -197,6 +197,13 @@ def generate_email():
 def generate_url():
     return "http://www.kgenie.com/" + test_name_lc()
 
+def mail_args():
+    null = 0
+    
+mail_args.sender = "kgfrom@a222.biz"
+mail_args.to = "kgto@a222.biz"
+mail_args.template_name = "tracker_not_found"
+
  
 def print_number (my_text, my_number):
 # Prints text then a number. Handles number if null or non-numeric.
@@ -326,11 +333,31 @@ class testing(unittest.TestCase):
         self.assertEqual(td.url,my_url)
         self.assertEqual(td.user_id,my_user_id)
 
-    def test_send_mail_simple(self):
-    # Dummy unit test - just to see if email works.
+    def test_send_mail(self):
+    # Will require manual checking of email content
+        test_name ("Send mail")
+        my_to = mail_args.to
+        my_from = mail_args.sender
+                        
+        my_subject = "Simple mail: " + test_name()
+        my_content = "Content: " + test_name()
         my_service =  NotificationService
-        td = NotificationService(my_service).send_mail_simple ("bazin.frederic@gmail.com","Test from Andy, KGenie VM","Simple non-template mail")        
+        td = NotificationService(my_service).send_mail (my_to, my_subject, my_content, None, None, my_from)        
+        self.assertTrue(td)
         
+    def test_send_template_mail(self):
+    # Will require manual checking of email content
+        test_name ("Send template mail")
+        my_to = mail_args.to
+
+        my_subject = "Template mail: " + test_name()
+        my_template = mail_args.template_name
+        my_url = generate_url()
+        my_context = { 'url': my_url }
+        my_service =  NotificationService
+        td = NotificationService(my_service).send_template_mail (my_to, my_subject, my_template, my_context)
+        self.assertTrue(td)        
+            
 run_once()    
     
 if __name__ == '__main__':
