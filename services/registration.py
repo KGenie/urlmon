@@ -3,6 +3,7 @@ from string import Template
 from storage import StorageService
 from daemons.mailer import DAEMON as mailer_daemon
 from models.registration import Registration
+from services.notification import NotificationService
 from helpers import UrlHelper
 from urllib import quote
 
@@ -24,7 +25,8 @@ class RegistrationService(StorageService):
         self.session.add(reg)
         activation_link = self.reconstruct_url(reg.reg_id)
         subject = 'Activate your account on the Web Monitor'
-        mailer_daemon.send_template_mail(user.email, subject, 'activate',
+        my_service = NotificationService
+        NotificationService(my_service).send_template_mail(user.email, subject, 'activate',
                 {'activation_link': activation_link})
 
 
@@ -45,7 +47,8 @@ class RegistrationService(StorageService):
                    
 
     def reconstruct_url(self, reg_id):
-        url = util.reconstruct_url(self.context.environ)
+    #    url = util.reconstruct_url(self.context.environ)
+        url = "http://www.kgenie.com/confirm"
         url += u.action(controller='registration', name='confirm_activation',
                 reg_id=reg_id)
         return url
