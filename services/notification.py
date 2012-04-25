@@ -29,9 +29,9 @@ uh = UrlHelper()
 def mail_enabled():
     null = 0
 # Set to 0 to turn off feature
-mail_enabled.notify_no_tracker = 0
+mail_enabled.notify_no_tracker = -1
 mail_enabled.request_registration = -1
-mail_enabled.notify_tracker_updated = 0
+mail_enabled.notify_tracker_updated = -1
 
 def smtp_params():
     null = 0
