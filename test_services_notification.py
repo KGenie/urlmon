@@ -248,6 +248,9 @@ def test_prefix(my_prefix):
 # increment counter and return appended to supplied string.
     return my_prefix + "_" + str(test_next())
 
+
+
+
 def webpage_check (session, my_url):
      if session.query(Webpage).filter(Webpage._url == my_url).count() == 0:
          return False
@@ -306,6 +309,8 @@ class testing(unittest.TestCase):
             print test_name() + " commit failed" 
             self.assertTrue(0)
 
+
+
     def test_get_tracker_data(self):
         test_name("Get Tracker Data")
 
@@ -333,6 +338,83 @@ class testing(unittest.TestCase):
         self.assertEqual(td.url,my_url)
         self.assertEqual(td.user_id,my_user_id)
 
+    def test_notify_no_tracker(self):
+        test_name("Notify No tracker")
+
+        u = User()
+        my_email = test_prefix("kg") + "@a222.biz"
+        u.email = my_email
+        my_user_id = create_user(self.session,u)
+        tg = TrackerGroup()
+        tg.user_id = my_user_id
+        tracker_group_id = create_tracker_group(self.session,tg)
+       
+        t = Tracker()
+        my_css_selector = test_prefix("css")
+        t.css_selector = my_css_selector
+        my_url = generate_url()
+        t.url = my_url
+        t.tracker_group_id = tracker_group_id
+        tracker_id = create_tracker(self.session,t)
+
+        my_service =  NotificationService
+        td = NotificationService(my_service).notify_no_tracker(tracker_id)
+
+        print "Email values:-"
+        print my_email
+        print my_url
+        print "(end)"
+
+        self.assertTrue(td)
+
+    def test_notify_tracker_updated(self):
+        test_name("Notify Tracker updated")
+
+        u = User()
+        my_email = test_prefix("kg") + "@a222.biz"
+        u.email = my_email
+        my_user_id = create_user(self.session,u)
+        tg = TrackerGroup()
+        tg.user_id = my_user_id
+        tracker_group_id = create_tracker_group(self.session,tg)
+       
+        t = Tracker()
+        my_css_selector = test_prefix("css")
+        t.css_selector = my_css_selector
+        my_url = generate_url()
+        t.url = my_url
+        t.tracker_group_id = tracker_group_id
+        tracker_id = create_tracker(self.session,t)
+
+        old_content = test_prefix("Old")
+        new_content = test_prefix("New")
+        my_service =  NotificationService
+        td = NotificationService(my_service).notify_tracker_updated(tracker_id, old_content, new_content)
+
+        print "Email values:-"
+        print my_email
+        print my_url
+        print old_content
+        print new_content
+        print "(end)"
+
+        self.assertTrue(td)    
+
+    def test_request_registration(self):
+        test_name ("Request Registration")
+        u = User()
+        u.email = test_prefix ("kg") + "@a222.biz"
+        reg = Registration(u)
+        reg.email = u.email
+        self.session.add(reg)
+        reg_id = reg.reg_id
+
+        test_url = "http://fake.kgenie.com/registration"
+        my_service =  NotificationService
+        my_ok = NotificationService(my_service).request_registration (reg_id, test_url)
+        self.assertTrue(my_ok)
+        print "Check for email to %s" % u.email
+
     def test_send_mail(self):
     # Will require manual checking of email content
         test_name ("Send mail")
@@ -342,7 +424,17 @@ class testing(unittest.TestCase):
         my_subject = "Simple mail: " + test_name()
         my_content = "Content: " + test_name()
         my_service =  NotificationService
-        td = NotificationService(my_service).send_mail (my_to, my_subject, my_content, None, None, my_from)        
+        td = NotificationService(my_service).send_mail (my_to, my_subject, my_content, None, None, my_from)
+        
+        print "Email values:-"
+        print my_to
+        print my_subject
+        print my_content
+        print my_from
+        print "(end)"
+        
+        
+                
         self.assertTrue(td)
         
     def test_send_template_mail(self):
@@ -356,7 +448,16 @@ class testing(unittest.TestCase):
         my_context = { 'url': my_url }
         my_service =  NotificationService
         td = NotificationService(my_service).send_template_mail (my_to, my_subject, my_template, my_context)
-        self.assertTrue(td)        
+        
+        print "Email values:-"
+        print my_to
+        print my_subject
+        print my_url
+        print "(end)"
+               
+        self.assertTrue(td)
+        
+    
             
 run_once()    
     

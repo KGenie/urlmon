@@ -33,6 +33,30 @@ Created on Mar 31, 2012
 
 @author: bernard
 '''
+def create_registration(session,arg_email=None):
+    
+    r = Registration()
+
+    u = User()
+    
+    if not arg_email:
+        arg_email = generate_email()
+    
+    u.email = arg_email
+    
+    session.query(User).filter(User.email == arg_email).delete()
+    
+    u.first_name = "First"
+    u.last_name = test_name();
+        
+    r.email = arg_email
+    r.user = u
+    my_id = test_prefix("1234")
+    r.reg_id = my_id
+    session.add(r)
+    session.flush()
+    return r.reg_id
+        
 def generate_email():
     return test_name_lc() + "@kgenie.com"
 
@@ -72,8 +96,8 @@ def test_next():
     test_iteration.counter = test_iteration.counter + 1
     return test_iteration.counter
 
-def test_suffix(my_suffix):
-    return my_suffix + "_" + str(test_next())
+def test_prefix(my_prefix):
+    return my_prefix + "_" + str(test_next())
 
 
 
@@ -85,6 +109,10 @@ def run_once():
     my_result = session.query(Registration)
     for my_row in my_result:
         session.delete(my_row)
+    
+   
+    
+    
     
     session.commit()
     
@@ -101,36 +129,38 @@ class testing(unittest.TestCase):
         except:
             print test_name() + " commit failed" 
             self.assertTrue(0)
-            
-
            
-    def test_registration_insert(self):
-        test_name("Registration Insert");        
+    def test_activate_user(self):
+        test_name("Activate User");
+        my_email = generate_email()
+        reg_id = create_registration (self.session, my_email)
         my_service = RegistrationService
-        r = Registration()
-        r.email = generate_email()
-        r.email = "bazin.frederic@gmail.com"
-        my_id = test_suffix("1234")
-        r.reg_id = my_id
-        RegistrationService(my_service).insert(r)
-        self.session.flush()
-        self.assertEqual(my_id,r.reg_id)
+        RegistrationService(my_service).activate_user(reg_id)
+        q = self.session.query(User).filter(User.email == my_email)
+        self.assertEqual(1,q.count())
+        
+    def test_pending(self):
+        test_name("Pending");
+        my_email = generate_email()
+        reg_id = create_registration (self.session, my_email)
+        my_email = generate_email()
+        reg_id = create_registration (self.session, my_email)
+        my_service = RegistrationService
+        pr = RegistrationService(my_service).pending(my_email)
+        self.assertTrue(pr)
+        my_email = generate_email()
+        pr = RegistrationService(my_service).pending(my_email)
+        self.assertTrue(not(pr))
                
     def test_registration_request(self):
-    # Unit testing not possible. This is because the Service references context data which cannot be emulated in unit-test. Accordingly test is set to fail.
         test_name("Registration Request");
         u = User()
-        u.email = "kg@a222.biz"
+        u.email = test_prefix("kg") + "@a222.biz"
         my_service = RegistrationService
         my_id = RegistrationService(my_service).request_registration(u)
         self.assertTrue(my_id)
+        print "Check email to %s for results" % u.email
 
-    def test_reconstruct_url(self):
-    # Initial test, not true unittest at this time.
-        my_reg = "1234"
-        my_service = RegistrationService
-        my_url = RegistrationService(my_service).reconstruct_url(my_reg)
-        print my_url
            
 
 run_once()    

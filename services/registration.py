@@ -19,17 +19,7 @@ u = UrlHelper()
 
 class RegistrationService(StorageService):
 
-    def request_registration(self, user):
-        reg = Registration(user)
-        reg.email = user.email
-        self.session.add(reg)
-        activation_link = self.reconstruct_url(reg.reg_id)
-        subject = 'Activate your account on the Web Monitor'
-        my_service = NotificationService
-        NotificationService(my_service).send_template_mail(user.email, subject, 'activate',
-                {'activation_link': activation_link})
-
-
+   
     def activate_user(self, reg_id):
         
         ret = None
@@ -46,14 +36,22 @@ class RegistrationService(StorageService):
         return ret
                    
 
-    def reconstruct_url(self, reg_id):
-    #    url = util.reconstruct_url(self.context.environ)
+    def base_url(self):
+    # Subject to parameterisation
         url = "http://www.kgenie.com/confirm"
-        url += u.action(controller='registration', name='confirm_activation',
-                reg_id=reg_id)
         return url
 
 
     def pending(self, email):
         return self.session.query(Registration).\
                 filter(Registration.email == email).count() > 0
+                
+    def request_registration(self, user):
+        reg = Registration(user)
+        reg.email = user.email
+        self.session.add(reg)
+        reg_id = reg.reg_id
+        base_url = self.base_url() 
+        my_service = NotificationService
+        return NotificationService(my_service).request_registration (reg_id, base_url)
+
