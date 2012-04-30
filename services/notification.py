@@ -100,7 +100,7 @@ class NotificationService(StorageService):
         if not mail_enabled.notify_no_tracker:
             return -1
         td = self.get_tracker_data(tracker_id) 
-        subject = 'Warning: The page at %s has changed,<br> but its tracker must be updated.' % td.url
+        subject = 'Warning: The page at %s has changed, but its tracker must be updated.' % td.url
         template_name = 'tracker_not_found'
         template_context = { 'url': td.url , 'tracker_name' : td.name, 'group_name': td.group_name}
         return self.send_template_mail(td.email, subject, template_name,
