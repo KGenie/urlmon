@@ -53,9 +53,9 @@ class RegistrationController(WebMonitorController):
     @post
     def activate(self, request):
         reg_id = request.POST.get('reg_id', None)
-
+        my_url = util.reconstruct_url(self.context.environ)
         if reg_id:
-            user = self.registration_service.activate_user(reg_id)
+            user = self.registration_service.activate_user(reg_id, my_url)
             if user:
                 self.session['user'] = user
                 return self.redirect('main', 'home')

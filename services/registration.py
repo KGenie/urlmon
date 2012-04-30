@@ -20,7 +20,7 @@ u = UrlHelper()
 class RegistrationService(StorageService):
 
    
-    def activate_user(self, reg_id):
+    def activate_user(self, reg_id, arg_url):
         
         ret = None
         reg = self.session.query(Registration).get(reg_id)
@@ -32,7 +32,9 @@ class RegistrationService(StorageService):
             self.session.expunge(user)
             self.session.delete(reg)
             self.session.commit()
-            ret = user 
+            ret = user
+            my_service = NotificationService
+            return NotificationService(my_service).confirm_registration (user.id, arg_url)
         return ret
                    
     def pending(self, email):

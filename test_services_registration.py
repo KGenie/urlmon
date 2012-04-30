@@ -132,10 +132,11 @@ class testing(unittest.TestCase):
            
     def test_activate_user(self):
         test_name("Activate User");
-        my_email = generate_email()
+        my_email = test_prefix("kg") + "@a222.biz"
         reg_id = create_registration (self.session, my_email)
         my_service = RegistrationService
-        RegistrationService(my_service).activate_user(reg_id)
+        my_url = "http://registration_test.kgenie.com"
+        RegistrationService(my_service).activate_user(reg_id,my_url)
         q = self.session.query(User).filter(User.email == my_email)
         self.assertEqual(1,q.count())
         

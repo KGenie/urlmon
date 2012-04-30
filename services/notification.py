@@ -9,6 +9,8 @@ MAINTENANCE NOTE: Various notifications can be turned on and off by changing mai
 
 '''
 
+import re
+
 from storage import StorageService
 
 from daemons.mailer import DAEMON as mailer_daemon
@@ -52,7 +54,21 @@ def tracker_data():
 
 class NotificationService(StorageService):
     
-    
+    def confirm_registration(self,user_id, base_url):
+        if not mail_enabled.request_registration:
+            return -1
+        
+        u = self.session.query(User).get(user_id)
+        subject = 'Your account is now active'
+        template_name = 'confirm_registration'
+        template_context = {'email': u.email, 'url': base_url }
+        return self.send_template_mail(u.email, subject, template_name,
+        template_context)
+        
+        
+        
+        
+        
         
     def get_registration_data(self, registration_id):
     # Populate registration_data with tracker related data.
@@ -84,9 +100,9 @@ class NotificationService(StorageService):
         if not mail_enabled.notify_no_tracker:
             return -1
         td = self.get_tracker_data(tracker_id) 
-        subject = 'Warning: The page at %s has changed, but its tracker must be updated.' % td.url
+        subject = 'Warning: The page at %s has changed,<br> but its tracker must be updated.' % td.url
         template_name = 'tracker_not_found'
-        template_context = { 'url': td.url }
+        template_context = { 'url': td.url , 'tracker_name' : td.name, 'group_name': td.group_name}
         return self.send_template_mail(td.email, subject, template_name,
         template_context)
         
@@ -121,7 +137,10 @@ class NotificationService(StorageService):
     def send_mail (self, mail_to, mail_subject, mail_content=None, mail_mime='PLAIN', mail_charset='utf-8',mail_from=None):
     # Send a mail in specified format. Argument mail_from may be used to override the default 'from' mail in the SMTP setup.
         msg = MIMEText(mail_content, mail_mime, mail_charset)
+    
+            
         msg['Subject'] = mail_subject
+                
         if mail_from:
             msg['From'] = mail_from
         else:

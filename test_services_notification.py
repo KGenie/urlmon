@@ -309,7 +309,20 @@ class testing(unittest.TestCase):
             print test_name() + " commit failed" 
             self.assertTrue(0)
 
-
+    def test_confirm_registration(self):
+        test_name("Confirm Registration")
+        u = User()
+        my_email = test_prefix("kg") + "@a222.biz"
+        u.email = my_email
+        my_user_id = create_user(self.session,u)
+        my_url = "http://notification_test.kgenie.com"
+        my_service =  NotificationService
+        my_ok = NotificationService(my_service).confirm_registration(my_user_id,my_url)
+        self.assertTrue(my_ok)
+        print "Email details for %s" % test_name()
+        print my_email
+        print my_url
+        
 
     def test_get_tracker_data(self):
         test_name("Get Tracker Data")
