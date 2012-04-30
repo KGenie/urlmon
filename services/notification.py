@@ -36,6 +36,13 @@ mail_enabled.notify_tracker_updated = -1
 def smtp_params():
     null = 0
 
+smtp_params.sender = 'kgenie@a222.biz'
+smtp_params.server ='mail.a222.co.uk'
+smtp_params.port = 587
+smtp_params.username = 'oval@a222.co.uk'
+smtp_params.password = 'gates98'
+      
+
 def registration_data():
     null = 0
 
@@ -62,7 +69,9 @@ class NotificationService(StorageService):
         t = self.session.query(Tracker).get(tracker_id)
         tracker_data.css_selector = t.css_selector
         tracker_data.url = t.url
+        tracker_data.name = t.name
         g = self.session.query(TrackerGroup).get(t.tracker_group_id)
+        tracker_data.group_name = g.name
         tracker_data.user_id = g.user_id
         u = self.session.query(User).get(g.user_id)
         tracker_data.email = u.email
@@ -90,9 +99,10 @@ class NotificationService(StorageService):
         
         td = self.get_tracker_data(tracker_id)
         
+              
         subject = 'The page at %s has changed' % td.url
         template_name = 'tracker_updated'
-        template_context = { 'url': td.url, 'old_content': old_content, 
+        template_context = { 'url': td.url, 'tracker_name' : td.name, 'group_name': td.group_name, 'old_content': old_content, 
             'new_content': new_content }
 
         return self.send_template_mail(td.email, subject, template_name,
@@ -110,7 +120,6 @@ class NotificationService(StorageService):
         
     def send_mail (self, mail_to, mail_subject, mail_content=None, mail_mime='PLAIN', mail_charset='utf-8',mail_from=None):
     # Send a mail in specified format. Argument mail_from may be used to override the default 'from' mail in the SMTP setup.
-        self.smtp_setup()
         msg = MIMEText(mail_content, mail_mime, mail_charset)
         msg['Subject'] = mail_subject
         if mail_from:
@@ -143,12 +152,4 @@ class NotificationService(StorageService):
         return self.send_mail(to, subject, text, mime, charset, mail_from)
 
 
-    def smtp_setup(self):
-    # Hardcoded at the moment.
-        smtp_params.sender = 'kgenie@a222.biz'
-        smtp_params.server ='mail.a222.co.uk'
-        smtp_params.port = 587
-        smtp_params.username = 'oval@a222.co.uk'
-        smtp_params.password = 'gates98'
-       
-        return -1
+    

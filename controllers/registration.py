@@ -1,9 +1,14 @@
+'''
+26-Apr-2012,Andy:    Reconstruct URL here and pass to service (Registration)
+'''
+
+import util
 from app_components.controller import WebMonitorController
 from wsgi.auth import auth
 from wsgi.http_method import get, post
 from wtforms.validators import ValidationError
 from forms.registration import RegistrationForm
-from helpers import menu
+from helpers import menu, UrlHelper
 from models.user import User
 from services.registration import RegistrationService
 from services.user import UserService
@@ -31,7 +36,8 @@ class RegistrationController(WebMonitorController):
         if form.validate():
             user = User()
             form.populate_obj(user)
-            self.registration_service.request_registration(user)
+            my_url = util.reconstruct_url(self.context.environ)
+            self.registration_service.request_registration(user,my_url)
             return self.redirect(controller='home', action='main')
         else:
             return self.view({'form': form}, 'new')

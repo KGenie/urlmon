@@ -147,7 +147,7 @@ def run_once():
         session.delete(my_row)
     
     session.query(TrackerGroup).filter(TrackerGroup.id > 0).delete()
-    session.query(User).filter(User.id > 0).delete()
+    
     
     
     session.commit()
@@ -227,13 +227,13 @@ class testing(unittest.TestCase):
         self.assertEqual (my_email, my_comment)
            
         
-    def xtest_user_authenticate(self):
+    def test_user_authenticate(self):
     # Unit testing not possible. This is because the Service references context data which cannot be emulated in unit-test. Accordingly test is set to fail.
         test_name ("User Authenticate")
     # Test unworkable because of project structure. Fudged to fai.
         my_id = 0
 #       my_id = my_service.registration_request(self.session,rowdata)
-        self.assertTrue(my_id)
+        self.assertTrue(my_id,"Test not workable because of context issues")
         
     
     def test_user_exists_fake(self):

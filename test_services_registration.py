@@ -156,8 +156,9 @@ class testing(unittest.TestCase):
         test_name("Registration Request");
         u = User()
         u.email = test_prefix("kg") + "@a222.biz"
+        test_url = "http://fake.kgenie.com"
         my_service = RegistrationService
-        my_id = RegistrationService(my_service).request_registration(u)
+        my_id = RegistrationService(my_service).request_registration(u,test_url)
         self.assertTrue(my_id)
         print "Check email to %s for results" % u.email
 

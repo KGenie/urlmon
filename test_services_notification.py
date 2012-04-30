@@ -408,8 +408,7 @@ class testing(unittest.TestCase):
         reg.email = u.email
         self.session.add(reg)
         reg_id = reg.reg_id
-
-        test_url = "http://fake.kgenie.com/registration"
+        test_url = "http://fake.kgenie.com"
         my_service =  NotificationService
         my_ok = NotificationService(my_service).request_registration (reg_id, test_url)
         self.assertTrue(my_ok)

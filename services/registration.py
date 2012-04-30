@@ -35,23 +35,15 @@ class RegistrationService(StorageService):
             ret = user 
         return ret
                    
-
-    def base_url(self):
-    # Subject to parameterisation
-        url = "http://www.kgenie.com/confirm"
-        return url
-
-
     def pending(self, email):
         return self.session.query(Registration).\
                 filter(Registration.email == email).count() > 0
                 
-    def request_registration(self, user):
+    def request_registration(self, user, base_url):
         reg = Registration(user)
         reg.email = user.email
         self.session.add(reg)
         reg_id = reg.reg_id
-        base_url = self.base_url() 
         my_service = NotificationService
         return NotificationService(my_service).request_registration (reg_id, base_url)
 
