@@ -12,6 +12,8 @@ It does not do comprehensive tests on every single column.
 
 Be warned: produces many rows of data! 
 
+NOTE. You can change the destination email and return address by altering mail_args 
+
 '''
 import env
 

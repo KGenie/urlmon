@@ -6,6 +6,9 @@ It does not do comprehensive tests on every single column.
 
 Be warned: produces many rows of data! 
 
+NOTE: You can change the email destination for activate_user and registration_request by changing 
+email_suffix.
+
 '''
 import env
 
@@ -33,6 +36,9 @@ Created on Mar 31, 2012
 
 @author: bernard
 '''
+
+email_suffix = "_test@a222.biz"
+
 def create_registration(session,arg_email=None):
     
     r = Registration()
@@ -132,7 +138,7 @@ class testing(unittest.TestCase):
            
     def test_activate_user(self):
         test_name("Activate User");
-        my_email = test_prefix("kg") + "@a222.biz"
+        my_email = test_prefix("kg") + email_suffix
         reg_id = create_registration (self.session, my_email)
         my_service = RegistrationService
         my_url = "http://registration_test.kgenie.com"
@@ -156,7 +162,7 @@ class testing(unittest.TestCase):
     def test_registration_request(self):
         test_name("Registration Request");
         u = User()
-        u.email = test_prefix("kg") + "@a222.biz"
+        u.email = test_prefix("kg") + email_suffix
         test_url = "http://fake.kgenie.com"
         my_service = RegistrationService
         my_id = RegistrationService(my_service).request_registration(u,test_url)
