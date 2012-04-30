@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from storage import StorageService
 from models.tracker import Tracker
+from models.tracker_change import TrackerChange
 from models.tracker_group import TrackerGroup
 from models.track_resource import TrackResource
 from models.webpage import Webpage
@@ -42,7 +43,6 @@ class TrackerService(StorageService):
 
 
     def insert(self, tracker):
-        print "insert"
         self.before_insert(tracker)
         tracker = super(TrackerService, self).insert(tracker)
         self.after_insert(tracker)
@@ -51,11 +51,18 @@ class TrackerService(StorageService):
 
     def before_delete(self, tracker):
         s = self.session
-        tasks = s.query(TrackResource).filter(TrackResource.tracker_id ==
+        rows = s.query(TrackResource).filter(TrackResource.tracker_id ==
+                tracker.id).all()
+        if rows:
+            for row in rows:
+                s.delete(row)
+
+        tasks = s.query(TrackerChange).filter(TrackerChange.tracker_id ==
                 tracker.id).all()
         if tasks:
             for task in tasks:
                 s.delete(task)
+
 
 
     def delete(self, tracker):

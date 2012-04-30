@@ -20,11 +20,12 @@ from database.sqlalch import Session
 from models.registration import Registration
 from models.task import Task
 from models.tracker import Tracker
+from models.tracker_change import TrackerChange
 from models.tracker_group import TrackerGroup
 from models.track_resource import TrackResource
 from models.user import User
 from models.webpage import Webpage
-
+from models.webpage_version import WebpageVersion
 
 from services.registration import RegistrationService
 from services.tracker import TrackerService
@@ -153,16 +154,23 @@ def run_once():
         session.delete(my_row)
         
     session.query(Task).filter(Task.id > 0).delete()
-    session.query(Tracker).filter(Tracker.id > 0).delete()
+    session.query(TrackerChange).filter(TrackerChange.tracker_id > 0).delete()
     
-    my_result = session.query(Webpage)
-    for my_row in my_result:
-        session.delete(my_row)
+    session.query(Tracker).filter(Tracker.id > 0).delete()
     
     session.query(TrackerGroup).filter(TrackerGroup.id > 0).delete()
     session.query(User).filter(User.id > 0).delete()
     
+    my_result = session.query(WebpageVersion)
+    for my_row in my_result:
+        session.delete(my_row)
+    
+    
     my_result = session.query(Registration)
+    for my_row in my_result:
+        session.delete(my_row)
+    
+    my_result = session.query(Webpage)
     for my_row in my_result:
         session.delete(my_row)
     
@@ -369,10 +377,34 @@ class testing(unittest.TestCase):
         t=Tracker()
         t.tracker_group_id = group_id
         t.name = test_name()
-        t.url = generate_url()
+        my_url = generate_url()
+        t.url = my_url
         my_service = TrackerService
         TrackerService(my_service).insert(t)
         self.session.flush()
+        
+        wv = WebpageVersion(my_url)
+        wv.url = my_url
+        wv.content = "Content"
+        wv.digest = "Digest"
+        self.session.add(wv)
+        self.session.flush 
+        
+        tc = TrackerChange()
+        tc.tracker_id = t.id
+        tc.webpage_version_id = wv.id
+        tc.content = "Content"
+        tc.current_css_selector = "CSS Selector"
+        tc.digest = "Digest"
+        tc.start_index = 123
+        self.session.add(tc)
+
+        tr = TrackResource()
+        tr.tracker_id = t.id
+        self.session.add(tr)
+
+        
+        my_service = TrackerService
         TrackerService(my_service).delete(t)
         my_result =  TrackerService(my_service).any_with_group(group_id)
         self.assertTrue(not(my_result))
