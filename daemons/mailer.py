@@ -1,9 +1,18 @@
+'''
+Mail Daemon
+
+02-05-2012, Andy    Refactored. Added syncronous operation.
+
+Referenced via method 'send_mail'
+
+Sends mail asychronously unless daemon not started in which case sends sychronously
+
+'''
+
 import smtplib, logging, app_globals, os
 from traceback import format_exc
 from controllable import ControllableDaemon
 from email.mime.text import MIMEText
-from helpers import HtmlHelper, UrlHelper
-from jinja2 import Environment, FileSystemLoader
 
 __logger = logging.getLogger('daemons.controllable.mailer')
 debug = __logger.debug
@@ -11,32 +20,18 @@ warn = __logger.warn
 error = __logger.error
 info = __logger.info
 
+def smtp_params():
+    null = 0
 
-
-
-def make_jinja_email_environment():
-    ret = Environment(loader=FileSystemLoader(
-        os.path.join(app_globals.APP_ROOT, 'email_templates')))
-    ret.globals['h'] = HtmlHelper()
-    ret.globals['u'] = UrlHelper()
-    return ret
-
+smtp_params.sender = 'kgenie@a222.biz'
+smtp_params.server ='mail.a222.co.uk'
+smtp_params.port = 587
+smtp_params.username = 'oval@a222.co.uk'
+smtp_params.password = 'gates98'
 
 class Mailer(ControllableDaemon):
-
-    def __init__(self, 
-            sender='thiago.arruda@live.com',
-            smtp_server='smtp.live.com',
-            port=587,
-            username='thiago.arruda@live.com',
-            password='ark123ark'):
+    def __init__(self):
         ControllableDaemon.__init__(self)
-        self.sender = sender
-        self.smtp_server = smtp_server
-        self.port = port
-        self.username = username
-        self.password = password
-
 
     def process_message(self, message):
         debug('Mail arrived, trying to send it...')
@@ -44,71 +39,56 @@ class Mailer(ControllableDaemon):
             method = message[0]
             args = message[1:]
             debug('Method is %s' % method)
-            if method == 'PLAIN':
-                self.__send_mail(*args)
-            elif method == 'TEMPLATE':
-                self.__send_template_mail(*args)
-            else:
-                error('Unknown method: %s')
+            self.__send_mail(*args)
         except Exception as e:
             error('Error ocurred while sending mail: %s', format_exc(e))
         else:
             debug('Mail successfully sent!')
 
 
-    def __send_mail(self, to, subject, text, mime='plain', charset='utf-8'):
-        msg = MIMEText(text, mime, charset)
-        msg['Subject'] = subject
-        msg['From'] = self.sender
-        msg['to'] = to
-
-        # TODO activate this when we have a working smtp server
-        #conn = smtplib.SMTP(self.smtp_server, self.port)
-        #conn.starttls()
-        #conn.ehlo()
-        #conn.login(self.username, self.password)
-        #conn.sendmail(self.sender, [to], msg.as_string())
-        #conn.quit()
-
-
-    def __send_template_mail(self, to, subject, template_name, 
-            template_context, mime='html', charset='utf-8'):
-
-        # Normalize template context
-        for k, v in template_context.items():
-            if isinstance(v, str):
-                template_context[k] = v.decode('utf-8')
-
-
-        env = app_globals.JINJA_EMAIL_ENV
-        templ = env.get_template(template_name + '.jinja2')
-
-        text = templ.render(template_context)
-
-
-        msg = MIMEText(text, mime, charset)
-        msg['Subject'] = subject
-        msg['From'] = self.sender
-        msg['to'] = to
-
-#        conn = smtplib.SMTP(self.smtp_server, self.port)
-#        conn.starttls()
-#        conn.ehlo()
-#        conn.login(self.username, self.password)
-#        conn.sendmail(self.sender, [to], msg.as_string())
-#        conn.quit()
-
-
-    def send_mail(self, email, subject, msg):
-        self.send(('PLAIN', email, subject, msg))
-
-
-    def send_template_mail(self, to, subject, template_name, 
-            template_context):
-        self.send(('TEMPLATE', to, subject, template_name, 
-            template_context))
-
-
+    def __send_mail (self, mail_to, mail_subject, mail_content="", mail_mime='PLAIN', mail_charset='utf-8',mail_from=None):
+    # Send a mail in specified format. Argument mail_from may be used to override the default 'from' mail in the SMTP setup.
+        
+    # Defaulting does not seem effective, coded here to compensate:
+        if not mail_charset:
+            mail_charset = "utf-8"
+        
+        if not mail_mime:
+            mail_mime = "PLAIN"
+                
+        
+        msg = MIMEText(mail_content, mail_mime, mail_charset)
+        
+        print "mailer"
+        print mail_mime
+        print mail_charset
+            
+        msg['Subject'] = mail_subject
+                
+        if mail_from:
+            msg['From'] = mail_from
+        else:
+            msg['From'] = smtp_params.sender
+        msg['to'] = mail_to
+        
+     
+        
+        conn = smtplib.SMTP(smtp_params.server, smtp_params.port)
+        conn.ehlo()
+        conn.login(smtp_params.username, smtp_params.password)
+        conn.sendmail(smtp_params.sender, [mail_to], msg.as_string())
+        conn.quit()
+        
+        
+    def send_mail (self, mail_to, mail_subject, mail_content=None, mail_mime=None, mail_charset=None,mail_from=None):
+        try:
+            self.send(('ALL',mail_to, mail_subject, mail_content, mail_mime, mail_charset, mail_from))
+            debug ("async")
+            return 1
+        except:
+            self.__send_mail(mail_to, mail_subject, mail_content, mail_mime, mail_charset,mail_from)
+            debug ("sync")
+            return 2
 
 DAEMON = Mailer()
-app_globals.JINJA_EMAIL_ENV = make_jinja_email_environment()
+
