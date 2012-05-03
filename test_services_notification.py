@@ -10,9 +10,9 @@ Unit Test for Notifications
 This is an initial shallow test. It tests basic functions,e.g : Is record created? Does it retrieve?
 It does not do comprehensive tests on every single column.
 
-Be warned: produces many rows of data! 
+Be warned: produces many rows of data!
 
-NOTE. You can change the destination email and return address by altering mail_args 
+NOTE. You can change the destination email and return address by altering mail_args
 
 '''
 import env
@@ -98,7 +98,7 @@ def create_tracker_change(session, arg_tc, arg_object=None):
     tc = TrackerChange()
        
     tc.tracker_id = arg_tc.tracker_id
-    tc.webpage_version_id = arg_tc.webpage_version_id   
+    tc.webpage_version_id = arg_tc.webpage_version_id
     
     t = Tracker()
     
@@ -170,7 +170,7 @@ def create_webpage(session, url):
         print "Created " + url
         
 def create_webpage_version (session, arg_url=None, arg_content=None, arg_digest=None):
-    if  not arg_url:
+    if not arg_url:
         arg_url = generate_url()
     create_webpage (session, arg_url)
     print "Creating version of " + arg_url
@@ -191,7 +191,7 @@ def create_webpage_version (session, arg_url=None, arg_content=None, arg_digest=
      
     session.add(wv)
     session.flush()
-    return wv.id    
+    return wv.id
 
 def generate_email():
     return test_name_lc() + "@kgenie.com"
@@ -242,7 +242,7 @@ def test_name_lc ():
     return my_name
 
 def test_next():
-# Increment stored counter each time this is called.  
+# Increment stored counter each time this is called.
     test_iteration.counter = test_iteration.counter + 1
     return test_iteration.counter
 
@@ -308,7 +308,7 @@ class testing(unittest.TestCase):
             self.session.commit()
             print test_name() + " committed"
         except:
-            print test_name() + " commit failed" 
+            print test_name() + " commit failed"
             self.assertTrue(0)
 
     def test_confirm_registration(self):
@@ -318,7 +318,7 @@ class testing(unittest.TestCase):
         u.email = my_email
         my_user_id = create_user(self.session,u)
         my_url = "http://notification_test.kgenie.com"
-        my_service =  NotificationService
+        my_service = NotificationService
         my_ok = NotificationService(my_service).confirm_registration(my_user_id,my_url)
         self.assertTrue(my_ok)
         print "Email details for %s" % test_name()
@@ -345,7 +345,7 @@ class testing(unittest.TestCase):
         t.tracker_group_id = tracker_group_id
         tracker_id = create_tracker(self.session,t)
         
-        my_service =  NotificationService
+        my_service = NotificationService
         td = NotificationService(my_service).get_tracker_data(tracker_id)
         
         self.assertEqual(td.css_selector,my_css_selector)
@@ -372,7 +372,7 @@ class testing(unittest.TestCase):
         t.tracker_group_id = tracker_group_id
         tracker_id = create_tracker(self.session,t)
 
-        my_service =  NotificationService
+        my_service = NotificationService
         td = NotificationService(my_service).notify_no_tracker(tracker_id)
 
         print "Email values:-"
@@ -403,7 +403,7 @@ class testing(unittest.TestCase):
 
         old_content = test_prefix("Old")
         new_content = test_prefix("New")
-        my_service =  NotificationService
+        my_service = NotificationService
         td = NotificationService(my_service).notify_tracker_updated(tracker_id, old_content, new_content)
 
         print "Email values:-"
@@ -413,7 +413,7 @@ class testing(unittest.TestCase):
         print new_content
         print "(end)"
 
-        self.assertTrue(td)    
+        self.assertTrue(td)
 
     def test_request_registration(self):
         test_name ("Request Registration")
@@ -424,56 +424,15 @@ class testing(unittest.TestCase):
         self.session.add(reg)
         reg_id = reg.reg_id
         test_url = "http://fake.kgenie.com"
-        my_service =  NotificationService
+        my_service = NotificationService
         my_ok = NotificationService(my_service).request_registration (reg_id, test_url)
         self.assertTrue(my_ok)
         print "Check for email to %s" % u.email
 
-    def test_send_mail(self):
-    # Will require manual checking of email content
-        test_name ("Send mail")
-        my_to = mail_args.to
-        my_from = mail_args.sender
-                        
-        my_subject = "Simple mail: " + test_name()
-        my_content = "Content: " + test_name()
-        my_service =  NotificationService
-        td = NotificationService(my_service).send_mail (my_to, my_subject, my_content, None, None, my_from)
-        
-        print "Email values:-"
-        print my_to
-        print my_subject
-        print my_content
-        print my_from
-        print "(end)"
-        
-        
-                
-        self.assertTrue(td)
-        
-    def test_send_template_mail(self):
-    # Will require manual checking of email content
-        test_name ("Send template mail")
-        my_to = mail_args.to
-
-        my_subject = "Template mail: " + test_name()
-        my_template = mail_args.template_name
-        my_url = generate_url()
-        my_context = { 'url': my_url }
-        my_service =  NotificationService
-        td = NotificationService(my_service).send_template_mail (my_to, my_subject, my_template, my_context)
-        
-        print "Email values:-"
-        print my_to
-        print my_subject
-        print my_url
-        print "(end)"
-               
-        self.assertTrue(td)
         
     
             
-run_once()    
+run_once()
     
 if __name__ == '__main__':
     unittest.main()
