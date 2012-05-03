@@ -59,10 +59,6 @@ class Mailer(ControllableDaemon):
         
         msg = MIMEText(mail_content, mail_mime, mail_charset)
         
-        print "mailer"
-        print mail_mime
-        print mail_charset
-            
         msg['Subject'] = mail_subject
                 
         if mail_from:
