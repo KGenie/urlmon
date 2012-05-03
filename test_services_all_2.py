@@ -4,14 +4,13 @@ Unit Test for Services.
 This is an initial shallow test. It tests basic functions,e.g : Is record created? Does it retrieve?
 It does not do comprehensive tests on every single column.
 
-Be warned: produces many rows of data! 
+Be warned: produces many rows of data!
 
 '''
 import env
 
 from database.sqlalch import Session
  
-from models.registration import Registration
 from models.task import Task
 from models.tracker import Tracker
 from models.tracker_group import TrackerGroup
@@ -20,7 +19,6 @@ from models.user import User
 from models.webpage import Webpage
 
 
-from services.registration import RegistrationService
 from services.tracker import TrackerService
 from services.tracker_group import TrackerGroupService
 from services.user import UserService
@@ -166,7 +164,7 @@ class testing(unittest.TestCase):
         try:
             self.session.commit()
         except:
-            print test_name() + " commit failed" 
+            print test_name() + " commit failed"
             self.assertTrue(0)
             
     
@@ -227,18 +225,11 @@ class testing(unittest.TestCase):
         self.assertEqual (my_email, my_comment)
            
         
-    def test_user_authenticate(self):
-    # Unit testing not possible. This is because the Service references context data which cannot be emulated in unit-test. Accordingly test is set to fail.
-        test_name ("User Authenticate")
-    # Test unworkable because of project structure. Fudged to fai.
-        my_id = 0
-#       my_id = my_service.registration_request(self.session,rowdata)
-        self.assertTrue(my_id,"Test not workable because of context issues")
-        
+    
     
     def test_user_exists_fake(self):
         test_name ("User Exists fake")
-        my_service = UserService 
+        my_service = UserService
         my_email = generate_email()
         my_ok = UserService(my_service).exists(my_email)
         self.assertTrue(not(my_ok))
@@ -246,7 +237,7 @@ class testing(unittest.TestCase):
     def test_user_exists(self):
         test_name ("User Exists")
         u = User()
-        my_service = UserService 
+        my_service = UserService
         my_email = generate_email()
         u.email = my_email
         create_user(self.session,u)
@@ -285,12 +276,12 @@ class testing(unittest.TestCase):
         self.assertEqual(my_email,my_row.email)
         
     def test_webpage_get(self):
-        test_name ("Webpage get")        
+        test_name ("Webpage get")
         my_url = generate_url()
         webpage_create (self.session,my_url)
         self.assertTrue (webpage_check(self.session,my_url))
 
-run_once()    
+run_once()
     
 if __name__ == '__main__':
     unittest.main()
