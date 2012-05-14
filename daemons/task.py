@@ -25,7 +25,7 @@ from lxml import etree, html
 from database.sqlalch import Session
 from hashlib import sha1
 from htmldiff import change_start_index, htmldiff
-from services.notifications import NotificationService
+from services.notification import NotificationService
 
 __logger = logging.getLogger('daemons.task')
 debug = __logger.debug
