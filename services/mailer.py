@@ -3,22 +3,19 @@ Mail Service
 
 29-05-2012, Andy    NEW
 
-Sends mail asychronously (but pool process still being understood)
+Sends mail asychronously via Pool module.
+Returns the Pool Worker object. 
+This can be processed by the caller to ensure that mailing has been completed.
 
 '''
 
 import smtplib, logging, app_globals, os
 from traceback import format_exc
 from multiprocessing.dummy import Pool
+from time import sleep
 from email.mime.text import MIMEText
 
-from app_components.service import Service
-
-__logger = logging.getLogger('daemons.controllable.mailer')
-debug = __logger.debug
-warn = __logger.warn
-error = __logger.error
-info = __logger.info
+from storage import StorageService
 
 def smtp_params():
     null = 0
@@ -29,7 +26,7 @@ smtp_params.port = 587
 smtp_params.username = 'oval@a222.co.uk'
 smtp_params.password = 'gates98'
 
-class MailerService(Service):
+class MailerService(StorageService):
     
     def __send_mail (self, mail_to, mail_subject, mail_content="", mail_mime='PLAIN', mail_charset='utf-8',mail_from=None):
     # Send a mail in specified format. Argument mail_from may be used to override the default 'from' mail in the SMTP setup.
@@ -63,9 +60,10 @@ class MailerService(Service):
         
         
     def send_mail (self, mail_to, mail_subject, mail_content=None, mail_mime=None, mail_charset=None,mail_from=None):
-        self.threads = 3
+# Creates an async worker to process the call. Returns worker object.
+        self.threads = 2
         self.pool = Pool(self.threads)
-        
+
         my_print = self.pool.apply_async(self.__send_mail, args=(mail_to, mail_subject, mail_content, mail_mime, mail_charset,mail_from))
+        return my_print
         
-        return 1
