@@ -1,5 +1,5 @@
 '''
-20-04-2012, Andy NEW
+20-04-2012, Andy NEW.
 
 Notification service replaces individual email calls.
 
@@ -13,7 +13,7 @@ import re
 
 from storage import StorageService
 
-from daemons.mailer import DAEMON as mailer_daemon
+
 
 from email.mime.text import MIMEText
 
@@ -25,6 +25,8 @@ from models.registration import Registration
 from models.tracker_group import TrackerGroup
 from models.tracker import Tracker
 from models.user import User
+
+from services.mailer import MailerService
 
 import smtplib, logging, app_globals, os
 
@@ -144,10 +146,9 @@ class NotificationService(StorageService):
                 {'activation_link': activation_link})
         
         
-    def send_template_mail(self, to, subject, template_name,
-    # Send a templated mail Argument mail_from may be used to override the default 'from' mail in the SMTP setup.
+    def send_template_mail(self, to, subject, template_name,   
         template_context, mime='html', charset='utf-8',mail_from=None):
-
+# Send a templated mail Argument mail_from may be used to override the default 'from' mail in the SMTP setup.
         # Normalize template context
         for k, v in template_context.items():
             if isinstance(v, str):
@@ -158,6 +159,7 @@ class NotificationService(StorageService):
         templ = env.get_template(template_name + '.jinja2')
 
         text = templ.render(template_context)
-        return mailer_daemon.send_mail(to, subject, text, mime, charset, mail_from)
+        my_service = MailerService
+        return MailerService(my_service).send_mail(to, subject, text, mime, charset, mail_from)
 
 app_globals.JINJA_EMAIL_ENV = make_jinja_email_environment()
