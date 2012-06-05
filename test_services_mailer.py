@@ -2,16 +2,12 @@
 '''
 
 28-May-2012, Andy, new file. 
+04-Jun-2012, Andy, removed incorrect comments.
 
 '''
 
 '''
 Unit test for mailer service.
-
-This is an initial shallow test. It tests basic functions,e.g : Is record created? Does it retrieve?
-It does not do comprehensive tests on every single column.
-
-Be warned: produces many rows of data! 
 
 NOTE. You can change the destination email and return address by altering mail_args 
 
@@ -26,7 +22,7 @@ from services.mailer import MailerService
 
 import time
 
-import unittest
+
 
 #########################################################################################
 
@@ -36,7 +32,7 @@ def generate_email():
     return test_name_lc() + "@kgenie.com"
 
 def get_mailto(arg_string):
-    return arg_string + "_kg@polardog.co.uk"
+    return arg_string + "_kg@triumphacclaim.co.uk"
     
     
 def print_number (my_text, my_number):
@@ -82,89 +78,66 @@ def test_prefix(my_prefix):
 # increment counter and return appended to supplied string.
     return my_prefix + "_" + str(test_next())
 
+def test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from):
+    print "To:" + mail_to
+    print "Subject:" + mail_subject
+    print "Content:" + mail_content
+    print "Charset:" + mail_charset
+    print "Mime:" + mail_mime
+    print "From:" + mail_from
 
-
-
-#########################################################################################
+    #########################################################################################
 
     
 
-class testing(unittest.TestCase):
-
-    def test_charset(self):
-        test_name("Charset test")
+class testing():
+    
+    def test_charset_japanese(self):
+        test_name("Charset Japanese test")
         mail_to = get_mailto(test_prefix("kg"))
         mail_subject = test_name()
         mail_charset = "shift-jis"
         mail_mime = "PLAIN"
+        mail_from = "(default)"
         mail_content = mail_subject + " Japanese: " + mail_charset
         my_service = MailerService
-        my_result = MailerService(my_service).send_mail (mail_to, mail_subject, mail_content, mail_mime, mail_charset)
-        print "Mail details"
-        print mail_to
-        print mail_subject
-        print mail_content
-        print mail_mime
-        print mail_charset
-        self.assertTrue(my_result)
+        my_result = MailerService(my_service).send_mail (mail_to, mail_subject, mail_content, None, mail_charset)
+        test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from)
         my_result.get()
    
-    
-    def test_default(self):
-        test_name("Default settings")
-        mail_to = get_mailto(test_prefix("kg"))
-        mail_subject = test_name()
-        mail_charset = "utf-8"
-        mail_mime = "PLAIN"
-        mail_content = mail_subject + " " + mail_mime + " " + mail_charset
-        my_service = MailerService
-        my_result = MailerService(my_service).send_mail (mail_to, mail_subject, mail_content)
-        print "Mail details"
-        print mail_to
-        print mail_subject
-        print mail_content
-        print mail_mime
-        print mail_charset
-        self.assertTrue(my_result)    
-        my_result.get()    
-    
     def test_from(self):
         test_name("Specific FROM address")
         mail_to = get_mailto(test_prefix("kg"))
-        mail_from = test_prefix("kgfrom") + "@polardog.co.uk
+        mail_from = test_prefix("kgfrom") + "@polardog.co.uk"
         mail_subject = test_name()
+        mail_mime = "PLAIN"
+        mail_charset = "utf-8"
         mail_content = mail_subject + " "  + mail_from
         my_service = MailerService
         my_result = MailerService(my_service).send_mail(mail_to, mail_subject, mail_content, None, None, mail_from)
-        print "Mail details"
-        print mail_to
-        print mail_subject
-        print mail_content
-        print mail_from
-        self.assertTrue(my_result)
+        test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from)
         my_result.get()
 
             
-    def test_mime(self):
+    def test_mime_html(self):
         test_name("MIME test")
         mail_to = get_mailto(test_prefix("kg"))
         mail_subject = test_name()
         mail_charset = "utf-8"
         mail_mime = "HTML"
+        mail_from = "(default)"
         mail_content = mail_subject + " " + mail_mime + " " + mail_charset
         my_service = MailerService
         my_result = MailerService(my_service).send_mail(mail_to, mail_subject, mail_content, mail_mime)
-        print "Mail details"
-        print mail_to
-        print mail_subject
-        print mail_content
-        print mail_mime
-        print mail_charset
-        self.assertTrue(my_result)
+        test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from)
         my_result.get()
-       
-if __name__ == '__main__':
-    unittest.main()
     
-
+    for each_method in dir():
+        if each_method[:5] == "test_":
+            my_command = each_method + "(-1)"
+            exec my_command
+    
+       
+       
+print "Please check email for results"
     
