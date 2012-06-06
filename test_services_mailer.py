@@ -21,7 +21,7 @@ import os
 from services.mailer import MailerService
 
 import time
-
+from collections import namedtuple
 
 
 #########################################################################################
@@ -78,66 +78,58 @@ def test_prefix(my_prefix):
 # increment counter and return appended to supplied string.
     return my_prefix + "_" + str(test_next())
 
-def test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from):
-    print "To:" + mail_to
-    print "Subject:" + mail_subject
-    print "Content:" + mail_content
-    print "Charset:" + mail_charset
-    print "Mime:" + mail_mime
-    print "From:" + mail_from
-
     #########################################################################################
 
     
+#TRICK: using 'mail_from because 'from' is a forbidden variable name in python
+mail_data= namedtuple('mail','to subject charset mime mail_from test_name')
 
-class testing():
+class test_mailer_service:
     
     def test_charset_japanese(self):
-        test_name("Charset Japanese test")
-        mail_to = get_mailto(test_prefix("kg"))
-        mail_subject = test_name()
-        mail_charset = "shift-jis"
-        mail_mime = "PLAIN"
-        mail_from = "(default)"
-        mail_content = mail_subject + " Japanese: " + mail_charset
+        mail = {'to' : get_mailto(test_prefix("kg")) ,
+		'subject' : test_name() ,
+		'charset' : "shift-jis" ,
+		'mime' : "PLAIN" ,
+		'mail_from' : None , 
+		'test_name' : "Charset Japanese test",}
+        self.testhelper_sendmail_data(mail)
+
+    def testhelper_sendmail_data(self,mail):
+	mail = mail_data(**mail)
+	test_name(mail.test_name);
         my_service = MailerService
-        my_result = MailerService(my_service).send_mail (mail_to, mail_subject, mail_content, None, mail_charset)
-        test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from)
+        my_result = MailerService(my_service).send_mail (mail.to, mail.test_name, str(mail), mail.charset, mail.mime,mail.mail_from)
+        print str(mail)
         my_result.get()
    
     def test_from(self):
-        test_name("Specific FROM address")
-        mail_to = get_mailto(test_prefix("kg"))
-        mail_from = test_prefix("kgfrom") + "@polardog.co.uk"
-        mail_subject = test_name()
-        mail_mime = "PLAIN"
-        mail_charset = "utf-8"
-        mail_content = mail_subject + " "  + mail_from
-        my_service = MailerService
-        my_result = MailerService(my_service).send_mail(mail_to, mail_subject, mail_content, None, None, mail_from)
-        test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from)
-        my_result.get()
+        mail={ 'test_name' : "Specific FROM address",
+               'to' : get_mailto(test_prefix("kg")),
+               'mail_from' : test_prefix("kgfrom") + "@polardog.co.uk",
+               'subject' : test_name(),
+               'mime' : "PLAIN",
+               'charset' : "utf-8",}
+        self.testhelper_sendmail_data(mail)
 
-            
     def test_mime_html(self):
-        test_name("MIME test")
-        mail_to = get_mailto(test_prefix("kg"))
-        mail_subject = test_name()
-        mail_charset = "utf-8"
-        mail_mime = "HTML"
-        mail_from = "(default)"
-        mail_content = mail_subject + " " + mail_mime + " " + mail_charset
-        my_service = MailerService
-        my_result = MailerService(my_service).send_mail(mail_to, mail_subject, mail_content, mail_mime)
-        test_results (mail_to,mail_subject, mail_content,  mail_charset,  mail_mime, mail_from)
-        my_result.get()
-    
-    for each_method in dir():
+        mail={ 'test_name' : "MIME test",
+               'to' : get_mailto(test_prefix("kg")),
+               'subject' : test_name(),
+               'charset' : "utf-8",
+               'mime' : "HTML",
+               'mail_from' : "(default)",}
+        self.testhelper_sendmail_data(mail)
+
+    def run(self):
+      for each_method in dir(self):
         if each_method[:5] == "test_":
-            my_command = each_method + "(-1)"
+            my_command = "self." + each_method + "()"
             exec my_command
     
-       
+if __name__ == '__main__':
+  a= test_mailer_service()
+  a.run()       
        
 print "Please check email for results"
     
