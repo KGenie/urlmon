@@ -3,6 +3,7 @@
 
 28-May-2012, Andy, new file. 
 04-Jun-2012, Andy, removed incorrect comments.
+06-jun-2012, Fred, refactored
 
 '''
 
@@ -96,12 +97,12 @@ class test_mailer_service:
         self.testhelper_sendmail_data(mail)
 
     def testhelper_sendmail_data(self,mail):
-	mail = mail_data(**mail)
-	test_name(mail.test_name);
+        mail = mail_data(**mail)
+        test_name(mail.test_name);
         my_service = MailerService
         my_result = MailerService(my_service).send_mail (mail.to, mail.test_name, str(mail), mail.charset, mail.mime,mail.mail_from)
         print str(mail)
-        my_result.get()
+  
    
     def test_from(self):
         mail={ 'test_name' : "Specific FROM address",
@@ -118,8 +119,17 @@ class test_mailer_service:
                'subject' : test_name(),
                'charset' : "utf-8",
                'mime' : "HTML",
-               'mail_from' : "(default)",}
+               'mail_from' : None,}
         self.testhelper_sendmail_data(mail)
+        
+    def test_shutdown(self):
+        print
+        print "Shutdown"
+        my_service = MailerService
+        my_result = MailerService(my_service).shutdown()
+        print "Ensure no Thread exceptions occur. Will need to run several times"
+        print "Check that Shutdown emails (see Mailer service module code) are sent after other emails"
+        
 
     def run(self):
       for each_method in dir(self):
