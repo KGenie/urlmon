@@ -19,6 +19,8 @@ import env
 
 from database.sqlalch import Session
 from datetime import datetime
+
+from time import sleep
  
 from models.registration import Registration
 from models.task import Task
@@ -26,6 +28,7 @@ from models.tracker import Tracker
 from models.tracker_change import TrackerChange
 from models.tracker_group import TrackerGroup
 from models.track_resource import TrackResource
+from models.update_resource import UpdateResource
 from models.user import User
 from models.webpage import Webpage
 from models.webpage_version import WebpageVersion
@@ -203,7 +206,7 @@ def mail_args():
     null = 0
     
 mail_args.sender = "kgfrom@a222.biz"
-mail_args.to = "kgto@a222.biz"
+mail_args.to = "_kgto@polardog.co.uk"
 mail_args.template_name = "tracker_not_found"
 
  
@@ -269,12 +272,19 @@ def webpage_check (session, my_url):
 def run_once():
     session = Session()
     print "Initial reset"
+    
+    my_result = session.query(UpdateResource).filter(UpdateResource.id > 0)
+    for my_row in my_result:
+        session.delete(my_row)
+    
     my_result = session.query(TrackResource).filter(TrackResource.tracker_id > 0)
     for my_row in my_result:
         session.delete(my_row)
-        
+
     session.query(TrackerChange).filter(TrackerChange.id > 0).delete()
+    session.query(TrackerChange).filter(TrackerChange.id < 1).delete()
     session.query(Task).filter(Task.id > 0).delete()
+    session.query(Task).filter(Task.id < 1).delete()
     session.query(Tracker).filter(Tracker.id > 0).delete()
     
     
@@ -304,17 +314,19 @@ class testing(unittest.TestCase):
         self.session = Session()
               
     def tearDown(self):
+        sleep(5)
         try:
             self.session.commit()
             print test_name() + " committed"
         except:
             print test_name() + " commit failed"
             self.assertTrue(0)
+        
 
     def test_confirm_registration(self):
         test_name("Confirm Registration")
         u = User()
-        my_email = test_prefix("kg") + "@a222.biz"
+        my_email = test_prefix("kg") + mail_args.to
         u.email = my_email
         my_user_id = create_user(self.session,u)
         my_url = "http://notification_test.kgenie.com"
@@ -357,7 +369,7 @@ class testing(unittest.TestCase):
         test_name("Notify No tracker")
 
         u = User()
-        my_email = test_prefix("kg") + "@a222.biz"
+        my_email = test_prefix("kg") + mail_args.to
         u.email = my_email
         my_user_id = create_user(self.session,u)
         tg = TrackerGroup()
@@ -386,7 +398,7 @@ class testing(unittest.TestCase):
         test_name("Notify Tracker updated")
 
         u = User()
-        my_email = test_prefix("kg") + "@a222.biz"
+        my_email = test_prefix("kg") + mail_args.to
         u.email = my_email
         my_user_id = create_user(self.session,u)
         tg = TrackerGroup()
@@ -418,7 +430,7 @@ class testing(unittest.TestCase):
     def test_request_registration(self):
         test_name ("Request Registration")
         u = User()
-        u.email = test_prefix ("kg") + "@a222.biz"
+        u.email = test_prefix ("kg") + mail_args.to
         reg = Registration(u)
         reg.email = u.email
         self.session.add(reg)
@@ -429,10 +441,18 @@ class testing(unittest.TestCase):
         self.assertTrue(my_ok)
         print "Check for email to %s" % u.email
 
+    def test_shutdown(self):
+        test_name ("Shutdown")
+        my_service = NotificationService
+        my_ok = NotificationService(my_service).shutdown()
+        self.assertTrue(my_ok)
+        print "Check for shutdown emails."
         
-    
             
 run_once()
     
 if __name__ == '__main__':
     unittest.main()
+    
+print "Completed"
+

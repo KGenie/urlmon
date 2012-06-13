@@ -2,6 +2,7 @@
 Mail Service
 
 29-05-2012, Andy    NEW
+13-05-2012, Andy    Added reply to .shutdown, added sleep to .shutdown
 
 Sends mail asychronously via Pool module.
 Returns the Pool Worker object. 
@@ -14,6 +15,8 @@ from traceback import format_exc
 from multiprocessing.dummy import Pool
 
 from email.mime.text import MIMEText
+
+from time import sleep
 
 from storage import StorageService
 
@@ -89,6 +92,7 @@ class MailerService(StorageService):
 # Using pool size plus one ensures flushing.
         my_count = pool_params.threads + 1
         while my_count > 0:
+            sleep(1)
             my_subject = shutdown_params.subject + "-" + str(my_count)
             my_worker = self.pool.apply_async(self.__send_mail, args=(shutdown_params.email, my_subject))
             my_worker.get()
@@ -97,4 +101,5 @@ class MailerService(StorageService):
         self.pool.close()
         self.pool.join()
               
-        
+        return True
+    

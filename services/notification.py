@@ -1,5 +1,6 @@
 '''
 20-04-2012, Andy NEW.
+13-06-2012, Andy, added shutdown.
 
 Notification service replaces individual email calls.
 
@@ -161,5 +162,13 @@ class NotificationService(StorageService):
         text = templ.render(template_context)
         my_service = MailerService
         return MailerService(my_service).send_mail(to, subject, text, mime, charset, mail_from)
+    
+    def shutdown(self):
+# Shutdown the various services used by notification.
+        my_service = MailerService
+        return MailerService(my_service).shutdown()
+    
+
+
 
 app_globals.JINJA_EMAIL_ENV = make_jinja_email_environment()
