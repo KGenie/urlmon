@@ -1,12 +1,12 @@
 '''
-Mail Service
+Pools experimentation
 
-29-05-2012, Andy    NEW
-13-05-2012, Andy    Added reply to .shutdown, added sleep to .shutdown
+14-06-2012, Andy    NEW
+14-06-2012, Andy    Improved comments
 
-Sends mail asychronously via Pool module.
-Returns the Pool Worker object. 
-This can be processed by the caller to ensure that mailing has been completed.
+Experiments with Pool 
+
+You can adjust pool_params.threads to change number of async processes and see how behaviour changes.
 
 '''
 
@@ -54,10 +54,10 @@ my_test = 0
 test_max = pool_params.threads + 1
 while my_test < test_max:
     my_test = my_test + 1
-    my_worker = pool.apply_async(pool_test, args = (my_test,1))
+    my_worker = pool.apply_async(pool_test, args = (my_test,0))
     show_test(my_test,"Shutdown")
 
-# Wait for last one to complete.
+
 sleep(1)
 
 
