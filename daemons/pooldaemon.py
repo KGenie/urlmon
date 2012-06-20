@@ -54,7 +54,7 @@ class PoolDaemon(object):
             except:
                 daemon_active = False
         
-        print "Closing down"
+        print "%s not found: closing down" % control_file
         self.shutdown(pool)
         print "Finished"  
 

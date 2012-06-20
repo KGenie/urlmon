@@ -16,6 +16,8 @@ class ScraperDaemon(PoolDaemon):
 # Run scraper 1 and 2 concurrently
         pool_object.apply_async(self.scraper1_process)      
         pool_object.apply_async(self.scraper2_process)
+        pool_object.apply_async(self.scraper3_process)      
+        pool_object.apply_async(self.scraper4_process)
 # but wait for completion before queueing any more 
         self.shutdown(pool_object)
         
@@ -31,6 +33,19 @@ class ScraperDaemon(PoolDaemon):
         print "Scraper2 started"
         sleep(5)
         print "Scraper2 ended"
+
+    def scraper3_process(self):
+
+        print "Scraper3 started"
+        sleep(5)
+        print "Scraper3 ended"
+
+    def scraper4_process(self):
+
+        print "Scraper4 started"
+        sleep(5)
+        print "Scraper4 ended"
+
 
 DAEMON = ScraperDaemon()
    
