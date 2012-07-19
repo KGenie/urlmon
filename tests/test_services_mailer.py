@@ -13,11 +13,10 @@ Unit test for mailer service.
 NOTE. You can change the destination email and return address by altering mail_args 
 
 '''
-import env 
+
+import env
 
 import config
-
-import os
 
 from services.mailer import MailerService
 
