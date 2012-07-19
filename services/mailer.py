@@ -19,6 +19,7 @@ from email.mime.text import MIMEText
 from time import sleep
 
 from storage import StorageService
+from threadpool import ThreadPool 
 
 def pool_params():
     null = 0
@@ -41,11 +42,13 @@ smtp_params.port = 587
 smtp_params.username = 'oval@a222.co.uk'
 smtp_params.password = 'gates98'
 
+thread_pool = ThreadPool
+
 class MailerService(StorageService):
     
     def __init__(self,*args, **kwargs):
-        self.pool = Pool(pool_params.threads)
-
+        pool_params.pool = ThreadPool(thread_pool).startup(pool_params.threads)
+    
     def __no_operation(self):
 # Dummy call used in shutdown
         pass
@@ -83,23 +86,10 @@ class MailerService(StorageService):
         
     def send_mail (self, mail_to, mail_subject, mail_content=None, mail_mime=None, mail_charset=None,mail_from=None):
 # Creates an async worker to process the call. Returns worker object.
-        my_print = self.pool.apply_async(self.__send_mail, args=(mail_to, mail_subject, mail_content, mail_mime, mail_charset,mail_from))
+        my_print = pool_params.pool.apply_async(self.__send_mail, args=(mail_to, mail_subject, mail_content, mail_mime, mail_charset,mail_from))
         return my_print
     
-    
+   
     def shutdown (self):
-# Flush the pool by running dummy processes
-# Using pool size plus one ensures flushing.
-        my_count = pool_params.threads + 1
-        while my_count > 0:
-            sleep(1)
-            my_subject = shutdown_params.subject + "-" + str(my_count)
-            my_worker = self.pool.apply_async(self.__send_mail, args=(shutdown_params.email, my_subject))
-            my_worker.get()
-            my_count = my_count - 1
-# Closes down the pools.
-        self.pool.close()
-        self.pool.join()
-              
-        return True
+        return ThreadPool(thread_pool).shutdown(pool_params.pool)
     
